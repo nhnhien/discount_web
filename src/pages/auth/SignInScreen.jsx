@@ -32,6 +32,7 @@ const SignInScreen = () => {
   const handleLogout = async () => {
     await signOut(auth);
     setUser(null);
+    console.log(user);
     localStorage.removeItem("user");
   };
 

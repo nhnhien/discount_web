@@ -1,10 +1,13 @@
-import { Button } from "antd";
-import SignInScreen from "./pages/auth/SignInScreen";
+import { RouterProvider } from 'react-router-dom';
+import mainRouter from './router/router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 function App() {
   return (
-    <div className="text-red-900 text-2xl">
-      <SignInScreen />
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={mainRouter} />
+    </QueryClientProvider>
   );
 }
 
