@@ -7,6 +7,7 @@ import { AdminLayout } from '../admin/components/layout';
 import { DashboardAdmin } from '../admin/features/dashboard';
 import { ProductManager } from '../admin/features/product';
 import NotFoundScreen from '../pages/NotFoundScreen';
+import ProductEditor from '../admin/features/product/ProductEditor';
 
 const mainRouter = createBrowserRouter([
   {
@@ -42,6 +43,14 @@ const mainRouter = createBrowserRouter([
       {
         path: 'product',
         element: <ProductManager />,
+      },
+      {
+        path: 'product/create',
+        element: <ProductEditor />,
+      },
+      {
+        path: 'product/edit/:id',
+        element: <ProductEditor />,
       },
       {
         path: '*',
