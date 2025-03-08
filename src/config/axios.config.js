@@ -28,8 +28,5 @@ apiClient.interceptors.response.use(
   },
 );
 
-<<<<<<< HEAD
+
 export default apiClient;
-=======
-export default apiClient;
->>>>>>> 578b5de (update: UI admin)

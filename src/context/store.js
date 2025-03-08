@@ -33,8 +33,5 @@ export const store = configureStore({
     }),
 });
 
-<<<<<<< HEAD
+
 export let persistor = persistStore(store);
-=======
-export let persistor = persistStore(store);
->>>>>>> 578b5de (update: UI admin)

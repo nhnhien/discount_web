@@ -38,13 +38,9 @@ const AdminHeader = () => {
         />
 
         <Popover content={menu} trigger='click'>
-<<<<<<< HEAD
-        <Button type='text' className='text-white hover:text-red-500 flex items-center space-x-2'>   
-                 <span className='font-semibold'>Xin chào, Admin</span>
-=======
+
           <Button type='text' className='text-white hover:text-red-500 flex items-center space-x-2'>
             <span className='font-semibold'>Xin chào, Admin</span>
->>>>>>> 578b5de (update: UI admin)
             <DownOutlined />
           </Button>
         </Popover>

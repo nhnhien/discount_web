@@ -36,8 +36,5 @@ const AdminNavigationItems = [
   },
 ];
 
-<<<<<<< HEAD
+
 export { AdminNavigationItems };
-=======
-export { AdminNavigationItems };
->>>>>>> 578b5de (update: UI admin)

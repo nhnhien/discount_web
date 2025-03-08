@@ -3,10 +3,8 @@ import mainRouter from './router/router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
-<<<<<<< HEAD
-=======
 
->>>>>>> 578b5de (update: UI admin)
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -15,8 +13,5 @@ function App() {
   );
 }
 
-<<<<<<< HEAD
+
 export default App;
-=======
-export default App;
->>>>>>> 578b5de (update: UI admin)

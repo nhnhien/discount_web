@@ -13,29 +13,19 @@ const AdminLayout = () => {
           <AdminSidebar />
         </div>
         <main className='flex-1 p-4 overflow-auto bg-content-admin ml-[260px]'>
-<<<<<<< HEAD
-        <div className='mt-8 ml-2'>
-=======
+
           <div className='mt-8 ml-2'>
->>>>>>> 578b5de (update: UI admin)
             <Breadcrumbs />
           </div>
           <div className='mt-10'>
             <Outlet />
-<<<<<<< HEAD
-          </div>        
-          </main>
-=======
+
           </div>
         </main>
->>>>>>> 578b5de (update: UI admin)
       </div>
     </div>
   );
 };
 
-<<<<<<< HEAD
+
 export default AdminLayout;
-=======
-export default AdminLayout;
->>>>>>> 578b5de (update: UI admin)

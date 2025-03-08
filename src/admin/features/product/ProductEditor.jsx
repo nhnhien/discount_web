@@ -1,24 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-<<<<<<< HEAD
- import { Form, Input, Button, Select, Switch, Row, Col, Collapse, message } from 'antd';
- import { DeleteOutlined } from '@ant-design/icons';
-=======
+
 import { Form, Input, Button, Select, Switch, Row, Col, Collapse, message, ColorPicker } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
->>>>>>> 578b5de (update: UI admin)
 import { useForm, Controller, useFieldArray, set } from 'react-hook-form';
 import SaveBar from '../../components/savebar/Savebar';
 import { v4 as uuidv4 } from 'uuid';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { uploadImage } from '../../../service/upload';
 import { getCategory } from '../../../service/category';
-<<<<<<< HEAD
- import { getMarket } from '../../../service/market';
- import { createProduct } from '../../../service/product';
- import { useNavigate } from 'react-router-dom';
- import Loading from '../../../components/loading/Loading';
- import ImageUploader from './ImageUploader';
-=======
 import { getMarket } from '../../../service/market';
 import { createProduct } from '../../../service/product';
 import { useNavigate } from 'react-router-dom';
@@ -26,7 +15,6 @@ import Loading from '../../../components/loading/Loading';
 import ImageUploader from './ImageUploader';
 import { color } from 'framer-motion';
 
->>>>>>> 578b5de (update: UI admin)
 const { Option } = Select;
 const { Panel } = Collapse;
 
@@ -44,13 +32,9 @@ const ProductEditor = () => {
     market: '',
     price: '',
     image: '',
-<<<<<<< HEAD
-     image_url: '',
-     name: '',
-=======
+
     image_url: '',
     name: '',
->>>>>>> 578b5de (update: UI admin)
     sku: '',
     stock: '',
     variants: [
@@ -61,12 +45,10 @@ const ProductEditor = () => {
         stock: '',
         image: null,
         description: '',
-<<<<<<< HEAD
-=======
+
         size: '',
         color: '',
         material: '',
->>>>>>> 578b5de (update: UI admin)
       },
     ],
   };
@@ -116,12 +98,10 @@ const ProductEditor = () => {
       stock: '',
       image: null,
       description: '',
-<<<<<<< HEAD
-=======
+
       size: '',
       color: '',
       material: '',
->>>>>>> 578b5de (update: UI admin)
     });
   };
 
@@ -134,28 +114,7 @@ const ProductEditor = () => {
     },
     onError: (error) => {
       message.error('Có lỗi khi tạo sản phẩm!');
-<<<<<<< HEAD
-       console.error('Create Product Error:', error);
-    },
-  });
-  const { isPending } = createMutation;
-  const onSubmit = async (data) => {
-    console.log(data);
-    if (!data.hasVariants) {
-      const productData = {
-        name: data.name,
-        description: data.description,
-        category_id: data.category,
-        market_id: data.market,
-        image_url: data.image_url,
-        has_variants: data.hasVariants,
-        original_price: data.price,
-        final_price: data.price,
-        stock_quantity: data.stock,
-      };
-      await createMutation.mutateAsync(productData);
-    }
-=======
+
       console.error('Create Product Error:', error);
     },
   });
@@ -204,98 +163,11 @@ const ProductEditor = () => {
 
     console.log('productData', productData);
     await createMutation.mutateAsync(productData);
->>>>>>> 578b5de (update: UI admin)
   };
 
   const renderVariants = () => (
     <>
-<<<<<<< HEAD
-    {isPending && <Loading />}
-    <div className='mt-4 p-4 bg-white border rounded-md shadow-md'>
-      <h2 className='text-xl font-semibold mb-4 text-blue-700'>Quản lý biến thể</h2>
-      <Collapse defaultActiveKey={['0']} accordion>
-        {fields.map((field, index) => (
-          <Panel
-            header={`Biến thể ${index + 1}`}
-            key={field.id}
-            extra={
-              fields.length > 1 && (
-                <Button danger icon={<DeleteOutlined />} onClick={() => remove(index)}>
-                  Xóa
-                </Button>
-              )
-            }
-          >
-            <Row gutter={24}>
-              <Col span={8}>
-                <Form.Item label='SKU' required>
-                  <Controller
-                    name={`variants[${index}].sku`}
-                    control={control}
-                    rules={{ required: 'Vui lòng nhập SKU' }}
-                    render={({ field }) => <Input {...field} placeholder='SKU' />}
-                  />
-                  {errors.variants?.[index]?.sku && (
-                    <span className='text-red-500'>{errors.variants[index].sku.message}</span>
-                  )}
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label='Giá'>
-                  <Controller
-                    name={`variants[${index}].price`}
-                    control={control}
-                    render={({ field }) => <Input {...field} placeholder='Nhập giá' />}
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Form.Item label='Tồn kho'>
-                  <Controller
-                    name={`variants[${index}].stock`}
-                    control={control}
-                    render={({ field }) => <Input {...field} placeholder='Nhập tồn kho' />}
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
 
-            <Form.Item label='Ảnh biến thể'>
-                 <Controller
-                   name={`variants[${index}].image_url`}
-                   control={control}
-                   render={({ field }) => <ImageUploader value={field.value || undefined} onChange={field.onChange} />}
-                 />
-               </Form.Item>
-             </Panel>
-           ))}
-         </Collapse>
-
-         <Button type='primary' onClick={handleAddVariant} disabled={!isLastVariantFilled()} className='mt-4'>
-           Thêm biến thể
-         </Button>
-       </div>
-     </>
-  );
-
-
-  return (
-    <div className='bg-white p-4 shadow-md rounded-md max-h-[800px]'>
-      <SaveBar
-         onSave={handleSubmit(onSubmit)}
-         title={'Thêm sản phẩm'}
-         onDiscard={() => reset()}
-         visible={isFormChanged}
-       />
-             <h1 className='text-2xl font-semibold mb-4 text-center text-blue-700'>Thêm sản phẩm</h1>
-
-      <Form onFinish={handleSubmit(onSubmit)} layout='vertical' className='max-w-[1200px] mx-auto'>
-        <Row gutter={100}>
-          <Col span={12}>
-            <Form.Item label='Tên sản phẩm'>
-              <Controller
-                name='name'                control={control}
-=======
       {isPending && <Loading />}
       <div className='mt-4 p-4 bg-white border rounded-md shadow-md'>
         <h2 className='text-xl font-semibold mb-4 text-blue-700'>Quản lý biến thể</h2>
@@ -425,7 +297,6 @@ const ProductEditor = () => {
               <Controller
                 name='name'
                 control={control}
->>>>>>> 578b5de (update: UI admin)
                 render={({ field }) => <Input {...field} placeholder='Nhập tên sản phẩm' size='large' />}
               />
             </Form.Item>
@@ -436,26 +307,15 @@ const ProductEditor = () => {
                 render={({ field }) => (
                   <Input.TextArea {...field} placeholder='Nhập mô tả sản phẩm' size='large' rows={3} />
                 )}
-<<<<<<< HEAD
-                              />
-=======
+
               />
->>>>>>> 578b5de (update: UI admin)
             </Form.Item>
             <Form.Item label='Danh mục'>
               <Controller
                 name='category'
                 control={control}
                 render={({ field }) => (
-<<<<<<< HEAD
-                  <Select {...field} placeholder='Chọn danh mục' size='large'>
-                    {getCategorySuccess &&
-                       categories.data?.map((category) => (
-                         <Option key={category.id} value={category.id}>
-                           {category.name}
-                         </Option>
-                       ))}
-=======
+
                   <Select {...field} placeholder='Chọn danh mục' size='large' className='w-full'>
                     {getCategorySuccess &&
                       categories.data?.map((category) => (
@@ -463,7 +323,6 @@ const ProductEditor = () => {
                           {category.name}
                         </Option>
                       ))}
->>>>>>> 578b5de (update: UI admin)
                   </Select>
                 )}
               />
@@ -473,15 +332,7 @@ const ProductEditor = () => {
                 name='market'
                 control={control}
                 render={({ field }) => (
-<<<<<<< HEAD
-                  <Select {...field} placeholder='Chọn Market' size='large'>
-                    {getMarketSuccess &&
-                       markets?.data?.map((market) => (
-                         <Option key={market.id} value={market.id}>
-                           {market.name}
-                         </Option>
-                       ))}
-=======
+
                   <Select {...field} placeholder='Chọn Market' size='large' className='w-full'>
                     {getMarketSuccess &&
                       markets?.data?.map((market) => (
@@ -489,22 +340,11 @@ const ProductEditor = () => {
                           {market.name}
                         </Option>
                       ))}
->>>>>>> 578b5de (update: UI admin)
                   </Select>
                 )}
               />
             </Form.Item>
-<<<<<<< HEAD
 
-            <Form.Item label='Ảnh sản phẩm'>
-            
-            <Controller
-                 name='image_url'
-                 control={control}
-                 render={({ field }) => <ImageUploader value={field.value || undefined} onChange={field.onChange} />}
-               />       
-                    </Form.Item>
-=======
             <Form.Item label='Ảnh sản phẩm'>
               <Controller
                 name='image_url'
@@ -512,7 +352,6 @@ const ProductEditor = () => {
                 render={({ field }) => <ImageUploader value={field.value || undefined} onChange={field.onChange} />}
               />
             </Form.Item>
->>>>>>> 578b5de (update: UI admin)
             <Form.Item label='Thêm biến thể'>
               <Controller
                 name='hasVariants'
@@ -520,30 +359,20 @@ const ProductEditor = () => {
                 render={({ field }) => (
                   <Switch {...field} checked={field.value} onChange={(checked) => setValue('hasVariants', checked)} />
                 )}
-<<<<<<< HEAD
-                              />
-            </Form.Item>
-          </Col>
 
-          <Col span={12}>
-=======
               />
             </Form.Item>
           </Col>
 
           <Col xs={24} lg={12}>
->>>>>>> 578b5de (update: UI admin)
             {!hasVariants ? (
               <>
                 <Form.Item label='SKU'>
                   <Controller
                     name='sku'
                     control={control}
-<<<<<<< HEAD
-                    render={({ field }) => <Input {...field} placeholder='Nhập SKU' size='middle' />}
-=======
+
                     render={({ field }) => <Input {...field} placeholder='Nhập SKU' size='large' />}
->>>>>>> 578b5de (update: UI admin)
                   />
                 </Form.Item>
                 <Form.Item label='Giá'>
@@ -571,8 +400,5 @@ const ProductEditor = () => {
   );
 };
 
-<<<<<<< HEAD
+
 export default ProductEditor;
-=======
-export default ProductEditor;
->>>>>>> 578b5de (update: UI admin)

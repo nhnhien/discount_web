@@ -72,8 +72,5 @@ const SignInScreen = () => {
   );
 };
 
-<<<<<<< HEAD
+
 export default SignInScreen;
-=======
-export default SignInScreen;
->>>>>>> 578b5de (update: UI admin)

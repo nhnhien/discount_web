@@ -38,8 +38,5 @@ const Breadcrumbs = () => {
   );
 };
 
-<<<<<<< HEAD
+
 export default Breadcrumbs;
-=======
-export default Breadcrumbs;
->>>>>>> 578b5de (update: UI admin)

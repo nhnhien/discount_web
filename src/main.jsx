@@ -11,8 +11,5 @@ createRoot(document.getElementById('root')).render(
       <App />
     </PersistGate>
   </Provider>,
-<<<<<<< HEAD
+
 );
-=======
-);
->>>>>>> 578b5de (update: UI admin)
