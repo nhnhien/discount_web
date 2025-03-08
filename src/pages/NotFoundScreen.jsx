@@ -21,4 +21,8 @@ const NotFoundScreen = () => {
   );
 };
 
+<<<<<<< HEAD
 export default NotFoundScreen;
+=======
+export default NotFoundScreen;
+>>>>>>> 578b5de (update: UI admin)

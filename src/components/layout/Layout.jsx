@@ -13,4 +13,8 @@ const Layout = () => {
   );
 };
 
+<<<<<<< HEAD
 export default Layout;
+=======
+export default Layout;
+>>>>>>> 578b5de (update: UI admin)

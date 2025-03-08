@@ -45,4 +45,8 @@ const deleteProduct = async (productId) => {
   }
 };
 
+<<<<<<< HEAD
 export { getProduct, getProductById, createProduct, editProduct, deleteProduct };
+=======
+export { getProduct, getProductById, createProduct, editProduct, deleteProduct };
+>>>>>>> 578b5de (update: UI admin)

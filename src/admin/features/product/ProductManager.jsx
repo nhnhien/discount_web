@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+<<<<<<< HEAD
  import { Table, Button, Input, Select, Space, Spin, Image, message, Modal } from 'antd';
+=======
+import { Table, Button, Input, Select, Space, Spin, Image, message, Modal } from 'antd';
+>>>>>>> 578b5de (update: UI admin)
 import {
   PlusOutlined,
   UploadOutlined,
@@ -9,14 +13,25 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { deleteProduct, getProduct } from '../../../service/product';
+<<<<<<< HEAD
 import { formatVND } from '../../../utils/format';
 import { useNavigate } from 'react-router-dom';
 import { getCategory } from '../../../service/category';
  import Loading from '../../../components/loading/Loading';
+=======
+import { formatVND } from '../../../format';
+import { useNavigate } from 'react-router-dom';
+import { getCategory } from '../../../service/category';
+import Loading from '../../../components/loading/Loading';
+>>>>>>> 578b5de (update: UI admin)
 
 const { Search } = Input;
 const { Option } = Select;
 const { confirm } = Modal;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 578b5de (update: UI admin)
 const ProductManager = () => {
   const queryClient = useQueryClient();
   const { data: categories, isLoading: isLoadingCategories } = useQuery({
@@ -30,6 +45,10 @@ const ProductManager = () => {
     queryKey: ['product'],
     queryFn: getProduct,
   });
+<<<<<<< HEAD
+=======
+
+>>>>>>> 578b5de (update: UI admin)
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     onSuccess: () => {
@@ -54,11 +73,20 @@ const ProductManager = () => {
       },
     });
   };
+<<<<<<< HEAD
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     return products.data.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
        const matchesCategory = categoryFilter ? product.category_id === categoryFilter : true;
+=======
+
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    return products.data?.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = categoryFilter ? product.category_id === categoryFilter : true;
+>>>>>>> 578b5de (update: UI admin)
       return matchesSearch && matchesCategory;
     });
   }, [products, searchTerm, categoryFilter]);
@@ -119,12 +147,22 @@ const ProductManager = () => {
             Edit
           </Button>
           <Button
+<<<<<<< HEAD
              icon={<DeleteOutlined />}
              danger
              type='default'
              loading={deleteMutation.isLoading}
              onClick={() => showDeleteConfirm(record.id)}
            >            Delete
+=======
+            icon={<DeleteOutlined />}
+            danger
+            type='default'
+            loading={deleteMutation.isLoading}
+            onClick={() => showDeleteConfirm(record.id)}
+          >
+            Delete
+>>>>>>> 578b5de (update: UI admin)
           </Button>
         </Space>
       ),
@@ -133,15 +171,22 @@ const ProductManager = () => {
 
   return (
     <div className='p-6 bg-white rounded-xl shadow-lg'>
+<<<<<<< HEAD
             <div className='flex justify-between mb-4'>
             <div className='flex space-x-4'>
            <Search placeholder='Tìm kiếm sản phẩm' onChange={(e) => setSearchTerm(e.target.value)} className='w-64' />
+=======
+      <div className='flex justify-between mb-4'>
+        <div className='flex space-x-4'>
+          <Search placeholder='Tìm kiếm sản phẩm' onChange={(e) => setSearchTerm(e.target.value)} className='w-64' />
+>>>>>>> 578b5de (update: UI admin)
           <Select
             placeholder='Chọn danh mục'
             allowClear
             onChange={(value) => setCategoryFilter(value)}
             className='w-48'
           >
+<<<<<<< HEAD
             {categories?.data.map((category) => (
                <Option key={category.id} value={category.id}>
                  {category.name}
@@ -151,6 +196,18 @@ const ProductManager = () => {
         </div>
         <div className='space-x-2'>
         <Button type='primary' icon={<PlusOutlined />} onClick={() => navigate('create')}>
+=======
+            {categories &&
+              categories?.data?.map((category) => (
+                <Option key={category.id} value={category.id}>
+                  {category.name}
+                </Option>
+              ))}
+          </Select>
+        </div>
+        <div className='space-x-2'>
+          <Button type='primary' icon={<PlusOutlined />} onClick={() => navigate('create')}>
+>>>>>>> 578b5de (update: UI admin)
             Add Product
           </Button>
           <Button icon={<UploadOutlined />}>Import</Button>
@@ -158,6 +215,7 @@ const ProductManager = () => {
       </div>
       {isLoading ? (
         <div className='flex justify-center py-10'>
+<<<<<<< HEAD
         <Spin size='large' />
       </div>
             ) : (
@@ -169,8 +227,25 @@ const ProductManager = () => {
               className='shadow-sm rounded-lg'
             />
                   )}
+=======
+          <Spin size='large' />
+        </div>
+      ) : (
+        <Table
+          dataSource={filteredProducts}
+          columns={columns}
+          rowKey='id'
+          pagination={{ pageSize: 5 }}
+          className='shadow-sm rounded-lg'
+        />
+      )}
+>>>>>>> 578b5de (update: UI admin)
     </div>
   );
 };
 
+<<<<<<< HEAD
 export default ProductManager;
+=======
+export default ProductManager;
+>>>>>>> 578b5de (update: UI admin)

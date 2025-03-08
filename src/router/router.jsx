@@ -60,4 +60,8 @@ const mainRouter = createBrowserRouter([
   },
 ]);
 
+<<<<<<< HEAD
 export default mainRouter;
+=======
+export default mainRouter;
+>>>>>>> 578b5de (update: UI admin)
