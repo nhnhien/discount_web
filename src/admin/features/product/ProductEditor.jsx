@@ -1,26 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Form, Input, Button, Upload, Select, Switch, Row, Col, Collapse, message, Progress } from 'antd';
-import { UploadOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useEffect, useRef } from 'react';
+ import { Form, Input, Button, Select, Switch, Row, Col, Collapse, message } from 'antd';
+ import { DeleteOutlined } from '@ant-design/icons';
 import { useForm, Controller, useFieldArray, set } from 'react-hook-form';
 import SaveBar from '../../components/savebar/Savebar';
 import { v4 as uuidv4 } from 'uuid';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { uploadImage } from '../../../service/upload';
-
+import { getCategory } from '../../../service/category';
+ import { getMarket } from '../../../service/market';
+ import { createProduct } from '../../../service/product';
+ import { useNavigate } from 'react-router-dom';
+ import Loading from '../../../components/loading/Loading';
+ import ImageUploader from './ImageUploader';
 const { Option } = Select;
 const { Panel } = Collapse;
 
-const ProductForm = () => {
-  const [uploading, setUploading] = useState(false); // Để theo dõi trạng thái upload
-  const [progress, setProgress] = useState(0); // Để lưu trữ tiến trình
+const ProductEditor = () => {
+  const navigate = useNavigate();
+  const { data: categories, isSuccess: getCategorySuccess } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategory,
+  });
+  const { data: markets, isSuccess: getMarketSuccess } = useQuery({ queryKey: ['markets'], queryFn: getMarket });
   const defaultValues = {
     category: '',
     description: '',
     hasVariants: false,
     market: '',
     price: '',
-    image: null,
-    productName: '',
+    image: '',
+     image_url: '',
+     name: '',
     sku: '',
     stock: '',
     variants: [
@@ -49,14 +59,14 @@ const ProductForm = () => {
 
   const initialFormValues = useRef(defaultValues);
 
-  const normalizeValues = (values) => Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value ?? '']));
+  const normalizeValues = (values) =>
+    Object.fromEntries(Object.entries(values).map(([key, value]) => [key, value ?? '']));
 
   useEffect(() => {
     if (!initialFormValues.current) {
       initialFormValues.current = normalizeValues(getValues());
     }
   }, []);
-  console.log(getValues());
 
   const isFormChanged = JSON.stringify(normalizeValues(watch())) !== JSON.stringify(initialFormValues.current);
   const hasVariants = watch('hasVariants', false);
@@ -83,42 +93,40 @@ const ProductForm = () => {
     });
   };
 
-  const mutation = useMutation({
-    mutationFn: uploadImage,
-
-    onSuccess: (data) => {
-      message.success('Ảnh đã được tải lên thành công!');
-      console.log('Uploaded Image Data:', data);
-      setUploading(false);
+  const createMutation = useMutation({
+    mutationFn: createProduct,
+    onSuccess: () => {
+      message.success('Tạo sản phẩm thành công!');
+      reset();
+      navigate('/admin/product');
     },
     onError: (error) => {
-      message.error('Có lỗi khi tải ảnh lên!');
-      console.error('Upload Error:', error);
-      setUploading(false);
+      message.error('Có lỗi khi tạo sản phẩm!');
+       console.error('Create Product Error:', error);
     },
   });
-
-  const handleVariantImageChange = (index, file) => {
-    setValue(`variants[${index}].image`, file);
-  };
-
-  const handleImageChange = async (info) => {
-    const file = info.file;
-    setValue('image', file);
-    setUploading(true);
-    await mutation.mutateAsync(file, {
-      onUploadProgress: (event) => {
-        const percent = Math.round((event.loaded / event.total) * 100);
-        setProgress(percent);
-      },
-    });
-  };
-
-  const onSubmit = (data) => {
-    console.log('Form Data:', data);
+  const { isPending } = createMutation;
+  const onSubmit = async (data) => {
+    console.log(data);
+    if (!data.hasVariants) {
+      const productData = {
+        name: data.name,
+        description: data.description,
+        category_id: data.category,
+        market_id: data.market,
+        image_url: data.image_url,
+        has_variants: data.hasVariants,
+        original_price: data.price,
+        final_price: data.price,
+        stock_quantity: data.stock,
+      };
+      await createMutation.mutateAsync(productData);
+    }
   };
 
   const renderVariants = () => (
+    <>
+    {isPending && <Loading />}
     <div className='mt-4 p-4 bg-white border rounded-md shadow-md'>
       <h2 className='text-xl font-semibold mb-4 text-blue-700'>Quản lý biến thể</h2>
       <Collapse defaultActiveKey={['0']} accordion>
@@ -143,7 +151,9 @@ const ProductForm = () => {
                     rules={{ required: 'Vui lòng nhập SKU' }}
                     render={({ field }) => <Input {...field} placeholder='SKU' />}
                   />
-                  {errors.variants?.[index]?.sku && <span className='text-red-500'>{errors.variants[index].sku.message}</span>}
+                  {errors.variants?.[index]?.sku && (
+                    <span className='text-red-500'>{errors.variants[index].sku.message}</span>
+                  )}
                 </Form.Item>
               </Col>
               <Col span={8}>
@@ -166,42 +176,41 @@ const ProductForm = () => {
               </Col>
             </Row>
 
-            <Form.Item label='Ảnh bien thể'>
-              <Upload
-                listType='picture-card'
-                fileList={field.image ? [field.image] : []}
-                beforeUpload={(file) => {
-                  handleVariantImageChange(index, file);
-                  return false;
-                }}
-              >
-                <Button icon={<UploadOutlined />} />
-              </Upload>
-            </Form.Item>
-          </Panel>
-        ))}
-      </Collapse>
+            <Form.Item label='Ảnh biến thể'>
+                 <Controller
+                   name={`variants[${index}].image_url`}
+                   control={control}
+                   render={({ field }) => <ImageUploader value={field.value || undefined} onChange={field.onChange} />}
+                 />
+               </Form.Item>
+             </Panel>
+           ))}
+         </Collapse>
 
-      <Button type='primary' onClick={handleAddVariant} disabled={!isLastVariantFilled()} className='mt-4'>
-        Thêm biến thể
-      </Button>
-    </div>
+         <Button type='primary' onClick={handleAddVariant} disabled={!isLastVariantFilled()} className='mt-4'>
+           Thêm biến thể
+         </Button>
+       </div>
+     </>
   );
 
-  console.log(uploading);
 
   return (
     <div className='bg-white p-4 shadow-md rounded-md max-h-[800px]'>
-      <SaveBar onSave={handleSubmit(onSubmit)} onDiscard={() => reset()} visible={isFormChanged} />
-      <h1 className='text-2xl font-semibold mb-4 text-center text-blue-700'>Thêm sản phẩm</h1>
+      <SaveBar
+         onSave={handleSubmit(onSubmit)}
+         title={'Thêm sản phẩm'}
+         onDiscard={() => reset()}
+         visible={isFormChanged}
+       />
+             <h1 className='text-2xl font-semibold mb-4 text-center text-blue-700'>Thêm sản phẩm</h1>
 
       <Form onFinish={handleSubmit(onSubmit)} layout='vertical' className='max-w-[1200px] mx-auto'>
         <Row gutter={100}>
           <Col span={12}>
             <Form.Item label='Tên sản phẩm'>
               <Controller
-                name='productName'
-                control={control}
+                name='name'                control={control}
                 render={({ field }) => <Input {...field} placeholder='Nhập tên sản phẩm' size='large' />}
               />
             </Form.Item>
@@ -209,8 +218,10 @@ const ProductForm = () => {
               <Controller
                 name='description'
                 control={control}
-                render={({ field }) => <Input.TextArea {...field} placeholder='Nhập mô tả sản phẩm' size='large' rows={3} />}
-              />
+                render={({ field }) => (
+                  <Input.TextArea {...field} placeholder='Nhập mô tả sản phẩm' size='large' rows={3} />
+                )}
+                              />
             </Form.Item>
             <Form.Item label='Danh mục'>
               <Controller
@@ -218,8 +229,12 @@ const ProductForm = () => {
                 control={control}
                 render={({ field }) => (
                   <Select {...field} placeholder='Chọn danh mục' size='large'>
-                    <Option value='1'>Danh mục 1</Option>
-                    <Option value='2'>Danh mục 2</Option>
+                    {getCategorySuccess &&
+                       categories.data?.map((category) => (
+                         <Option key={category.id} value={category.id}>
+                           {category.name}
+                         </Option>
+                       ))}
                   </Select>
                 )}
               />
@@ -230,48 +245,33 @@ const ProductForm = () => {
                 control={control}
                 render={({ field }) => (
                   <Select {...field} placeholder='Chọn Market' size='large'>
-                    <Option value='1'>Market 1</Option>
-                    <Option value='2'>Market 2</Option>
+                    {getMarketSuccess &&
+                       markets?.data?.map((market) => (
+                         <Option key={market.id} value={market.id}>
+                           {market.name}
+                         </Option>
+                       ))}
                   </Select>
                 )}
               />
             </Form.Item>
 
             <Form.Item label='Ảnh sản phẩm'>
-              <div className='flex items-center space-x-4'>
-                <Upload
-                  listType='picture-card'
-                  customRequest={handleImageChange}
-                  showUploadList={{
-                    showRemoveIcon: false,
-                    showPreviewIcon: false,
-                    showProgress: true,
-                  }}
-                  accept='image/*'
-                  fileList={
-                    getValues('image')
-                      ? [
-                          {
-                            uid: '1',
-                            name: getValues('image').name,
-                            url: URL.createObjectURL(getValues('image')),
-                            status: uploading ? 'uploading' : 'done',
-                            progress: progress,
-                          },
-                        ]
-                      : []
-                  }
-                >
-                  <Button icon={<UploadOutlined />} />
-                </Upload>
-              </div>
-            </Form.Item>
+            
+            <Controller
+                 name='image_url'
+                 control={control}
+                 render={({ field }) => <ImageUploader value={field.value || undefined} onChange={field.onChange} />}
+               />       
+                    </Form.Item>
             <Form.Item label='Thêm biến thể'>
               <Controller
                 name='hasVariants'
                 control={control}
-                render={({ field }) => <Switch {...field} checked={field.value} onChange={(checked) => setValue('hasVariants', checked)} />}
-              />
+                render={({ field }) => (
+                  <Switch {...field} checked={field.value} onChange={(checked) => setValue('hasVariants', checked)} />
+                )}
+                              />
             </Form.Item>
           </Col>
 
@@ -310,4 +310,4 @@ const ProductForm = () => {
   );
 };
 
-export default ProductForm;
+export default ProductEditor;
