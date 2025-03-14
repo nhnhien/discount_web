@@ -33,6 +33,23 @@ const AdminNavigationItems = [
     title: 'Discounts',
     icon: <RiDiscountPercentFill size='18' />,
     link: '/admin/discounts',
+    children: [
+      {
+        id: 51,
+        title: 'Custom Pricing',
+        link: '/admin/discounts/cp',
+      },
+      {
+        id: 52,
+        title: 'Price List',
+        link: '/admin/discounts/pl',
+      },
+      {
+        id: 53,
+        title: 'Quantity Break',
+        link: '/admin/discounts/qb',
+      },
+    ],
   },
 ];
 

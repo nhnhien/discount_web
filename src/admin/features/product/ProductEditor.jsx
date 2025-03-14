@@ -6,7 +6,6 @@ import { useForm, Controller, useFieldArray, set } from 'react-hook-form';
 import SaveBar from '../../components/savebar/Savebar';
 import { v4 as uuidv4 } from 'uuid';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { uploadImage } from '../../../service/upload';
 import { getCategory } from '../../../service/category';
 import { getMarket } from '../../../service/market';
 import { createProduct } from '../../../service/product';
