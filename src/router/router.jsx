@@ -8,6 +8,8 @@ import { DashboardAdmin } from '../admin/features/dashboard';
 import { ProductManager } from '../admin/features/product';
 import NotFoundScreen from '../pages/NotFoundScreen';
 import ProductEditor from '../admin/features/product/ProductEditor';
+import CPManager from '@/admin/features/custom-pricing/components/CPManager';
+import CPEditor from '@/admin/features/custom-pricing/components/CPEditor';
 
 const mainRouter = createBrowserRouter([
   {
@@ -51,6 +53,18 @@ const mainRouter = createBrowserRouter([
       {
         path: 'product/edit/:id',
         element: <ProductEditor />,
+      },
+      {
+        path: 'discounts/cp',
+        element: <CPManager />,
+      },
+      {
+        path: 'discount/cp/create',
+        element: <CPEditor />,
+      },
+      {
+        path: 'discount/cp/edit/:id',
+        element: <CPEditor />,
       },
       {
         path: '*',

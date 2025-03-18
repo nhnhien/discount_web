@@ -20,8 +20,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
    },
    {
      id: 3,
-     image: 'https://esmee.qodeinteractive.com/wp-content/uploads/2021/07/main-home-rev-img-2-50x100.jpg',
-     title: 'Luxury & Comfort',
+     image: 'https://esmee.qodeinteractive.com/wp-content/uploads/2021/07/main-home-rev-img-2.jpg',
      description: 'Experience high-end fashion combined with ultimate comfort and elegance.',
    },
  ];

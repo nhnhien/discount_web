@@ -3,10 +3,12 @@ import { Link, useLocation } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
 
 const breadcrumbMap = {
-  '/admin': 'Dashboard',
+  '/admin': 'Trang chủ',
   '/admin/product': 'Sản phẩm',
   '/admin/product/create': 'Thêm sản phẩm',
   '/admin/orders': 'Đơn hàng',
+  '/admin/discounts': 'Giảm giá',
+  '/admin/discount/cp/create': 'Tạo custom pricing', 
 };
 
 const Breadcrumbs = () => {
@@ -15,22 +17,14 @@ const Breadcrumbs = () => {
 
   return (
     <Breadcrumb style={{ marginBottom: 16 }}>
-      <Breadcrumb.Item>
-        <Link to='/admin'>Trang chủ</Link>
-      </Breadcrumb.Item>
       {pathnames.map((segment, index) => {
         let url = `/${pathnames.slice(0, index + 1).join('/')}`;
-        if (index === pathnames.length - 1 && !breadcrumbMap[url]) {
-          return null;
-        }
-
+        const breadcrumbLabel = breadcrumbMap[url];
+ 
+         if (!breadcrumbLabel) return null;
         return (
           <Breadcrumb.Item key={url}>
-            {breadcrumbMap[url] ? (
-              <Link to={url}>{breadcrumbMap[url]}</Link>
-            ) : (
-              'Chỉnh sửa'
-            )}
+            <Link to={url}>{breadcrumbLabel}</Link>
           </Breadcrumb.Item>
         );
       })}
