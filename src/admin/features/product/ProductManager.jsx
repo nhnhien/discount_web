@@ -31,9 +31,9 @@ const ProductManager = () => {
   const [categoryFilter, setCategoryFilter] = useState(null);
   const { data: products, isLoading } = useQuery({
     queryKey: ['product'],
-    queryFn: getProduct,
-  });
-
+    queryFn: () => getProduct([]),
+    });
+    console.log(products);
 
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,

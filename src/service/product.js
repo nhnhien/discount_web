@@ -1,8 +1,8 @@
 import apiClient from '../config/axios.config';
 
-const getProduct = async () => {
+const getProduct = async (customerIds) => {
   try {
-    const res = await apiClient.get('/api/product');
+    const res = await apiClient.get(`/api/product/?customerIds=${customerIds}`);
     return res.data;
   } catch (error) {
     throw new Error(error);

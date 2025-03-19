@@ -1,13 +1,16 @@
 import { Layout } from 'antd';
 import React, { useState } from 'react';
-import { AdminNavigationItems } from '../../../constants';
+import { getAdminNavigationItems } from '../../../constants';
 import { NavLink } from 'react-router-dom';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 const { Sider } = Layout;
 
 const AdminSidebar = () => {
+  const { t } = useTranslation();
   const [openMenus, setOpenMenus] = useState({});
+  const AdminNavigationItems = getAdminNavigationItems(t);
 
   return (
     <Sider width={260} className='h-screen bg-sidebar-admin'>
@@ -36,8 +39,8 @@ const AdminSidebar = () => {
                          key={child.id}
                          to={child.link}
                          className={({ isActive }) =>
-                           `block px-4 py-1 text-sm text-gray-700 hover:text-gray-600  rounded-md ${
-                             isActive ? 'bg-white font-semibold' : 'hover:bg-gray-200'
+                          `block px-4 py-1 text-sm text-gray-700 hover:text-gray-600 rounded-md ${
+                              isActive ? 'bg-white font-semibold' : 'hover:bg-gray-200'
                            }`
                          }
                        >

@@ -2,15 +2,26 @@ import { Button, Menu, Popover, Select } from 'antd';
 import { Header } from 'antd/es/layout/layout';
 import { NavLink } from 'react-router-dom';
 import { DownOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useSelector, useDispatch } from 'react-redux';
+import { setLanguage } from '@/context/slice/language';
 
 const AdminHeader = () => {
+  const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const language = useSelector((state) => state.language.language);
+
+  const handleLanguageChange = (value) => {
+    dispatch(setLanguage(value));
+  };
+
   const menu = (
     <Menu>
       <Menu.Item key='1' className='hover:bg-gray-700 text-white'>
-        Profile
+      {t('profile')}
       </Menu.Item>
       <Menu.Item key='2' className='hover:bg-gray-700 text-white'>
-        Logout
+      {t('logout')}
       </Menu.Item>
     </Menu>
   );
@@ -29,10 +40,10 @@ const AdminHeader = () => {
 
       <div className='flex items-center space-x-4'>
         <Select
-          defaultValue='vn'
+          value={language}
           className='w-28 text-black'
           options={[
-            { value: 'vn', label: '🇻🇳 Tiếng Việt' },
+            { value: 'vi', label: '🇻🇳 Tiếng Việt' },
             { value: 'en', label: '🇬🇧 English' },
           ]}
         />
@@ -40,7 +51,7 @@ const AdminHeader = () => {
         <Popover content={menu} trigger='click'>
 
           <Button type='text' className='text-white hover:text-red-500 flex items-center space-x-2'>
-            <span className='font-semibold'>Xin chào, Admin</span>
+          <span className='font-semibold'>{t('hello_admin')}</span>
             <DownOutlined />
           </Button>
         </Popover>
