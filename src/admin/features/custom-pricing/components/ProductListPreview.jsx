@@ -1,27 +1,21 @@
-import Loading from '@/components/loading/Loading';
- import { getProduct } from '@/service/product';
- import { useQuery } from '@tanstack/react-query';
- import { Table, Tag, Tooltip } from 'antd';
- import React from 'react';
+import React from 'react';
+import { Table, Tag, Tooltip } from 'antd';
+import { calculateCPPrice } from '@/utils/caculation';
  
- const ProductListPreview = ({ customers }) => {
-   const { data, isLoading } = useQuery({
-     queryKey: ['products'],
-     queryFn: () => getProduct(),
-   });
+const ProductListPreview = ({ products, productSelected, discountValue, discountType }) => {
+  console.log('🚀 ~ ProductListPreview ~ discountType:', discountType);
+  const filteredProducts = products?.filter((p) => productSelected.includes(p.id)) || [];
  
    const columns = [
      {
-       title: 'Hình ảnh',
-       dataIndex: 'image_url',
-       key: 'image_url',
-       render: (url) => <img src={url} alt='product' className='w-14 h-14 object-cover rounded shadow' />,
-     },
-     {
-       title: 'Tên sản phẩm',
-       dataIndex: 'name',
-       key: 'name',
-       render: (text) => <span className='font-medium'>{text}</span>,
+      title: 'Sản phẩm',
+       key: 'product',
+       render: (_, record) => (
+         <div className='flex items-center gap-3'>
+           <img src={record.image_url} alt={record.name} className='w-14 h-14 object-cover rounded shadow' />
+           <span className='font-medium'>{record.name}</span>
+         </div>
+       ),
      },
      {
        title: 'Giá gốc',
@@ -31,13 +25,13 @@ import Loading from '@/components/loading/Loading';
      },
      {
        title: 'Giảm giá',
-       dataIndex: 'discountPercentage',
-       key: 'discountPercentage',
-       render: (discount, record) =>
-         discount > 0 ? (
-           <Tooltip title={`Áp dụng theo rule: ${record.discountRule || 'Không rõ'}`}>
+       key: 'discount',
+       render: (_, record) =>
+         discountValue > 0 ? (
+           <Tooltip title={`Giảm: ${discountValue} ${discountType === 'percentage' ? '%' : 'đ'}`}>
              <Tag color='red' className='text-sm'>
-               -{discount}%
+             -{discountValue}
+               {discountType === 'percentage' ? '%' : 'đ'}
              </Tag>
            </Tooltip>
          ) : (
@@ -46,10 +40,11 @@ import Loading from '@/components/loading/Loading';
      },
      {
        title: 'Giá cuối',
-       dataIndex: 'final_price',
        key: 'final_price',
-       render: (price) => <span className='text-red-500 font-bold'>{Number(price).toLocaleString()}đ</span>,
-     },
+       render: (_, record) => {
+        const finalPrice = calculateCPPrice(record.original_price, discountValue, discountType);
+        return <span className='text-red-500 font-bold'>{Number(finalPrice).toLocaleString()}đ</span>;
+      },     },
      {
        title: 'Kho',
        dataIndex: 'stock_quantity',
@@ -60,7 +55,7 @@ import Loading from '@/components/loading/Loading';
  
    return (
      <div className='p-4 bg-white rounded-lg shadow'>
-       {isLoading ? <Loading /> : <Table columns={columns} dataSource={data?.data} rowKey='id' pagination={false} />}
+        <Table columns={columns} dataSource={filteredProducts} rowKey='id' pagination={false} />
      </div>
    );
  };

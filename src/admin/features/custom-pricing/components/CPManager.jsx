@@ -101,7 +101,11 @@ import React, { useState } from 'react';
              onClick={() => showDetails(record)}
              className='bg-blue-500 hover:bg-blue-600'
            />
-           <Button type='default' icon={<EditOutlined />} />
+            <Button
+             type='default'
+             icon={<EditOutlined />}
+             onClick={() => navigate(`/admin/discount/cp/edit/${record.id}`)}
+           />
            <Button type='danger' icon={<DeleteOutlined />} onClick={() => showDeleteConfirm(record.id)} />
          </div>
        ),

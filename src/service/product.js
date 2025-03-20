@@ -1,8 +1,16 @@
 import apiClient from '../config/axios.config';
 
-const getProduct = async (customerIds) => {
+const getProduct = async () => {
   try {
-    const res = await apiClient.get(`/api/product/?customerIds=${customerIds}`);
+    const res = await apiClient.get('/api/product');
+    return res.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const getProductApplyCP = async (userId) => {
+  try {
+    const res = await apiClient.get(`/api/product/?userId=${userId}`);
     return res.data;
   } catch (error) {
     throw new Error(error);
@@ -46,4 +54,4 @@ const deleteProduct = async (productId) => {
 };
 
 
-export { getProduct, getProductById, createProduct, editProduct, deleteProduct };
+export { getProduct, getProductById, createProduct, editProduct, deleteProduct, getProductApplyCP };

@@ -8,6 +8,22 @@ import apiClient from '@/config/axios.config';
      throw new Error(error);
    }
  };
+ const createRule = async (rule) => {
+  try {
+    const res = await apiClient.post('/api/cp', rule);
+    return res.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+const updateRule = async (ruleId, rule) => {
+  try {
+    const res = await apiClient.patch(`/api/cp/${ruleId}`, rule);
+    return res.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
  const getRule = async (ruleId) => {
    try {
      const res = await apiClient.get(`/api/cp/${ruleId}`);
@@ -24,4 +40,4 @@ import apiClient from '@/config/axios.config';
      throw new Error(error);
    }
  };
- export { getRules, getRule, deleteRule };
+ export { getRules, getRule, deleteRule, createRule, updateRule };
