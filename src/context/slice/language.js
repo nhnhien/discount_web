@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
- import i18n from '@/i18n';
+import i18n from '@/i18n/i18n';
  
  const initialState = {
    language: 'vi',

@@ -35,7 +35,7 @@ const createProduct = async (product) => {
   }
 };
 
-const editProduct = async (product, productId) => {
+const editProduct = async (productId, product) => {
   try {
     const res = await apiClient.patch(`/api/product/${productId}`, product);
     return res.data;
