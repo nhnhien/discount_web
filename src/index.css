@@ -5,3 +5,26 @@
 body {
   @apply font-roboto;
 }
+
+.sidebar-fixed {
+  @apply fixed left-0 top-[60px] bottom-0 z-30 bg-white shadow-lg transition-transform duration-300 ease-in-out;
+  background-image: linear-gradient(to bottom, white, white);
+  background-repeat: repeat-y;
+  background-size: 100% 100vh;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-content {
+  @apply h-full overflow-hidden;
+  min-height: calc(100vh - 60px);
+}
+
+.main-container {
+  @apply flex flex-1 bg-content-admin;
+  min-height: calc(100vh - 60px);
+}
+
+.main-content {
+  @apply flex-1 p-4 overflow-auto transition-all duration-300;
+  min-height: calc(100vh - 60px);
+}

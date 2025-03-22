@@ -10,6 +10,10 @@ import NotFoundScreen from '../pages/NotFoundScreen';
 import ProductEditor from '../admin/features/product/ProductEditor';
 import CPManager from '@/admin/features/custom-pricing/components/CPManager';
 import CPEditor from '@/admin/features/custom-pricing/components/CPEditor';
+import ProductScreen from '@/pages/product/components/ProductScreen';
+import ProductMain from '@/pages/product/components/ProductMain';
+import ProductCard from '@/pages/product/components/ProductCard';
+import CartScreen from '@/pages/cart/components/CartScreen';
 
 const mainRouter = createBrowserRouter([
   {
@@ -19,6 +23,18 @@ const mainRouter = createBrowserRouter([
       {
         path: '/',
         element: <HomeScreen />,
+      },
+      {
+        path: '/products',
+        element: <ProductScreen />,
+      },
+      {
+        path: '/product/:id',
+        element: <ProductMain />,
+      },
+      {
+        path: '/cart',
+        element: <CartScreen />,
       },
       {
         path: '/checkout',
@@ -73,6 +89,5 @@ const mainRouter = createBrowserRouter([
     ],
   },
 ]);
-
 
 export default mainRouter;

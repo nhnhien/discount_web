@@ -8,12 +8,22 @@ const getProduct = async () => {
     throw new Error(error);
   }
 };
-const getProductApplyCP = async (userId) => {
+const getProductApplyCP = async (userId, options = {}) => {
   try {
-    const res = await apiClient.get(`/api/product/?userId=${userId}`);
+    const { page = 1, limit = 10, search = '', categoryId = '' } = options;
+    const params = new URLSearchParams();
+
+    if (userId) params.append('userId', userId);
+    if (page) params.append('page', page);
+    if (limit) params.append('limit', limit);
+    if (search) params.append('search', search);
+    if (categoryId) params.append('categoryId', categoryId);
+
+    const queryString = params.toString();
+    const res = await apiClient.get(`/api/product?${queryString}`);
     return res.data;
   } catch (error) {
-    throw new Error(error);
+    throw new Error(error.message || 'Không thể tải sản phẩm');
   }
 };
 
@@ -52,6 +62,5 @@ const deleteProduct = async (productId) => {
     throw new Error(error);
   }
 };
-
 
 export { getProduct, getProductById, createProduct, editProduct, deleteProduct, getProductApplyCP };

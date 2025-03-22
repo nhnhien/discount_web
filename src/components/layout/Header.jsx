@@ -8,6 +8,7 @@ import { setLanguage } from '@/context/slice/language';
 import { useTranslation } from 'react-i18next';
 import { SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
+import { logoutSuccess } from '@/context/slice/auth';
 
 const languages = [
   { key: 'en', label: 'English', flag: '🇬🇧' },
@@ -30,7 +31,7 @@ const Header = () => {
       <Menu.Item key='settings' icon={<SettingOutlined />}>
         {t('home.settings')}
       </Menu.Item>
-      <Menu.Item key='logout' icon={<LogoutOutlined />}>
+      <Menu.Item key='logout' onClick={() => dispatch(logoutSuccess())} icon={<LogoutOutlined />}>
         {t('home.logout')}
       </Menu.Item>
     </Menu>

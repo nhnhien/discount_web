@@ -1,7 +1,6 @@
 import React from 'react';
  import HomeSlider from './HomeSlider';
  import HomeBanner from './HomeBanner';
- import ProductCard from '@/pages/product/components/ProductCard';
  import HomeProduct from './HomeProduct';
  const FeaturedCategories = () => {
    return (
