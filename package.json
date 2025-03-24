@@ -19,6 +19,8 @@
     "antd": "^5.23.1",
     "axios": "^1.7.9",
     "chart.js": "^4.4.8",
+    "chartjs-adapter-date-fns": "^3.0.0",
+    "date-fns": "^4.1.0",
     "firebase": "^11.2.0",
     "framer-motion": "^12.4.7",
     "i18next": "^24.2.3",
