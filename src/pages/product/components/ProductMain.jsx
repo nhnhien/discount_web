@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useSelector } from 'react-redux';
 import {
   Row,
@@ -33,10 +33,11 @@ import {
   SafetyCertificateOutlined,
   LineChartOutlined,
 } from '@ant-design/icons';
-import { getProductById } from '@/service/product';
+import { getProductApplyCPById, getProductById } from '@/service/product';
 import PriceTrendChart from './PriceTrendChart';
+import { cartService } from '@/service/cart';
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 const { TabPane } = Tabs;
 
 const ProductDetail = () => {
@@ -56,10 +57,9 @@ const ProductDetail = () => {
     data: productData,
     isLoading,
     error,
-    refetch,
   } = useQuery({
     queryKey: ['product', id, userId],
-    queryFn: () => getProductById(id, userId),
+    queryFn: () => getProductApplyCPById(id, userId),
     enabled: !!id,
   });
 
@@ -208,22 +208,32 @@ const ProductDetail = () => {
     }).format(amount);
   };
 
+  const addToCartMutation = useMutation({
+    mutationFn: (productData) => cartService.addToCart(productData),
+    onSuccess: (data) => {
+      if (data.success) {
+        message.success('Đã thêm sản phẩm vào giỏ hàng');
+      } else {
+        message.error(data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng');
+      }
+    },
+    onError: (error) => {
+      message.error('Không thể thêm sản phẩm vào giỏ hàng: ' + (error.message || 'Đã xảy ra lỗi'));
+    },
+  });
+
   const handleAddToCart = () => {
     if (!isInStock()) {
       message.error('Sản phẩm đã hết hàng');
       return;
     }
-
     const productToAdd = {
-      id: product.id,
-      name: product.name,
-      price: getFinalPrice(),
-      image: selectedVariant?.image_url || product.image_url,
+      userId: userId,
+      product_id: product.id,
+      variant_id: selectedVariant?.id || null,
       quantity: quantity,
-      variant_id: selectedVariant?.id,
     };
-
-    message.success('Đã thêm sản phẩm vào giỏ hàng');
+    addToCartMutation.mutate(productToAdd);
   };
 
   const handleAddToWishlist = () => {

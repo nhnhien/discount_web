@@ -35,7 +35,14 @@ const getProductById = async (productId) => {
     throw new Error(error);
   }
 };
-
+const getProductApplyCPById = async (productId, userId) => {
+  try {
+    const res = await apiClient.get(`/api/product/${productId}?userId=${userId}`);
+    return res.data;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 const createProduct = async (product) => {
   try {
     const res = await apiClient.post('/api/product', product);
@@ -63,4 +70,12 @@ const deleteProduct = async (productId) => {
   }
 };
 
-export { getProduct, getProductById, createProduct, editProduct, deleteProduct, getProductApplyCP };
+export {
+  getProduct,
+  getProductById,
+  createProduct,
+  editProduct,
+  deleteProduct,
+  getProductApplyCP,
+  getProductApplyCPById,
+};

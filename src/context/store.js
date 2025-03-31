@@ -1,5 +1,6 @@
 import authReducer from './slice/auth';
 import languageReducer from './slice/language';
+import cartReducer from './slice/cart';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
@@ -13,6 +14,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   auth: authReducer,
   language: languageReducer,
+  cart: cartReducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
