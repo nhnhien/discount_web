@@ -14,7 +14,8 @@ import ProductScreen from '@/pages/product/components/ProductScreen';
 import ProductMain from '@/pages/product/components/ProductMain';
 import ProductCard from '@/pages/product/components/ProductCard';
 import CartScreen from '@/pages/cart/components/CartScreen';
-
+import QBManager from '@/admin/features/quantity-break/components/QBManager';
+ import QBEditor from '../admin/features/quantity-break/components/QBEditor';
 const mainRouter = createBrowserRouter([
   {
     path: '/',
@@ -81,6 +82,18 @@ const mainRouter = createBrowserRouter([
       {
         path: 'discount/cp/edit/:id',
         element: <CPEditor />,
+      },
+      {
+        path: 'discounts/qb',
+        element: <QBManager />,
+      },
+      {
+        path: 'discount/qb/create',
+        element: <QBEditor />,
+      },
+      {
+        path: 'discount/qb/edit/:id',
+        element: <QBEditor />,
       },
       {
         path: '*',
