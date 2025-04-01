@@ -36,6 +36,7 @@ import {
 import { getProductApplyCPById, getProductById } from '@/service/product';
 import PriceTrendChart from './PriceTrendChart';
 import { cartService } from '@/service/cart';
+import { useQueryClient } from '@tanstack/react-query';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -52,7 +53,7 @@ const ProductDetail = () => {
   const [selectedAttributes, setSelectedAttributes] = useState({});
   const [availableVariants, setAvailableVariants] = useState([]);
   const [currentImage, setCurrentImage] = useState(0);
-
+  const queryClient = useQueryClient();
   const {
     data: productData,
     isLoading,
@@ -213,6 +214,7 @@ const ProductDetail = () => {
     onSuccess: (data) => {
       if (data.success) {
         message.success('Đã thêm sản phẩm vào giỏ hàng');
+        queryClient.invalidateQueries(['cart']);
       } else {
         message.error(data.message || 'Có lỗi xảy ra khi thêm vào giỏ hàng');
       }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { store } from '../context/store';
+import { getAuth } from 'firebase/auth';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -8,25 +8,20 @@ const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(
-  (config) => {
-    const state = store.getState();
-    const token = state.auth?.currentUser?.token;
+  async (config) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-    if (token) {
+    if (user) {
+      const token = await user.getIdToken();
       config.headers['Authorization'] = `Bearer ${token}`;
+    } else {
     }
+    
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
 
 export default apiClient;

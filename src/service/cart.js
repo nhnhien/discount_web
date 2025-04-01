@@ -1,75 +1,46 @@
 import apiClient from '../config/axios.config';
- 
- export const cartService = {
-   getCart: async (userId) => {
-     try {
-       const response = await apiClient.get(`/api/cart?userId=${userId}`);
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   addToCart: async (productData) => {
-     try {
-       const response = await apiClient.post('api/cart', productData);
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   updateCartItem: async (cartItemId, quantity) => {
-     try {
-       const response = await apiClient.put(`api/cart/items/${cartItemId}`, { quantity });
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   removeCartItem: async (cartItemId) => {
-     try {
-       const response = await apiClient.delete(`api/cart/items/${cartItemId}`);
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   clearCart: async () => {
-     try {
-       const response = await apiClient.post('api/cart/clear');
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   updateShippingInfo: async (shippingData) => {
-     try {
-       const response = await apiClient.put('api/cart/shipping', shippingData);
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   applyDiscount: async (discountCode) => {
-     try {
-       const response = await apiClient.post('/cart/discount', { discount_code: discountCode });
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- 
-   removeDiscount: async () => {
-     try {
-       const response = await apiClient.delete('/cart/discount');
-       return response.data;
-     } catch (error) {
-       throw new Error(error);
-     }
-   },
- };
+
+export const cartService = {
+  getCart: async () => {
+    const response = await apiClient.get('/api/cart');
+    return response.data;
+  },
+
+  addToCart: async (productData) => {
+    const response = await apiClient.post('/api/cart', productData);
+    return response.data;
+  },
+
+  updateCartItem: async (cartItemId, quantity) => {
+    const response = await apiClient.put(`/api/cart/${cartItemId}`, { quantity });
+    return response.data;
+  },
+
+  removeCartItem: async (cartItemId) => {
+    const response = await apiClient.delete(`/api/cart/${cartItemId}`);
+    return response.data;
+  },
+
+  clearCart: async () => {
+    const response = await apiClient.delete('/api/cart/apply');
+    return response.data;
+  },
+
+  updateShippingInfo: async (shippingData) => {
+    const response = await apiClient.put('/api/cart/shipping', {
+      ...shippingData, 
+    });
+    return response.data;
+  },
+  
+
+  applyDiscount: async (discountCode) => {
+    const response = await apiClient.post('/api/cart/apply', { discount_code: discountCode });
+    return response.data;
+  },
+
+  removeDiscount: async () => {
+    const response = await apiClient.delete('/api/cart/apply');
+    return response.data;
+  },
+};
