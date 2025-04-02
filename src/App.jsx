@@ -6,7 +6,7 @@ import i18n from '@/i18n/i18n';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { setCurrentUser } from '@/context/slice/auth'; 
+import { setCurrentUser } from '@/context/slice/auth';
 import { Spin } from 'antd';
 
 const queryClient = new QueryClient();
@@ -25,11 +25,21 @@ function App() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await user.getIdToken();
+
+        let name = 'Người dùng';
+        if (user.displayName) {
+          name = user.displayName;
+        } else if (user.email && typeof user.email === 'string') {
+          name = user.email.split('@')[0];
+        } else if (user.phoneNumber) {
+          name = user.phoneNumber;
+        }
+
         dispatch(
           setCurrentUser({
             id: user.uid,
-            name: user.displayName || user.email.split('@')[0],
-            email: user.email,
+            name,
+            email: user.email || null,
             token,
           })
         );

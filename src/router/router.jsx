@@ -20,6 +20,8 @@ import QBEditor from '../admin/features/quantity-break/components/QBEditor';
 import OrderSuccess from '@/pages/payment/OrderSuccess';
 import OrdersScreen from '@/pages/order/OrdersScreen';
 import OrderManager from '@/admin/features/order/OrderManager';
+import CustomerManager from '@/admin/features/customer/CustomerManager';
+import ProfileScreen from '@/pages/profile/ProfileScreen';
 
 const mainRouter = createBrowserRouter([
   {
@@ -65,6 +67,10 @@ const mainRouter = createBrowserRouter([
       {
         path: '/orders', 
         element: <OrdersScreen />, 
+      },
+      {
+        path: '/profile',
+        element: <ProfileScreen />,
       },
     ],
   },
@@ -116,7 +122,10 @@ const mainRouter = createBrowserRouter([
         path: '/admin/orders',
         element: <OrderManager />,
       },
-      
+      {
+        path: '/admin/customer',
+        element: <CustomerManager />,
+      },
       {
         path: '*',
         element: <NotFoundScreen />,

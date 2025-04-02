@@ -14,7 +14,6 @@ import {
   MenuOutlined,
   UserOutlined,
   DownOutlined,
-  SettingOutlined,
   LogoutOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
@@ -24,6 +23,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutSuccess } from '@/context/slice/auth';
 import { useCartSummary } from '@/hooks/useCartSummary';
+import { getAuth, signOut } from 'firebase/auth';
+import { useQueryClient } from '@tanstack/react-query';
 
 const languages = [
   { key: 'en', label: 'English', flag: '🇬🇧' },
@@ -33,6 +34,7 @@ const languages = [
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const { t } = useTranslation();
   const language = useSelector((state) => state.language.language);
   const currentUser = useSelector((state) => state.auth.currentUser);
@@ -45,12 +47,25 @@ const Header = () => {
     dispatch(setLanguage(value));
   };
 
+  const handleLogout = async () => {
+    try {
+      const auth = getAuth();
+      await signOut(auth); // Đăng xuất khỏi Firebase
+      dispatch(logoutSuccess()); // Reset Redux state
+      localStorage.removeItem('user'); // Xóa localStorage nếu có
+      queryClient.clear(); // Clear react-query cache
+      navigate('/'); // Chuyển hướng về trang chủ
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
   const userMenu = (
     <Menu>
-      <Menu.Item key='settings' icon={<SettingOutlined />}>
-        {t('home.settings')}
+      <Menu.Item key='profile' icon={<UserOutlined />} onClick={() => navigate('/profile')}>
+        Hồ sơ cá nhân
       </Menu.Item>
-      <Menu.Item key='logout' onClick={() => dispatch(logoutSuccess())} icon={<LogoutOutlined />}>
+      <Menu.Item key='logout' icon={<LogoutOutlined />} onClick={handleLogout}>
         {t('home.logout')}
       </Menu.Item>
     </Menu>
@@ -93,7 +108,15 @@ const Header = () => {
             {currentUser ? (
               <Dropdown overlay={userMenu} trigger={['click']}>
                 <Button type='text' className='flex items-center space-x-2'>
-                  <UserOutlined className='text-gray-600 text-xl' />
+                  {currentUser.avatar ? (
+                    <img
+                      src={currentUser.avatar}
+                      alt='avatar'
+                      className='w-6 h-6 rounded-full object-cover border'
+                    />
+                  ) : (
+                    <UserOutlined className='text-gray-600 text-xl' />
+                  )}
                   <span className='hidden md:inline'>{currentUser.name}</span>
                   <DownOutlined />
                 </Button>
