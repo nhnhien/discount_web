@@ -61,34 +61,38 @@ const ProductDetail = () => {
   } = useQuery({
     queryKey: ['product', id, userId],
     queryFn: () => getProductApplyCPById(id, userId),
-    enabled: !!id,
-  });
+    enabled: !!id && !!userId,
+    });
 
   const product = productData?.data;
-
+  console.log('🟡 [DEBUG] Product:', product);
+  console.log('🟡 [DEBUG] Product final_price:', product?.final_price);
+  console.log('🟡 [DEBUG] Product appliedRule:', product?.appliedRule);
+  console.log('🟡 [DEBUG] Selected variant:', selectedVariant);
+  console.log('🟡 [DEBUG] Selected variant final_price:', selectedVariant?.final_price);
+  console.log('🟡 [DEBUG] Selected variant appliedRule:', selectedVariant?.appliedRule);
+  
   useEffect(() => {
-    if (product) {
-      if (product.has_variant && product.variants && product.variants.length > 0) {
-        setAvailableVariants(product.variants);
-
-        if (!selectedVariant) {
-          setSelectedVariant(product.variants[0]);
-
-          const firstVariantAttrs = {};
-          if (product.variants[0].attributes) {
-            product.variants[0].attributes.forEach((attr) => {
-              firstVariantAttrs[attr.attribute_name.toLowerCase()] = attr.value;
-            });
-          }
-          setSelectedAttributes(firstVariantAttrs);
-        }
+    if (product?.has_variant && product.variants?.length > 0) {
+      setAvailableVariants(product.variants);
+  
+      // Nếu chưa có selectedAttributes thì set mặc định từ variant đầu tiên
+      if (!selectedVariant && product.variants[0]) {
+        const defaultAttrs = {};
+        product.variants[0].attributes?.forEach((attr) => {
+          defaultAttrs[attr.attribute_name.toLowerCase()] = attr.value;
+        });
+  
+        setSelectedAttributes(defaultAttrs);
+        setSelectedVariant(product.variants[0]);
       }
-
-      if (!product.image_url && selectedVariant?.image_url) {
-        setCurrentImage(0);
-      }
+    } else {
+      setSelectedVariant(null);
+      setSelectedAttributes({});
     }
-  }, [product, selectedVariant]);
+  }, [product]);
+  
+  
 
   const getUniqueAttributeValues = (attributeName) => {
     if (!product || !product.variants) return [];
@@ -105,31 +109,34 @@ const ProductDetail = () => {
   };
 
   const getAttributeTypes = () => {
-    if (!product || !product.variants) return [];
-
+    if (!product?.variants) return [];
+  
     const types = new Set();
     product.variants.forEach((variant) => {
       variant.attributes?.forEach((attr) => {
         types.add(attr.attribute_name.toLowerCase());
       });
     });
-
+  
     return Array.from(types);
   };
-
+  
   const handleSelectAttribute = (attributeName, value) => {
-    const newAttributes = {
+    const updatedAttributes = {
       ...selectedAttributes,
       [attributeName.toLowerCase()]: value,
     };
-
-    setSelectedAttributes(newAttributes);
-
-    const matchingVariant = findMatchingVariant(newAttributes);
-    if (matchingVariant) {
-      setSelectedVariant(matchingVariant);
+  
+    setSelectedAttributes(updatedAttributes);
+  
+    const matchedVariant = findMatchingVariant(updatedAttributes);
+    if (matchedVariant) {
+      setSelectedVariant(matchedVariant);
+    } else {
+      setSelectedVariant(null); // fallback nếu không có variant khớp
     }
   };
+  
 
   const findMatchingVariant = (attributes) => {
     if (!product || !product.variants) return null;
@@ -147,28 +154,61 @@ const ProductDetail = () => {
   };
 
   const getFinalPrice = () => {
-    if (product?.has_variant && selectedVariant) {
-      return selectedVariant.final_price;
+    if (product?.has_variant) {
+      if (selectedVariant) {
+        return parseFloat(selectedVariant.final_price);
+      }
+      const prices = product.variants
+        ?.map((v) => parseFloat(v.final_price))
+        .filter((v) => !isNaN(v) && v > 0);
+  
+      if (prices.length > 0) {
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        return { min, max };
+      }
+      return 0;
     }
-    return product?.final_price || 0;
+    return parseFloat(product?.final_price || 0);
   };
-
+  
   const getOriginalPrice = () => {
-    if (product?.has_variant && selectedVariant) {
-      return selectedVariant.original_price;
+    if (product?.has_variant) {
+      if (selectedVariant) {
+        return parseFloat(selectedVariant.original_price);
+      }
+      const prices = product.variants
+        ?.map((v) => parseFloat(v.original_price))
+        .filter((v) => !isNaN(v) && v > 0);
+  
+      if (prices.length > 0) {
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        return { min, max };
+      }
+      return 0;
     }
-    return product?.original_price || 0;
+    return parseFloat(product?.original_price || 0);
   };
+  
+  
 
   const getDiscountPercent = () => {
     const original = getOriginalPrice();
     const final = getFinalPrice();
-
-    if (original > final) {
+  
+    if (typeof original === 'number' && typeof final === 'number' && original > final) {
       return Math.round(((original - final) / original) * 100);
     }
+  
+    if (typeof original === 'object' && typeof final === 'object' && original.min > final.min) {
+      return Math.round(((original.min - final.min) / original.min) * 100);
+    }
+  
     return 0;
   };
+  
+  
 
   const isAttributeValueAvailable = (attributeName, value) => {
     if (!product || !product.variants) return false;
@@ -349,7 +389,19 @@ const ProductDetail = () => {
                         className={`cursor-pointer border rounded-md overflow-hidden ${
                           currentImage === index ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'
                         }`}
-                        onClick={() => setCurrentImage(index)}
+                        onClick={() => {
+                          setCurrentImage(index);
+                        
+                          const variant = product.variants?.find(v => v.image_url === img);
+                          if (variant) {
+                            setSelectedVariant(variant);
+                            const attrs = {};
+                            variant.attributes?.forEach(attr => {
+                              attrs[attr.attribute_name.toLowerCase()] = attr.value;
+                            });
+                            setSelectedAttributes(attrs);
+                          }
+                        }}
                       >
                         <img
                           src={img || 'https://via.placeholder.com/100'}
@@ -395,31 +447,62 @@ const ProductDetail = () => {
               </div>
 
               {/* Giá */}
-              <div className='bg-gray-50 p-4 rounded-lg mb-6'>
-                <div className='flex items-baseline'>
-                  <Title level={2} className='text-red-600 m-0'>
-                    {formatCurrency(getFinalPrice())}
-                  </Title>
-                  {getDiscountPercent() > 0 && (
-                    <Text delete className='ml-3 text-gray-500 text-lg'>
-                      {formatCurrency(getOriginalPrice())}
-                    </Text>
-                  )}
-                </div>
-                {product.appliedRule && (
-                  <div className='mt-2 flex items-center'>
-                    <Tag color='gold' className='mr-2'>
-                      Khuyến mãi
-                    </Tag>
-                    <Text className='text-sm'>
-                      {product.appliedRule.name}
-                      {product.appliedRule.discount_type === 'percentage'
-                        ? ` (-${product.appliedRule.discount_value}%)`
-                        : ` (-${formatCurrency(product.appliedRule.discount_value)})`}
-                    </Text>
-                  </div>
-                )}
-              </div>
+{/* Giá */}
+<div className='bg-gray-50 p-4 rounded-lg mb-6'>
+  <div className='flex items-baseline'>
+  <>
+  <Title level={2} className='text-red-600 m-0'>
+    {(() => {
+      const final = getFinalPrice();
+      if (typeof final === 'number') return formatCurrency(final);
+      if (final.min === final.max) return formatCurrency(final.min);
+      return `Từ ${formatCurrency(final.min)} đến ${formatCurrency(final.max)}`;
+    })()}
+  </Title>
+
+  {(() => {
+    const original = getOriginalPrice();
+    const final = getFinalPrice();
+    if (typeof original === 'number' && typeof final === 'number' && original > final) {
+      return (
+        <Text delete className='ml-3 text-gray-500 text-lg'>
+          {formatCurrency(original)}
+        </Text>
+      );
+    }
+
+    if (typeof original === 'object' && original.min > final.min) {
+      return (
+        <Text delete className='ml-3 text-gray-500 text-lg'>
+          {original.min === original.max
+            ? formatCurrency(original.min)
+            : `Từ ${formatCurrency(original.min)} đến ${formatCurrency(original.max)}`}
+        </Text>
+      );
+    }
+
+    return null;
+  })()}
+</>
+
+  </div>
+
+  {(selectedVariant?.appliedRule || product.appliedRule) && (
+  <div className='mt-2 flex items-center'>
+    <Tag color='gold' className='mr-2'>
+      Khuyến mãi
+    </Tag>
+    <Text className='text-sm'>
+      {(selectedVariant?.appliedRule || product.appliedRule).name}
+      {(selectedVariant?.appliedRule || product.appliedRule).discount_type === 'percentage'
+        ? ` (-${(selectedVariant?.appliedRule || product.appliedRule).discount_value}%)`
+        : ` (-${formatCurrency((selectedVariant?.appliedRule || product.appliedRule).discount_value)})`}
+    </Text>
+  </div>
+)}
+
+</div>
+
 
               <div className='mb-6'>
                 <Row gutter={[16, 8]}>

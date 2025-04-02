@@ -16,6 +16,8 @@ import { cartService } from '@/service/cart';
 import { orderService } from '@/service/order';
 import { addressService } from '@/service/address';
 import { paymentService } from '@/service/payment';
+import { useLocation } from 'react-router-dom';
+
 
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
@@ -29,9 +31,10 @@ const CHECKOUT_STEPS = {
 
 const CheckoutScreen = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const location = useLocation();
+  
+    const queryClient = useQueryClient();
   const [form] = Form.useForm();
-
   const [currentStep, setCurrentStep] = useState(CHECKOUT_STEPS.ADDRESS);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
@@ -49,6 +52,22 @@ const CheckoutScreen = () => {
 
   const addresses = addressData?.data || [];
   const cart = cartData?.data;
+
+
+  const selectedItemIds = location.state?.selectedItems || [];
+  const selectedCartItems = (cart?.items || []).filter(item => selectedItemIds.includes(item.id));
+  
+  const computedSubtotal = selectedCartItems.reduce(
+    (sum, item) => sum + item.unit_price * item.quantity,
+    0
+  );
+  
+  const computedDiscount = selectedCartItems.reduce(
+    (sum, item) => sum + item.discount_amount,
+    0
+  );
+  
+  const computedTotal = computedSubtotal;
 
   const createOrderMutation = useMutation({
     mutationFn: orderService.createOrder,
@@ -110,12 +129,14 @@ const CheckoutScreen = () => {
     createOrderMutation.mutate({
       shipping_address_id: selectedAddress,
       payment_method: paymentMethod,
-      items: cart.items.map(item => ({
+      items: selectedCartItems.map(item => ({
         product_id: item.product_id,
         variant_id: item.variant_id,
         quantity: item.quantity
-      }))
+      })),
+      cart_item_ids: selectedCartItems.map(item => item.id),
     });
+    
   };
 
   const handleAddAddress = () => {
@@ -142,9 +163,10 @@ const CheckoutScreen = () => {
 
   // Helper function to format prices
   const formatPrice = (price) => {
-    return parseFloat(price).toLocaleString('vi-VN') + 'đ';
+    const number = parseFloat(price);
+    return isNaN(number) ? '0đ' : number.toLocaleString('vi-VN') + 'đ';
   };
-
+  
   const getSelectedAddress = () => {
     return addresses.find(addr => addr.id === selectedAddress);
   };
@@ -158,6 +180,7 @@ const CheckoutScreen = () => {
       default: return method;
     }
   };
+
 
   return (
     <div style={{ background: '#f7f9fc', minHeight: '100vh', padding: '24px 0' }}>
@@ -471,7 +494,7 @@ const CheckoutScreen = () => {
                   }}>
                     <List
                       itemLayout="horizontal"
-                      dataSource={cart?.items || []}
+                      dataSource={selectedCartItems}
                       renderItem={(item) => (
                         <List.Item style={{ padding: '12px 8px', borderBottom: '1px solid #f0f0f0' }}>
                           <List.Item.Meta
@@ -552,170 +575,152 @@ const CheckoutScreen = () => {
 
           <Col xs={24} md={8}>
             <div className="sticky top-6">
-              <Card 
-                className="order-summary-card"
-                style={{ 
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-                  borderRadius: '12px',
-                  overflow: 'hidden'
-                }}
-              >
+            <Card 
+  className="order-summary-card"
+  style={{ 
+    boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+    borderRadius: '12px',
+    overflow: 'hidden'
+  }}
+>
+  <div style={{ 
+    background: 'linear-gradient(135deg, #1890ff, #096dd9)',
+    margin: '-24px -24px 16px -24px',
+    padding: '16px 24px',
+    borderRadius: '12px 12px 0 0'
+  }}>
+    <Title level={4} style={{ color: 'white', margin: 0 }}>
+      <ShoppingOutlined /> Thông tin đơn hàng
+    </Title>
+  </div>
+
+  {cartLoading ? (
+    <div style={{ textAlign: 'center', padding: '20px 0' }}>
+      <Spin size="large" />
+    </div>
+  ) : (
+    <>
+      <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '16px' }}>
+        {selectedCartItems.length > 0 && (
+          <div style={{ padding: '0 0 16px' }}>
+            {selectedCartItems.map((item, index) => (
+              <div key={index} style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                padding: '8px 0',
+                borderBottom: index < selectedCartItems.length - 1 ? '1px solid #f0f0f0' : 'none'
+              }}>
                 <div style={{ 
-                  background: 'linear-gradient(135deg, #1890ff, #096dd9)',
-                  margin: '-24px -24px 16px -24px',
-                  padding: '16px 24px',
-                  borderRadius: '12px 12px 0 0'
+                  width: '40px', 
+                  height: '40px', 
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  marginRight: '12px',
+                  flexShrink: 0
                 }}>
-                  <Title level={4} style={{ color: 'white', margin: 0 }}>
-                    <ShoppingOutlined /> Thông tin đơn hàng
-                  </Title>
+                  <Image
+                    src={item.image_url || "/api/placeholder/40/40"}
+                    alt={item.product_name}
+                    width={40}
+                    height={40}
+                    style={{ objectFit: 'cover' }}
+                    preview={false}
+                  />
                 </div>
-                
-                {cartLoading || !cart ? (
-                  <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                    <Spin size="large" />
-                  </div>
-                ) : (
-                  <>
-                    <div style={{ maxHeight: '300px', overflowY: 'auto', marginBottom: '16px' }}>
-                      {cart.items && cart.items.length > 0 && (
-                        <div style={{ padding: '0 0 16px' }}>
-                          {cart.items.map((item, index) => (
-                            <div key={index} style={{ 
-                              display: 'flex', 
-                              alignItems: 'center', 
-                              padding: '8px 0',
-                              borderBottom: index < cart.items.length - 1 ? '1px solid #f0f0f0' : 'none'
-                            }}>
-                              <div style={{ 
-                                width: '40px', 
-                                height: '40px', 
-                                borderRadius: '4px',
-                                overflow: 'hidden',
-                                marginRight: '12px',
-                                flexShrink: 0
-                              }}>
-                                <Image
-                                  src={item.image_url || "/api/placeholder/40/40"}
-                                  alt={item.product_name}
-                                  width={40}
-                                  height={40}
-                                  style={{ objectFit: 'cover' }}
-                                  preview={false}
-                                />
-                              </div>
-                              <div style={{ 
-                                flex: 1,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap'
-                              }}>
-                                <Text type="secondary" style={{ fontSize: '13px' }}>
-                                  {item.product_name} x {item.quantity}
-                                </Text>
-                              </div>
-                              <div style={{ 
-                                marginLeft: '8px',
-                                fontSize: '14px',
-                                fontWeight: 500,
-                                color: '#1890ff'
-                              }}>
-                                {formatPrice(item.unit_price * item.quantity)}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <Divider style={{ margin: '16px 0' }} />
-                    
-                    <div style={{ fontSize: '16px' }}>
-                      <div className='flex justify-between mb-2'>
-                        <Text>Tạm tính</Text>
-                        <Text>{formatPrice(cart.subtotal)}</Text>
-                      </div>
-                      <div className='flex justify-between mb-2'>
-                        <Text>Phí vận chuyển</Text>
-                        <Text>{formatPrice(cart.shipping_fee)}</Text>
-                      </div>
-                      {cart.discount_amount > 0 && (
-                        <div className='flex justify-between mb-2'>
-                          <Text>Giảm giá</Text>
-                          <Text style={{ color: '#f5222d' }}>-{formatPrice(cart.discount_amount)}</Text>
-                        </div>
-                      )}
-                      <Divider style={{ margin: '12px 0' }} />
-                      <div className='flex justify-between mb-4'>
-                        <Text strong style={{ fontSize: '18px' }}>Tổng cộng</Text>
-                        <Text strong style={{ fontSize: '20px', color: '#1890ff' }}>
-                          {formatPrice(cart.total_amount)}
-                        </Text>
-                      </div>
-                      
-                      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
-                        {currentStep > 0 && (
-                          <Button 
-                            onClick={prev} 
-                            icon={<ArrowLeftOutlined />}
-                            size="large"
-                            style={{ flex: 1 }}
-                          >
-                            Quay lại
-                          </Button>
-                        )}
-                        {currentStep === CHECKOUT_STEPS.CONFIRMATION ? (
-                          <Button 
-                            type='primary' 
-                            onClick={handlePlaceOrder} 
-                            loading={createOrderMutation.isLoading}
-                            icon={<CheckCircleOutlined />}
-                            size="large"
-                            style={{ 
-                              background: 'linear-gradient(90deg, #1890ff, #096dd9)',
-                              flex: currentStep > 0 ? 2 : 1
-                            }}
-                          >
-                            Đặt hàng
-                          </Button>
-                        ) : (
-                          <Button 
-                            type='primary' 
-                            onClick={next}
-                            icon={<ArrowRightOutlined />}
-                            size="large"
-                            style={{ 
-                              background: 'linear-gradient(90deg, #1890ff, #096dd9)',
-                              flex: currentStep > 0 ? 2 : 1
-                            }}
-                          >
-                            Tiếp tục
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                <div style={{ 
+                  flex: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <Text type="secondary" style={{ fontSize: '13px' }}>
+                    {item.product_name} x {item.quantity}
+                  </Text>
+                </div>
+                <div style={{ 
+                  marginLeft: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#1890ff'
+                }}>
+                  {formatPrice(item.unit_price * item.quantity)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      <Divider style={{ margin: '16px 0' }} />
+      
+      <div style={{ fontSize: '16px' }}>
+        <div className='flex justify-between mb-2'>
+          <Text>Tạm tính</Text>
+          <Text>{formatPrice(computedSubtotal)}</Text>
+        </div>
+        <div className='flex justify-between mb-2'>
+          <Text>Phí vận chuyển</Text>
+          <Text>Tính khi giao hàng</Text>
+        </div>
+        {computedDiscount > 0 && (
+          <div className='flex justify-between mb-2'>
+            <Text>Giảm giá</Text>
+            <Text style={{ color: '#f5222d' }}>-{formatPrice(computedDiscount)}</Text>
+          </div>
+        )}
+        <Divider style={{ margin: '12px 0' }} />
+        <div className='flex justify-between mb-4'>
+          <Text strong style={{ fontSize: '18px' }}>Tổng cộng</Text>
+          <Text strong style={{ fontSize: '20px', color: '#1890ff' }}>
+            {formatPrice(computedTotal)}
+          </Text>
+        </div>
 
-                    <div style={{ marginTop: '24px', padding: '16px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                      <div className='mt-6 space-y-3'>
-                        <div className='flex items-center text-gray-600'>
-                          <SafetyOutlined style={{ color: '#52c41a', marginRight: '8px' }} />
-                          <Typography.Text className='text-sm'>Thanh toán an toàn & bảo mật</Typography.Text>
-                        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+          {currentStep > 0 && (
+            <Button 
+              onClick={prev} 
+              icon={<ArrowLeftOutlined />}
+              size="large"
+              style={{ flex: 1 }}
+            >
+              Quay lại
+            </Button>
+          )}
+          {currentStep === CHECKOUT_STEPS.CONFIRMATION ? (
+            <Button 
+              type='primary' 
+              onClick={handlePlaceOrder} 
+              loading={createOrderMutation.isLoading}
+              icon={<CheckCircleOutlined />}
+              size="large"
+              style={{ 
+                background: 'linear-gradient(90deg, #1890ff, #096dd9)',
+                flex: currentStep > 0 ? 2 : 1
+              }}
+            >
+              Đặt hàng
+            </Button>
+          ) : (
+            <Button 
+              type='primary' 
+              onClick={next}
+              icon={<ArrowRightOutlined />}
+              size="large"
+              style={{ 
+                background: 'linear-gradient(90deg, #1890ff, #096dd9)',
+                flex: currentStep > 0 ? 2 : 1
+              }}
+            >
+              Tiếp tục
+            </Button>
+          )}
+        </div>
+      </div>
+    </>
+  )}
+</Card>
 
-                        <div className='flex items-center text-gray-600'>
-                          <TruckOutlined style={{ color: '#1890ff', marginRight: '8px' }} />
-                          <Typography.Text className='text-sm'>Giao hàng nhanh toàn quốc</Typography.Text>
-                        </div>
-
-                        <div className='flex items-center text-gray-600'>
-                          <ClockCircleOutlined style={{ color: '#fa8c16', marginRight: '8px' }} />
-                          <Typography.Text className='text-sm'>Đổi trả miễn phí trong 7 ngày</Typography.Text>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </Card>
             </div>
           </Col>
         </Row>
