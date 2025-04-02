@@ -15,7 +15,10 @@ import ProductMain from '@/pages/product/components/ProductMain';
 import ProductCard from '@/pages/product/components/ProductCard';
 import CartScreen from '@/pages/cart/components/CartScreen';
 import QBManager from '@/admin/features/quantity-break/components/QBManager';
- import QBEditor from '../admin/features/quantity-break/components/QBEditor';
+import QBEditor from '../admin/features/quantity-break/components/QBEditor';
+// import PaymentSuccess from '@/pages/payment/PaymentSuccess';
+import OrderSuccess from '@/pages/payment/OrderSuccess';
+import OrdersScreen from '@/pages/order/OrdersScreen';
 const mainRouter = createBrowserRouter([
   {
     path: '/',
@@ -48,6 +51,18 @@ const mainRouter = createBrowserRouter([
       {
         path: '*',
         element: <NotFoundScreen />,
+      },
+      // {
+      //   path: '/payment-success',
+      //   element: <PaymentSuccess />,
+      // },
+      {
+        path: '/order-success/:id',
+        element: <OrderSuccess />,
+      },
+      {
+        path: '/orders', 
+        element: <OrdersScreen />, 
       },
     ],
   },
