@@ -19,6 +19,8 @@ import QBEditor from '../admin/features/quantity-break/components/QBEditor';
 // import PaymentSuccess from '@/pages/payment/PaymentSuccess';
 import OrderSuccess from '@/pages/payment/OrderSuccess';
 import OrdersScreen from '@/pages/order/OrdersScreen';
+import OrderManager from '@/admin/features/order/OrderManager';
+
 const mainRouter = createBrowserRouter([
   {
     path: '/',
@@ -110,6 +112,11 @@ const mainRouter = createBrowserRouter([
         path: 'discount/qb/edit/:id',
         element: <QBEditor />,
       },
+      {
+        path: '/admin/orders',
+        element: <OrderManager />,
+      },
+      
       {
         path: '*',
         element: <NotFoundScreen />,
