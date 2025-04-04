@@ -16,7 +16,6 @@ import ProductCard from '@/pages/product/components/ProductCard';
 import CartScreen from '@/pages/cart/components/CartScreen';
 import QBManager from '@/admin/features/quantity-break/components/QBManager';
 import QBEditor from '../admin/features/quantity-break/components/QBEditor';
-// import PaymentSuccess from '@/pages/payment/PaymentSuccess';
 import OrderSuccess from '@/pages/payment/OrderSuccess';
 import OrdersScreen from '@/pages/order/OrdersScreen';
 import OrderManager from '@/admin/features/order/OrderManager';
@@ -25,6 +24,8 @@ import ProfileScreen from '@/pages/profile/ProfileScreen';
 import PriceListManager from '@/admin/features/price-list/PriceListManager';
 import PLEditor from '@/admin/features/price-list/components/PLEditor';
 import RequireRole from '@/components/auth/RequireRole';
+import DiscountManager from '@/admin/features/discount/components/DiscountManager';
+import DiscountEditor from '@/admin/features/discount/components/DiscountEditor';
 
 const mainRouter = createBrowserRouter([
   {
@@ -59,10 +60,6 @@ const mainRouter = createBrowserRouter([
         path: '*',
         element: <NotFoundScreen />,
       },
-      // {
-      //   path: '/payment-success',
-      //   element: <PaymentSuccess />,
-      // },
       {
         path: '/order-success/:id',
         element: <OrderSuccess />,
@@ -100,6 +97,10 @@ const mainRouter = createBrowserRouter([
       { path: 'discounts/pl', element: <PriceListManager /> },
       { path: 'discount/pl/create', element: <PLEditor /> },
       { path: 'discount/pl/edit/:id', element: <PLEditor /> },
+      { path: 'discounts', element: <DiscountManager /> },
+      { path: 'discount/create', element: <DiscountEditor /> },
+      { path: 'discount/edit/:id', element: <DiscountEditor /> },
+      
       { path: '*', element: <NotFoundScreen /> },
     ],
   }

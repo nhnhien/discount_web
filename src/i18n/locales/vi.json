@@ -6,8 +6,6 @@
   "profile": "Hồ sơ",
   "logout": "Đăng xuất",
   "hello_admin": "Xin chào, Admin",
-  "login": "Đăng nhập",
-  "login_with_google": "Đăng nhập với Google",
   "sidebar": {
     "home": "Trang chủ",
     "orders": "Đơn hàng",
@@ -16,15 +14,8 @@
     "discounts": "Khuyến mãi",
     "custom_pricing": "Giá tùy chỉnh",
     "price_list": "Bảng giá",
-    "quantity_break": "Chiết khấu số lượng"
-  },
-  "breadcrumb": {
-    "home": "Trang chủ",
-    "product": "Sản phẩm",
-    "create_product": "Thêm sản phẩm",
-    "orders": "Đơn hàng",
-    "discounts": "Giảm giá",
-    "create_cp": "Tạo custom pricing"
+    "quantity_break": "Chiết khấu số lượng",
+    "voucher": "Mã giảm giá"
   },
   "cp": {
     "title": "Giá tùy chỉnh",
@@ -35,7 +26,7 @@
     "apply_to_market": "Chọn thị trường",
     "all_market": "Tất cả thị trường",
     "specific_market": "Thị trường cụ thể",
-    "apply_to_product": "Chọn sản phẩm",
+    "apply_to_product": " Chọn sản phẩm",
     "all_product": "Tất cả sản phẩm",
     "specific_product": "Sản phẩm cụ thể",
     "apply_to_customer": "Chọn khách hàng",
@@ -46,47 +37,7 @@
     "preview": "Xem trước",
     "percentage_discount": "Giảm giá theo phần trăm",
     "fixed_discount": "Giảm giá cố định",
-    "amount_discount": "Giảm giá theo số tiền",
-    "create": "Tạo mới",
-    "edit": "Chỉnh sửa",
-    "manage": "Quản lý Rules",
-    "add_rule": "Thêm Rule",
-    "search_rule": "Tìm kiếm rule...",
-    "rule_details": "Chi tiết Rule",
-    "select_customer": "Chọn khách hàng",
-    "select_product": "Chọn sản phẩm",
-    "applied_products": "Danh sách sản phẩm được áp dụng"
-  },
-  "product": {
-    "manage": "Quản lý sản phẩm",
-    "search": "Tìm kiếm sản phẩm...",
-    "add": "Thêm sản phẩm",
-    "edit": "Chỉnh sửa sản phẩm",
-    "import": "Nhập",
-    "delete_confirm": "Bạn có chắc chắn muốn xóa sản phẩm này?",
-    "delete_description": "Hành động này không thể hoàn tác!",
-    "delete_success": "Xóa sản phẩm thành công!",
-    "delete_error": "Lỗi khi xóa sản phẩm!",
-    "create_success": "Tạo sản phẩm thành công!",
-    "create_error": "Có lỗi khi tạo sản phẩm!",
-    "name": "Tên sản phẩm",
-    "description": "Mô tả sản phẩm",
-    "category": "Danh mục",
-    "market": "Thị trường",
-    "image": "Ảnh sản phẩm",
-    "variants": "Quản lý biến thể",
-    "add_variant": "Thêm biến thể",
-    "variant": "Biến thể",
-    "sku": "SKU",
-    "price": "Giá",
-    "stock": "Tồn kho",
-    "size": "Kích thước",
-    "color": "Màu sắc",
-    "material": "Chất liệu",
-    "variant_image": "Ảnh biến thể",
-    "original_price": "Giá gốc",
-    "final_price": "Giá cuối",
-    "has_variants": "Thêm biến thể"
+    "amount_discount": "Giảm giá theo số tiền"
   },
   "general": {
     "add": "Thêm",
@@ -114,59 +65,12 @@
     "import": "Nhập",
     "print": "In",
     "start_date": "Ngày bắt đầu",
-    "end_date": "Ngày kết thúc",
-    "discount_name": "Tên giảm giá",
-    "actions": "Hành động",
-    "created_at": "Thời gian tạo",
-    "confirm": "Xác nhận",
-    "discard": "Hủy",
-    "validation": {
-      "required": "Trường này không được để trống",
-      "min": "Giá trị phải lớn hơn hoặc bằng {min}",
-      "max_percentage": "Phần trăm phải nhỏ hơn hoặc bằng 100%",
-      "select_one": "Vui lòng chọn ít nhất một lựa chọn"
-    }
-  },
-  "notfound": {
-    "title": "404",
-    "message": "Trang không tìm thấy.",
-    "back_home": "Về trang chủ"
+    "end_date": "Ngày kết thúc"
   },
   "home": {
-    "new_arrivals": "Sản phẩm mới",
-    "new_arrivals_description": "Cập nhật xu hướng thời trang mới nhất",
-    "best_sellers": "Sản phẩm bán chạy",
-    "best_sellers_description": "Lựa chọn hàng đầu của khách hàng B2B",
-    "featured_categories": "Danh mục nổi bật",
-    "trending_products": "Sản phẩm gợi ý",
-    "add_to_cart": "Thêm vào giỏ",
-    "favorite": "Yêu thích",
-    "our_latest_collection": "Bộ sưu tập mới nhất",
-    "collection_description": "Khám phá bộ sưu tập Thu/Đông 2024 với thiết kế vượt thời gian và chất lượng cao cấp.",
-    "exclusive_fashion": "Xu hướng thời trang độc quyền",
-    "fashion_description": "Nâng cấp tủ đồ của bạn với những sản phẩm mới nhất và trang phục thời trang.",
-    "luxury_comfort": "Sang trọng & Thoải mái",
-    "luxury_description": "Trải nghiệm thời trang cao cấp kết hợp với sự thoải mái và thanh lịch tuyệt đối.",
-    "view_more": "Xem thêm"
-  },
-  "shop": {
-    "search_placeholder": "Tìm kiếm sản phẩm...",
-    "login": "Đăng nhập",
-    "store_name": "FashionStore"
-  },
-  "footer": {
-    "customer_support": "Hỗ trợ khách hàng",
-    "hotline": "Hotline: 1900 1234",
-    "email": "Email: support@fashionstore.com",
-    "working_hours": "Giờ làm việc: 8:00 - 22:00",
-    "about_us": "Về chúng tôi",
-    "introduction": "Giới thiệu",
-    "recruitment": "Tuyển dụng",
-    "store_system": "Hệ thống cửa hàng",
-    "policies": "Chính sách",
-    "privacy": "Bảo mật thông tin",
-    "return_policy": "Chính sách đổi trả",
-    "terms": "Điều khoản dịch vụ",
-    "copyright": "© 2024 FashionStore. All rights reserved"
+    "sign_in": "Đăng nhập",
+    "sign_up": "Đăng ký",
+    "logout": "Đăng xuất",
+    "settings": "Cài đặt"
   }
 }

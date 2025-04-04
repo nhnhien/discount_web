@@ -3,10 +3,11 @@ import { IoPricetag } from 'react-icons/io5';
 import { FaUser } from 'react-icons/fa';
 import { BsFillCartCheckFill } from 'react-icons/bs';
 import { RiDiscountPercentFill } from 'react-icons/ri';
+
 const getAdminNavigationItems = (t) => [
   {
     id: 1,
-    title: t('sidebar.home'), 
+    title: t('sidebar.home'), // ✅ Dùng key từ JSON
     icon: <GoHomeFill size='18' />,
     link: '/admin',
   },
@@ -35,6 +36,11 @@ const getAdminNavigationItems = (t) => [
     link: '/admin/discounts',
     children: [
       {
+        id: 50,
+        title: t('sidebar.voucher'),
+        link: '/admin/discounts',
+      },
+      {
         id: 51,
         title: t('sidebar.custom_pricing'),
         link: '/admin/discounts/cp',
@@ -52,6 +58,5 @@ const getAdminNavigationItems = (t) => [
     ],
   },
 ];
-
 
 export { getAdminNavigationItems };
