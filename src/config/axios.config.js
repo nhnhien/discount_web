@@ -13,10 +13,14 @@ apiClient.interceptors.request.use(
     const user = auth.currentUser;
 
     if (user) {
-      const token = await user.getIdToken();
-      config.headers['Authorization'] = `Bearer ${token}`;
-    } else {
+      try {
+        const token = await user.getIdToken();
+        config.headers['Authorization'] = `Bearer ${token}`;
+      } catch (err) {
+        console.error('Lỗi lấy token Firebase:', err);
+      }
     }
+    
     
 
     return config;

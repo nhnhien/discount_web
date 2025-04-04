@@ -42,13 +42,21 @@ const SignInScreen = () => {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider.setCustomParameters({ prompt: 'select_account' }));
-      const idToken = await result.user.getIdToken();
-      await syncUserWithBackend(idToken);
+      const user = result.user;
+      const idToken = await user.getIdToken();
+  
+      // 👉 gửi kèm avatar (photoURL) về backend nếu cần
+      await syncUserWithBackend(idToken, {
+        name: user.displayName,
+        email: user.email,
+        avatar: user.photoURL,
+      });
     } catch (error) {
       console.error('Đăng nhập thất bại:', error);
       message.error('Đăng nhập thất bại!');
     }
   };
+  
 
   const setupRecaptcha = () => {
     if (!window.recaptchaVerifier) {
@@ -92,7 +100,7 @@ const SignInScreen = () => {
     }
   };
 
-  const syncUserWithBackend = async (idToken) => {
+  const syncUserWithBackend = async (idToken, extraData = {}) => {
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
@@ -100,8 +108,9 @@ const SignInScreen = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
+        body: JSON.stringify(extraData), // 👈 Gửi thêm name, email, avatar nếu có
       });
-
+  
       const data = await response.json();
       if (response.ok) {
         dispatch(loginSuccess(data.user));
@@ -114,6 +123,7 @@ const SignInScreen = () => {
       message.error('Không thể đồng bộ người dùng');
     }
   };
+  
 
   // 👉 UI render theo step
   const renderStep = () => {

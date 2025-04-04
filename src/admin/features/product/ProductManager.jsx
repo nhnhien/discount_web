@@ -50,6 +50,7 @@ import Loading from '../../../components/loading/Loading';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
 import { getProductApplyCP } from '@/service/product';
+import { getAllUsers } from '@/service/user'; // API lấy danh sách user
 
 const { Search } = Input;
 const { Option } = Select;
@@ -71,7 +72,8 @@ const ProductManager = () => {
   const [filterDrawerVisible, setFilterDrawerVisible] = useState(false);
   const currentUser = useSelector((state) => state.auth.currentUser);
   const userId = currentUser?.id;
-  
+  const [selectedUser, setSelectedUser] = useState(null);
+
   useEffect(() => {
     if (screens.xs && viewMode === 'table') {
       setViewMode('list');
@@ -83,11 +85,30 @@ const ProductManager = () => {
     queryFn: getCategory,
   });
 
-  const { data: products, isLoading: productsLoading } = useQuery({
-    queryKey: ['product', userId],
-    queryFn: () => getProductApplyCP({ userId }),
-    enabled: !!userId, // đảm bảo chỉ gọi khi đã có userId
+  const { data: userList } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: getAllUsers,
   });
+  
+  // Fetch product theo userId
+  const { data: products, isLoading: productsLoading } = useQuery({
+    queryKey: ['product', selectedUser?.id || 'all'],
+    queryFn: () => {
+      console.log('🧪 userId gửi lên:', selectedUser?.id); // 🧪 check
+      return getProductApplyCP({ userId: selectedUser?.id });
+    },
+        enabled: selectedUser !== undefined, // đảm bảo chỉ chạy khi có user rõ ràng
+        onSuccess: (data) => {
+          console.log('✅ Products:', data.data);
+          data.data.forEach(p => {
+            console.log(`[${p.name}] Final price: ${p.final_price}, Rule:`, p.appliedRule);
+          });
+        }
+        
+    
+    
+  });
+  
   
   
   
@@ -276,7 +297,11 @@ const ProductManager = () => {
           <Text
             strong
             className='text-lg hover:text-blue-500 cursor-pointer'
-            onClick={() => showProductDetails(record)}
+            onClick={() => {
+              console.log('🧪 Rule đang áp dụng:', record.appliedRule);
+              showProductDetails(record);
+            }}
+            
           >
             {name}
           </Text>
@@ -309,6 +334,15 @@ const ProductManager = () => {
       title: 'Giá',
       key: 'price',
       render: (_, record) => {
+        const rule = record.appliedRule;
+        const ruleType = rule?.is_price_list
+          ? 'Price List'
+          : rule?.discount_type === 'percentage'
+            ? `Giảm ${rule.discount_value}%`
+            : rule?.discount_type === 'fixed price'
+              ? `Giảm ${formatVND(rule.discount_value)}`
+              : '';
+    
         if (record.has_variant) {
           const variantPrices = record.variants?.map((v) => parseFloat(v.final_price)).filter((p) => !isNaN(p));
           const minPrice = variantPrices?.length > 0 ? Math.min(...variantPrices) : 0;
@@ -317,21 +351,30 @@ const ProductManager = () => {
             <div>
               <Text type='secondary'>Giá từ:</Text>{' '}
               <Text strong className='text-red-600 ml-1'>{formatVND(minPrice)}</Text>
+              {rule && (
+                <Tag color='blue' className='ml-2'>
+                  {ruleType}
+                </Tag>
+              )}
             </div>
           );
         } else {
-          return record.original_price !== record.final_price ? (
+          return (
             <div>
-              <Text delete type='secondary'>{formatVND(record.original_price)}</Text>
+              {record.original_price !== record.final_price && (
+                <Text delete type='secondary'>{formatVND(record.original_price)}</Text>
+              )}
               <Text strong className='text-red-600 block'>{formatVND(record.final_price)}</Text>
+              {rule && (
+                <Tag color='blue'>
+                  {ruleType}
+                </Tag>
+              )}
             </div>
-          ) : (
-            <Text strong>{formatVND(record.final_price)}</Text>
           );
         }
       },
     },
-    
     {
       title: 'Tồn kho',
       key: 'stock',
@@ -580,7 +623,14 @@ const ProductManager = () => {
       dataSource={filteredProducts}
       renderItem={(item) => (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
-          <List.Item className='mb-4 border rounded-lg shadow-sm p-3 bg-white' onClick={() => showProductDetails(item)}>
+          <List.Item
+  className='mb-4 border ...'
+  onClick={() => {
+    console.log('🧪 Rule đang áp dụng (mobile):', item.appliedRule);
+    showProductDetails(item);
+  }}
+>
+
             <div className='flex w-full'>
               <div className='mr-4'>
                 <Avatar
@@ -733,6 +783,28 @@ const ProductManager = () => {
                   Reset
                 </Button>
               )}
+<Select
+  placeholder='Chọn người dùng để xem giá'
+  value={selectedUser?.id}
+  allowClear
+  style={{ width: 250 }}
+  onChange={(value) => {
+    const user = userList?.data?.find((u) => u.id === value);
+    console.log('🧪 Selected user:', user);
+
+    setSelectedUser(user || null);
+  }}
+  loading={!userList}
+>
+  <Option value=''>Tất cả người dùng</Option>
+  {userList?.data?.map((user) => (
+    <Option key={user.id} value={user.id}>
+      {user.email || user.name || `User ${user.id}`}
+    </Option>
+  ))}
+</Select>
+
+
             </div>
           ) : (
             <Button icon={<FilterOutlined />} onClick={() => setFilterDrawerVisible(true)}>

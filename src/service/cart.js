@@ -22,9 +22,10 @@ export const cartService = {
   },
 
   clearCart: async () => {
-    const response = await apiClient.delete('/api/cart/apply');
+    const response = await apiClient.delete('/api/cart');
     return response.data;
   },
+  
 
   updateShippingInfo: async (shippingData) => {
     const response = await apiClient.put('/api/cart/shipping', {

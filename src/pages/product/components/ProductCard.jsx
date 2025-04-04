@@ -63,45 +63,68 @@ const ProductCard = ({ product, onToggleWishlist, onViewDetail }) => {
   };
 
   const getPriceDisplay = () => {
-    if (product.has_variant && product.variants?.length > 0) {
-      const prices = product.variants.map((v) => v.final_price);
-      const minPrice = Math.min(...prices);
-      const samePrice = prices.every((p) => p === minPrice);
-
-      return samePrice ? (
-        <Text className='text-lg font-bold text-blue-600'>{formatCurrency(minPrice)}</Text>
-      ) : (
-        <Text className='text-lg font-bold text-blue-600'>Từ {formatCurrency(minPrice)}</Text>
+    const isValidPrice = (p) => typeof p === 'number' && !isNaN(p) && p > 0;
+  
+    let finalPrice = product.final_price;
+    let originalPrice = product.original_price;
+  
+    // Nếu có biến thể thì lấy min/max giá từ variants
+    if (product.has_variant && Array.isArray(product.variants) && product.variants.length > 0) {
+      const finalPrices = product.variants.map(v => v.final_price).filter(isValidPrice);
+      const originalPrices = product.variants.map(v => v.original_price).filter(isValidPrice);
+  
+      const minPrice = Math.min(...finalPrices);
+      const maxPrice = Math.max(...finalPrices);
+  
+      return (
+        <div className='flex flex-col'>
+          <Text className='text-lg font-bold text-blue-600'>
+            {`Chỉ từ ${formatCurrency(minPrice)} đến ${formatCurrency(maxPrice)}`}
+          </Text>
+        </div>
       );
     }
-
-    const hasDiscount = product.original_price > product.final_price;
-
+  
+    // Sản phẩm không có biến thể
+    const hasDiscount = isValidPrice(originalPrice) && isValidPrice(finalPrice) && originalPrice > finalPrice;
+  
     return (
       <div className='flex items-center gap-2'>
         <Text className='text-lg font-bold text-blue-600'>
-          {formatCurrency(product.final_price)}
+          {isValidPrice(finalPrice) ? formatCurrency(finalPrice) : 'Liên hệ'}
         </Text>
         {hasDiscount && (
-          <Text delete className='text-sm text-gray-500'>
-            {formatCurrency(product.original_price)}
-          </Text>
+          <Text delete className='text-sm text-gray-500'>{formatCurrency(originalPrice)}</Text>
         )}
       </div>
     );
   };
+  
+  
+  
+  
+  
 
-  const hasDiscount = product.original_price > product.final_price;
-  const discountPercent = hasDiscount
-    ? Math.round(((product.original_price - product.final_price) / product.original_price) * 100)
-    : 0;
+  const hasValidPrices =
+  typeof product.original_price === 'number' &&
+  typeof product.final_price === 'number' &&
+  product.original_price > 0;
+
+const hasDiscount =
+  hasValidPrices && product.original_price > product.final_price;
+
+const discountPercent = hasDiscount
+  ? Math.round(((product.original_price - product.final_price) / product.original_price) * 100)
+  : 0;
+
 
   return (
-    <Badge.Ribbon
-      text={`-${discountPercent}%`}
-      color='red'
-      style={{ display: hasDiscount ? 'block' : 'none' }}
-    >
+<Badge.Ribbon
+  text={discountPercent > 0 ? `-${discountPercent}%` : ''}
+  color='red'
+  style={{ display: discountPercent > 0 ? 'block' : 'none' }}
+>
+
       <Card
         hoverable
         onClick={() => navigate(`/product/${product.id}`)}

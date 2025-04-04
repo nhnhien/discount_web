@@ -22,6 +22,9 @@ import OrdersScreen from '@/pages/order/OrdersScreen';
 import OrderManager from '@/admin/features/order/OrderManager';
 import CustomerManager from '@/admin/features/customer/CustomerManager';
 import ProfileScreen from '@/pages/profile/ProfileScreen';
+import PriceListManager from '@/admin/features/price-list/PriceListManager';
+import PLEditor from '@/admin/features/price-list/components/PLEditor';
+import RequireRole from '@/components/auth/RequireRole';
 
 const mainRouter = createBrowserRouter([
   {
@@ -76,62 +79,30 @@ const mainRouter = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <AdminLayout />,
+    element: (
+      <RequireRole allowedRoles={[1]}>
+        <AdminLayout />
+      </RequireRole>
+    ),
     children: [
-      {
-        index: true,
-        element: <DashboardAdmin />,
-      },
-      {
-        path: 'product',
-        element: <ProductManager />,
-      },
-      {
-        path: 'product/create',
-        element: <ProductEditor />,
-      },
-      {
-        path: 'product/edit/:id',
-        element: <ProductEditor />,
-      },
-      {
-        path: 'discounts/cp',
-        element: <CPManager />,
-      },
-      {
-        path: 'discount/cp/create',
-        element: <CPEditor />,
-      },
-      {
-        path: 'discount/cp/edit/:id',
-        element: <CPEditor />,
-      },
-      {
-        path: 'discounts/qb',
-        element: <QBManager />,
-      },
-      {
-        path: 'discount/qb/create',
-        element: <QBEditor />,
-      },
-      {
-        path: 'discount/qb/edit/:id',
-        element: <QBEditor />,
-      },
-      {
-        path: '/admin/orders',
-        element: <OrderManager />,
-      },
-      {
-        path: '/admin/customer',
-        element: <CustomerManager />,
-      },
-      {
-        path: '*',
-        element: <NotFoundScreen />,
-      },
+      { index: true, element: <DashboardAdmin /> },
+      { path: 'product', element: <ProductManager /> },
+      { path: 'product/create', element: <ProductEditor /> },
+      { path: 'product/edit/:id', element: <ProductEditor /> },
+      { path: 'discounts/cp', element: <CPManager /> },
+      { path: 'discount/cp/create', element: <CPEditor /> },
+      { path: 'discount/cp/edit/:id', element: <CPEditor /> },
+      { path: 'discounts/qb', element: <QBManager /> },
+      { path: 'discount/qb/create', element: <QBEditor /> },
+      { path: 'discount/qb/edit/:id', element: <QBEditor /> },
+      { path: 'orders', element: <OrderManager /> },
+      { path: 'customer', element: <CustomerManager /> },
+      { path: 'discounts/pl', element: <PriceListManager /> },
+      { path: 'discount/pl/create', element: <PLEditor /> },
+      { path: 'discount/pl/edit/:id', element: <PLEditor /> },
+      { path: '*', element: <NotFoundScreen /> },
     ],
-  },
+  }
 ]);
 
 export default mainRouter;

@@ -46,7 +46,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
 
   const currentUser = useSelector((state) => state.auth.currentUser);
-  const userId = currentUser?.id || '';
+  const userId = currentUser?.id;
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(null);
@@ -63,6 +63,7 @@ const ProductDetail = () => {
     queryFn: () => getProductApplyCPById(id, userId),
     enabled: !!id && !!userId,
     });
+    console.log('[ProductDetail] userId:', userId); // 👈 kiểm tra xem userId có đúng không
 
   const product = productData?.data;
   console.log('🟡 [DEBUG] Product:', product);

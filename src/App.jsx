@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { setCurrentUser } from '@/context/slice/auth';
 import { Spin } from 'antd';
+import { loginSuccess, logoutSuccess } from '@/context/slice/auth';
+import { syncUser } from './service/user';
 
 const queryClient = new QueryClient();
 
@@ -22,33 +24,26 @@ function App() {
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const token = await user.getIdToken();
-
-        let name = 'Người dùng';
-        if (user.displayName) {
-          name = user.displayName;
-        } else if (user.email && typeof user.email === 'string') {
-          name = user.email.split('@')[0];
-        } else if (user.phoneNumber) {
-          name = user.phoneNumber;
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const token = await firebaseUser.getIdToken();
+          const user = await syncUser(token); // Gọi API backend
+  
+          dispatch(loginSuccess(user)); // ✅ Cập nhật Redux, bao gồm role_id
+        } catch (err) {
+          console.error('❌ Lỗi khi syncUser:', err);
         }
-
-        dispatch(
-          setCurrentUser({
-            id: user.uid,
-            name,
-            email: user.email || null,
-            token,
-          })
-        );
+      } else {
+        dispatch(logoutSuccess()); // logout => clear Redux
       }
+  
       setAuthReady(true);
     });
-
+  
     return () => unsubscribe();
   }, [dispatch]);
+  
 
   if (!authReady) {
     return (

@@ -1,5 +1,14 @@
 import apiClient from '@/config/axios.config';
 
+const getAllUsers = async () => {
+  try {
+    const res = await apiClient.get('/api/user'); // gọi đúng API getUser phía backend
+    return { data: res.data }; // format giống React Query
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Lỗi khi lấy danh sách người dùng');
+  }
+};
+
 const getCustomer = async () => {
   try {
     const res = await apiClient.get('/api/user/customer');
@@ -28,7 +37,7 @@ const updateProfile = async (id, data) => {
 const syncUser = async (idToken) => {
   try {
     const res = await apiClient.post(
-      '/api/user/sync',
+      '/api/auth/sync-user', // ✅ Sửa đúng endpoint
       {},
       {
         headers: {
@@ -43,4 +52,6 @@ const syncUser = async (idToken) => {
   }
 };
 
-export { getCustomer, deactivateUser, reactivateUser, updateProfile, syncUser };
+
+
+export { getCustomer, deactivateUser, reactivateUser, updateProfile, syncUser, getAllUsers };

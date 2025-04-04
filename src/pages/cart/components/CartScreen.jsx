@@ -59,9 +59,9 @@ const CartScreen = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['cart'],
+    queryKey: ['cart', userId],
     queryFn: () => cartService.getCart(),
-    enabled: !!currentUser,
+    enabled: !!userId,
   });
   
   const cart = cartResponse?.data || {};
@@ -604,6 +604,10 @@ const selectedTotal = selectedSubtotal;
         <Typography.Text className='text-red-500 font-medium'>
           -{formatPrice(selectedDiscount)}
         </Typography.Text>
+        <Tooltip title="Giá đã bao gồm giảm từ bảng giá / chiết khấu riêng">
+  <Tag color="green">Đã áp dụng khuyến mãi</Tag>
+</Tooltip>
+
       </div>
     )}
 
