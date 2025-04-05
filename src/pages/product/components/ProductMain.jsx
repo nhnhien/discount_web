@@ -32,11 +32,13 @@ import {
   ClockCircleOutlined,
   SafetyCertificateOutlined,
   LineChartOutlined,
+  ShoppingOutlined 
 } from '@ant-design/icons';
 import { getProductApplyCPById, getProductById } from '@/service/product';
 import PriceTrendChart from './PriceTrendChart';
 import { cartService } from '@/service/cart';
 import { useQueryClient } from '@tanstack/react-query';
+import PriceComparison from './PriceComparison';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -44,6 +46,7 @@ const { TabPane } = Tabs;
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('description');
 
   const currentUser = useSelector((state) => state.auth.currentUser);
   const userId = currentUser?.id;
@@ -637,8 +640,12 @@ const ProductDetail = () => {
         </Row>
 
         <div className='bg-white rounded-lg shadow-sm mt-8 p-6'>
-          <Tabs defaultActiveKey='description'>
-            <TabPane tab='Mô tả sản phẩm' key='description'>
+        <Tabs 
+  defaultActiveKey="description" 
+  activeKey={activeTab}
+  onChange={(key) => setActiveTab(key)}
+>       
+     <TabPane tab='Mô tả sản phẩm' key='description'>
               <div className='py-4'>
                 {product.description ? (
                   <div className='product-description' dangerouslySetInnerHTML={{ __html: product.description }} />
@@ -681,6 +688,23 @@ const ProductDetail = () => {
                 )}
               </div>
             </TabPane>
+  <TabPane
+    tab={
+      <span>
+        <ShoppingOutlined /> So sánh giá
+      </span>
+    }
+    key='price-comparison'
+  >
+    <div className='py-4'>
+    <PriceComparison
+  productId={product.id}
+  variantId={selectedVariant?.id}
+  isTabActive={activeTab === 'price-comparison'} // 👈 truyền vào
+/>
+
+    </div>
+  </TabPane>
             <TabPane tab='Đánh giá (120)' key='reviews'>
               <div className='py-4 text-center'>
                 <Empty description='Tính năng đánh giá đang được phát triển' className='my-10' />
@@ -690,12 +714,12 @@ const ProductDetail = () => {
           </Tabs>
         </div>
 
-        <div className='bg-white rounded-lg shadow-sm mt-8 p-6'>
-          <Title level={4} className='mb-4'>
-            Sản phẩm liên quan
-          </Title>
-          <Empty description='Tính năng sản phẩm liên quan đang được phát triển' className='my-10' />
-        </div>
+<div className='bg-white rounded-lg shadow-sm mt-8 p-6'>
+  <Title level={4} className='mb-4'>
+    Sản phẩm liên quan
+  </Title>
+  <Empty description='Tính năng sản phẩm liên quan đang được phát triển' className='my-10' />
+</div>
       </div>
     </div>
   );

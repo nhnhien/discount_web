@@ -1,43 +1,32 @@
 import apiClient from '@/config/axios.config';
- 
- const getRules = async () => {
-   try {
-     const res = await apiClient.get('/api/cp');
-     return res.data;
-   } catch (error) {
-     throw new Error(error);
-   }
- };
- const createRule = async (rule) => {
-  try {
-    const res = await apiClient.post('/api/cp', rule);
-    return res.data;
-  } catch (error) {
-    throw new Error(error);
-  }
+
+const getRules = async (isPriceList = false) => {
+  const res = await apiClient.get('/api/cp', {
+    params: { is_price_list: isPriceList ? 1 : 0 },
+  });
+  return res.data;
 };
-const updateRule = async (ruleId, rule) => {
-  try {
-    const res = await apiClient.patch(`/api/cp/${ruleId}`, rule);
-    return res.data;
-  } catch (error) {
-    throw new Error(error);
-  }
+
+
+const createRule = async (rule, isPriceList = false) => {
+  const res = await apiClient.post('/api/cp', { ...rule, is_price_list: isPriceList });
+  return res.data;
 };
- const getRule = async (ruleId) => {
-   try {
-     const res = await apiClient.get(`/api/cp/${ruleId}`);
-     return res.data;
-   } catch (error) {
-     throw new Error(error);
-   }
- };
- const deleteRule = async (ruleId) => {
-   try {
-     const res = await apiClient.delete(`/api/cp/${ruleId}`);
-     return res.data;
-   } catch (error) {
-     throw new Error(error);
-   }
- };
- export { getRules, getRule, deleteRule, createRule, updateRule };
+
+const updateRule = async (id, rule, isPriceList = false) => {
+  const res = await apiClient.patch(`/api/cp/${id}`, { ...rule, is_price_list: isPriceList });
+  return res.data;
+};
+
+
+const getRule = async (id) => {
+  const res = await apiClient.get(`/api/cp/${id}`);
+  return res.data;
+};
+
+const deleteRule = async (id) => {
+  const res = await apiClient.delete(`/api/cp/${id}`);
+  return res.data;
+};
+
+export { getRules, getRule, deleteRule, createRule, updateRule };

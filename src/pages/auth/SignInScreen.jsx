@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from '@/context/slice/auth';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = 'http://localhost:8005/api/auth/sync-user';
+const API_URL = 'http://localhost:8000/api/auth/sync-user';
 
 const SignInScreen = () => {
   const dispatch = useDispatch();

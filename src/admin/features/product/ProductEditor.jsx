@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Form, Input, Button, Select, Switch, Row, Col, Collapse, message, Tooltip, Space } from 'antd';
 import { DeleteOutlined, PlusOutlined, InfoCircleOutlined, SaveOutlined, UndoOutlined } from '@ant-design/icons';
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useForm, Controller, useFieldArray, useWatch } from 'react-hook-form';
 import { v4 as uuidv4 } from 'uuid';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCategory } from '../../../service/category';
@@ -60,7 +60,7 @@ const ProductEditor = () => {
     mode: 'onChange',
   });
 
-  const hasVariants = watch('hasVariants', false);
+  const hasVariants = useWatch({ control, name: 'hasVariants' });
 
   const { fields, append, remove, replace } = useFieldArray({
     control,
@@ -121,7 +121,7 @@ const ProductEditor = () => {
         const material = findAttribute('Material');
 
         return {
-          id: variant.id || uuidv4(),
+          id: uuidv4(),
           sku: variant.sku || '',
           price: variant.final_price || variant.original_price || '',
           stock: variant.stock_quantity || '',
@@ -263,178 +263,164 @@ const ProductEditor = () => {
 
   const renderVariants = () => (
     <div className='mt-4 p-4 bg-gray-50 border rounded-md'>
-      <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-lg font-semibold text-blue-700'>Quản lý biến thể</h2>
-        <Tooltip title='Thêm biến thể mới'>
-          <Button type='primary' onClick={handleAddVariant} disabled={!isLastVariantFilled()} icon={<PlusOutlined />}>
-            Thêm biến thể
-          </Button>
-        </Tooltip>
-      </div>
-
-      {fields.length === 0 ? (
-        <div className='text-center p-8 text-gray-500'>
-          <p>Chưa có biến thể nào. Hãy thêm biến thể đầu tiên.</p>
-          <Button type='primary' onClick={handleAddVariant} className='mt-2' icon={<PlusOutlined />}>
-            Thêm biến thể
-          </Button>
-        </div>
-      ) : (
-        <Collapse defaultActiveKey={['0']} className='variant-collapse'>
-          {fields.map((field, index) => (
-            <Panel
-              header={
-                <div className='flex items-center'>
-                  <span className='font-medium'>Biến thể {index + 1}</span>
-                  {watch(`variants.${index}.sku`) && (
-                    <span className='ml-2 text-xs text-gray-500'>SKU: {watch(`variants.${index}.sku`)}</span>
-                  )}
-                  {watch(`variants.${index}.size`) && (
-                    <span className='ml-2 text-xs text-gray-500'>| Size: {watch(`variants.${index}.size`)}</span>
-                  )}
-                  {watch(`variants.${index}.color`) && (
-                    <span className='ml-2 text-xs text-gray-500'>| Màu: {watch(`variants.${index}.color`)}</span>
+      <Collapse defaultActiveKey={['product-variants']}>
+        <Panel
+          header={
+            <div className='flex justify-between items-center'>
+              <span className='font-semibold text-blue-700 text-base'>
+                Biến thể của sản phẩm: {watch('name') || 'Chưa đặt tên'}
+              </span>
+              <Tooltip title='Thêm biến thể mới'>
+                <Button
+                  type='primary'
+                  onClick={handleAddVariant}
+                  disabled={!isLastVariantFilled()}
+                  icon={<PlusOutlined />}
+                >
+                  Thêm biến thể
+                </Button>
+              </Tooltip>
+            </div>
+          }
+          key='product-variants'
+        >
+          {fields.length === 0 ? (
+            <div className='text-center p-8 text-gray-500'>
+              <p>Chưa có biến thể nào. Hãy thêm biến thể đầu tiên.</p>
+            </div>
+          ) : (
+            fields.map((field, index) => (
+              <div key={field.id} className='mb-6 border-b pb-4'>
+                <div className='flex justify-between items-center mb-2'>
+                  <span className='font-medium text-blue-600'>
+                    Biến thể {index + 1}{' '}
+                    {watch(`variants.${index}.sku`) && (
+                      <span className='ml-2 text-sm text-gray-500'>({watch(`variants.${index}.sku`)})</span>
+                    )}
+                  </span>
+                  {fields.length > 1 && (
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => remove(index)}
+                      size='small'
+                    >
+                      Xóa
+                    </Button>
                   )}
                 </div>
-              }
-              key={field.id}
-              extra={
-                fields.length > 1 && (
-                  <Button
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      remove(index);
-                    }}
-                    size='small'
-                  >
-                    Xóa
-                  </Button>
-                )
-              }
-            >
-              <Row gutter={16}>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label='SKU'
-                    required
-                    validateStatus={errors.variants?.[index]?.sku ? 'error' : ''}
-                    help={errors.variants?.[index]?.sku?.message}
-                  >
-                    <Controller
-                      name={`variants.${index}.sku`}
-                      control={control}
-                      rules={{ required: 'Vui lòng nhập SKU' }}
-                      render={({ field }) => <Input {...field} placeholder='Nhập SKU' />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label='Giá'
-                    required
-                    validateStatus={errors.variants?.[index]?.price ? 'error' : ''}
-                    help={errors.variants?.[index]?.price?.message}
-                  >
-                    <Controller
-                      name={`variants.${index}.price`}
-                      control={control}
-                      rules={{
-                        required: 'Vui lòng nhập giá',
-                        pattern: {
-                          value: /^\d+(\.\d{1,2})?$/,
-                          message: 'Giá phải là số hợp lệ',
-                        },
-                      }}
-                      render={({ field }) => (
-                        <Input {...field} placeholder='Nhập giá' suffix='VNĐ' type='number' min='0' step='1000' />
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    label='Tồn kho'
-                    required
-                    validateStatus={errors.variants?.[index]?.stock ? 'error' : ''}
-                    help={errors.variants?.[index]?.stock?.message}
-                  >
-                    <Controller
-                      name={`variants.${index}.stock`}
-                      control={control}
-                      rules={{
-                        required: 'Vui lòng nhập tồn kho',
-                        pattern: {
-                          value: /^\d+$/,
-                          message: 'Tồn kho phải là số nguyên',
-                        },
-                      }}
-                      render={({ field }) => <Input {...field} placeholder='Nhập tồn kho' type='number' min='0' />}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Row gutter={16}>
-                <Col xs={24} md={8}>
-                  <Form.Item label='Size'>
-                    <Controller
-                      name={`variants.${index}.size`}
-                      control={control}
-                      render={({ field }) => (
-                        <Select {...field} placeholder='Chọn size' allowClear value={field.value || undefined}>
-                          {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
-                            <Select.Option key={size} value={size}>
-                              {size}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item label='Màu sắc'>
-                    <Controller
-                      name={`variants.${index}.color`}
-                      control={control}
-                      render={({ field }) => <Input {...field} placeholder='Nhập màu' />}
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={8}>
-                  <Form.Item label='Chất liệu'>
-                    <Controller
-                      name={`variants.${index}.material`}
-                      control={control}
-                      render={({ field }) => (
-                        <Select {...field} placeholder='Chọn chất liệu' allowClear value={field.value || undefined}>
-                          {['Cotton', 'Polyester', 'Linen', 'Denim', 'Wool', 'Silk'].map((material) => (
-                            <Select.Option key={material} value={material}>
-                              {material}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      )}
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Form.Item label='Ảnh biến thể'>
-                <Controller
-                  name={`variants.${index}.image_url`}
-                  control={control}
-                  render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />}
-                />
-              </Form.Item>
-            </Panel>
-          ))}
-        </Collapse>
-      )}
+  
+                <Row gutter={16}>
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label='SKU'
+                      required
+                      validateStatus={errors.variants?.[index]?.sku ? 'error' : ''}
+                      help={errors.variants?.[index]?.sku?.message}
+                    >
+                      <Controller
+                        name={`variants.${index}.sku`}
+                        control={control}
+                        rules={{ required: 'Vui lòng nhập SKU' }}
+                        render={({ field }) => <Input {...field} placeholder='Nhập SKU' />}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label='Giá'
+                      required
+                      validateStatus={errors.variants?.[index]?.price ? 'error' : ''}
+                      help={errors.variants?.[index]?.price?.message}
+                    >
+                      <Controller
+                        name={`variants.${index}.price`}
+                        control={control}
+                        rules={{ required: 'Vui lòng nhập giá' }}
+                        render={({ field }) => (
+                          <Input {...field} placeholder='Nhập giá' suffix='VNĐ' type='number' min='0' step='1000' />
+                        )}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item
+                      label='Tồn kho'
+                      required
+                      validateStatus={errors.variants?.[index]?.stock ? 'error' : ''}
+                      help={errors.variants?.[index]?.stock?.message}
+                    >
+                      <Controller
+                        name={`variants.${index}.stock`}
+                        control={control}
+                        rules={{ required: 'Vui lòng nhập tồn kho' }}
+                        render={({ field }) => <Input {...field} placeholder='Nhập tồn kho' type='number' min='0' />}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+  
+                <Row gutter={16}>
+                  <Col xs={24} md={8}>
+                    <Form.Item label='Size'>
+                      <Controller
+                        name={`variants.${index}.size`}
+                        control={control}
+                        render={({ field }) => (
+                          <Select {...field} placeholder='Chọn size' allowClear value={field.value || undefined}>
+                            {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
+                              <Select.Option key={size} value={size}>
+                                {size}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        )}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label='Màu sắc'>
+                      <Controller
+                        name={`variants.${index}.color`}
+                        control={control}
+                        render={({ field }) => <Input {...field} placeholder='Nhập màu' />}
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} md={8}>
+                    <Form.Item label='Chất liệu'>
+                      <Controller
+                        name={`variants.${index}.material`}
+                        control={control}
+                        render={({ field }) => (
+                          <Select {...field} placeholder='Chọn chất liệu' allowClear value={field.value || undefined}>
+                            {['Cotton', 'Polyester', 'Linen', 'Denim', 'Wool', 'Silk'].map((material) => (
+                              <Select.Option key={material} value={material}>
+                                {material}
+                              </Select.Option>
+                            ))}
+                          </Select>
+                        )}
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+  
+                <Form.Item label='Ảnh biến thể'>
+                  <Controller
+                    name={`variants.${index}.image_url`}
+                    control={control}
+                    render={({ field }) => <ImageUploader value={field.value} onChange={field.onChange} />}
+                  />
+                </Form.Item>
+              </div>
+            ))
+          )}
+        </Panel>
+      </Collapse>
     </div>
   );
+  
 
   const isLoading = isLoadingProduct || isLoadingCategories || isLoadingMarkets || loadingInitialData;
   if (isLoading) {
