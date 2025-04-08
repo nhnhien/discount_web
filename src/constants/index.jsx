@@ -1,6 +1,6 @@
 import { GoHomeFill } from 'react-icons/go';
 import { IoPricetag } from 'react-icons/io5';
-import { FaUser } from 'react-icons/fa';
+import { FaUser, FaTags } from 'react-icons/fa';
 import { BsFillCartCheckFill } from 'react-icons/bs';
 import { RiDiscountPercentFill } from 'react-icons/ri';
 
@@ -22,6 +22,18 @@ const getAdminNavigationItems = (t) => [
     title: t('sidebar.product'),
     icon: <IoPricetag size='18' />,
     link: '/admin/product',
+    children: [
+      {
+        id: 31,
+        title: 'Sản phẩm',
+        link: '/admin/product',
+      },
+      {
+        id: 32,
+        title: 'Danh mục',
+        link: '/admin/category',
+      },
+    ],
   },
   {
     id: 4,
@@ -58,5 +70,4 @@ const getAdminNavigationItems = (t) => [
     ],
   },
 ];
-
 export { getAdminNavigationItems };

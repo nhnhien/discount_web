@@ -181,6 +181,29 @@ const DiscountEditor = () => {
         </Card>
 
         <Card title="Thiết lập giảm giá" className="shadow-sm">
+            {/* ⚠️ Cảnh báo nếu mã đã hết lượt */}
+  {discountData?.data?.usage_limit &&
+    discountData.data.usage_count >= discountData.data.usage_limit && (
+      <div className="mb-4">
+        <p className="text-red-600 font-medium">
+          ⚠️ Mã này đã hết lượt sử dụng ({discountData.data.usage_count}/{discountData.data.usage_limit})
+        </p>
+      </div>
+  )}
+
+  {/* ⏰ Cảnh báo nếu sắp hết hạn */}
+  {discountData?.data?.end_date && (() => {
+    const daysLeft = dayjs(discountData.data.end_date).diff(dayjs(), 'day');
+    if (daysLeft <= 3) {
+      return (
+        <div className="mb-4">
+          <p className="text-orange-500 font-medium">
+            ⏰ Mã giảm giá sắp hết hạn: còn {daysLeft} ngày
+          </p>
+        </div>
+      );
+    }
+  })()}
           <div className="grid grid-cols-3 gap-6">
             <Controller
               name="discount_type"

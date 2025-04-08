@@ -26,6 +26,7 @@ import PLEditor from '@/admin/features/price-list/components/PLEditor';
 import RequireRole from '@/components/auth/RequireRole';
 import DiscountManager from '@/admin/features/discount/components/DiscountManager';
 import DiscountEditor from '@/admin/features/discount/components/DiscountEditor';
+import CategoryManager from '@/admin/features/category/CategoryManager';
 
 const mainRouter = createBrowserRouter([
   {
@@ -86,6 +87,7 @@ const mainRouter = createBrowserRouter([
       { path: 'product', element: <ProductManager /> },
       { path: 'product/create', element: <ProductEditor /> },
       { path: 'product/edit/:id', element: <ProductEditor /> },
+      { path: 'category', element: <CategoryManager /> },
       { path: 'discounts/cp', element: <CPManager /> },
       { path: 'discount/cp/create', element: <CPEditor /> },
       { path: 'discount/cp/edit/:id', element: <CPEditor /> },

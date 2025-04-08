@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body, #root {
+  @apply min-h-screen bg-orange-100;
+}
+
 body {
   @apply font-roboto;
 }
@@ -27,4 +31,153 @@ body {
 .main-content {
   @apply flex-1 p-4 overflow-auto transition-all duration-300;
   min-height: calc(100vh - 60px);
+}
+
+/* Add this to src/index.css or create a new CSS file and import it */
+
+.homepage-hero-carousel .slick-dots {
+  bottom: 20px;
+}
+
+.homepage-hero-carousel .slick-dots li button {
+  background: white;
+  border-radius: 50%;
+  opacity: 0.5;
+  width: 12px;
+  height: 12px;
+}
+
+.homepage-hero-carousel .slick-dots li.slick-active button {
+  opacity: 1;
+  background: white;
+}
+
+.homepage-hero-carousel .slick-prev,
+.homepage-hero-carousel .slick-next {
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(4px);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.homepage-hero-carousel .slick-prev {
+  left: 20px;
+}
+
+.homepage-hero-carousel .slick-next {
+  right: 20px;
+}
+
+.homepage-hero-carousel .slick-prev:hover,
+.homepage-hero-carousel .slick-next:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+/* Product card hover effects */
+.product-card-hover {
+  transition: all 0.3s ease;
+}
+
+.product-card-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Category card hover effects */
+.category-card {
+  overflow: hidden;
+  position: relative;
+}
+
+.category-card .category-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+  padding: 20px;
+  color: white;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.category-card:hover .category-overlay {
+  transform: translateY(0);
+}
+
+/* Benefits section hover effects */
+.benefit-card {
+  transition: transform 0.3s ease;
+}
+
+.benefit-card:hover {
+  transform: translateY(-10px);
+}
+
+.benefit-card .benefit-icon {
+  transition: transform 0.3s ease;
+}
+
+.benefit-card:hover .benefit-icon {
+  transform: scale(1.1);
+}
+
+/* Newsletter section */
+.newsletter-section {
+  background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
+}
+
+.newsletter-input {
+  transition: all 0.3s ease;
+}
+
+.newsletter-input:focus {
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+/* Promotional banner hover effect */
+.promo-banner {
+  overflow: hidden;
+}
+
+.promo-banner-image {
+  transition: transform 0.8s ease;
+}
+
+.promo-banner:hover .promo-banner-image {
+  transform: scale(1.05);
+}
+
+/* Add responsive adjustments */
+@media (max-width: 768px) {
+  .homepage-hero-carousel {
+    height: 60vh;
+  }
+  
+  .benefit-card {
+    margin-bottom: 20px;
+  }
+  
+  .newsletter-section {
+    padding: 40px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .homepage-hero-carousel {
+    height: 50vh;
+  }
+  
+  .homepage-hero-carousel .hero-content {
+    padding: 20px;
+  }
+  
+  .homepage-hero-carousel h1 {
+    font-size: 24px;
+  }
 }

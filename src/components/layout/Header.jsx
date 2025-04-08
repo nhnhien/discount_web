@@ -15,6 +15,7 @@ import {
   UserOutlined,
   DownOutlined,
   LogoutOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -64,6 +65,9 @@ const Header = () => {
     <Menu>
       <Menu.Item key='profile' icon={<UserOutlined />} onClick={() => navigate('/profile')}>
         Hồ sơ cá nhân
+      </Menu.Item>
+      <Menu.Item key='orders' icon={<UnorderedListOutlined />} onClick={() => navigate('/orders')}>
+        Đơn hàng của tôi
       </Menu.Item>
       <Menu.Item key='logout' icon={<LogoutOutlined />} onClick={handleLogout}>
         {t('home.logout')}
@@ -154,6 +158,11 @@ const Header = () => {
               {item}
             </a>
           ))}
+          {currentUser && (
+            <Link to='/orders' className='hover:text-gray-900 whitespace-nowrap text-blue-600 font-medium'>
+              <UnorderedListOutlined className='mr-1' /> Đơn hàng của tôi
+            </Link>
+          )}
         </nav>
       </div>
     </header>

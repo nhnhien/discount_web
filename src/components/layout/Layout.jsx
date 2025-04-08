@@ -3,15 +3,20 @@ import React from 'react';
  import { Outlet } from 'react-router-dom';
  import Footer from './Footer';
 
-const Layout = () => {
+ const Layout = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-orange-100">
       <Header />
-      <Outlet />
+      <main className="min-h-[80vh]">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );
 };
+
+
+
 
 
 export default Layout;

@@ -147,7 +147,11 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     if (userId) {
       discountService.getAvailableDiscounts(userId).then((res) => {
         if (res?.success) {
-          setAvailableCodes(res.data);
+          // ⚠️ Chỉ hiển thị các mã còn lượt sử dụng hoặc không giới hạn
+          const validCodes = res.data.filter(
+            (d) => d.remaining_uses === null || d.remaining_uses > 0
+          );
+          setAvailableCodes(validCodes);
         }
       }).catch((err) => {
         console.error('Lỗi khi lấy danh sách mã:', err.message);
@@ -155,12 +159,17 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     }
   }, [userId]);
   
-  
-  
-  
-  
-  
-  
+
+  useEffect(() => {
+    if (cart?.discount_code && availableCodes.length > 0 && !discountApplied) {   
+         const isValid = availableCodes.some((d) => d.discount_code === cart.discount_code);
+      if (!isValid) {
+        handleRemoveCoupon(); // Gỡ mã
+        message.warning(`Mã ${cart.discount_code} không còn hợp lệ và đã được gỡ`);
+      }
+    }
+  }, [cart?.discount_code, availableCodes]);
+
 
   const handleUpdateNote = async () => {
     if (!orderNote || orderNote.trim() === '') return;
@@ -176,16 +185,23 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
   
   const handleRemoveCoupon = async () => {
     try {
-      await cartService.removeDiscount();
+      await cartService.removeDiscount(selectedItems);
       message.success('Đã hủy mã giảm giá');
       setCouponCode('');
       setDiscountApplied(false);
-      setWantApplyDiscount(false); // ✅ KHÔNG áp lại discount
-      queryClient.invalidateQueries(['cart', userId, { apply_discount: false }]);
+      setWantApplyDiscount(false); // Không áp lại mã giảm giá
+  
+      // 🔥 Invalidate đúng key
+      queryClient.invalidateQueries([
+        'cart',
+        userId,
+        { apply_discount: false, selected_item_ids: selectedItems.join(',') }
+      ]);
     } catch (err) {
       message.error('Không thể hủy mã giảm giá');
     }
   };
+  
   
   
   
@@ -610,16 +626,27 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
   </Button>
 </div>
 <div className='mt-3 flex flex-wrap gap-2'>
-  {availableCodes.map((code) => (
+  {availableCodes.map(({ discount_code, remaining_uses, expires_in_days }) => (
+  <Tooltip
+    key={discount_code}
+    title={`Còn lại ${remaining_uses ?? '∞'} lượt • HSD: ${
+      expires_in_days != null ? `${expires_in_days} ngày` : 'Không giới hạn'
+    }`}
+  >
     <Tag
-      key={code}
-      color='blue'
+      color={
+        (remaining_uses !== null && remaining_uses <= 3) || (expires_in_days !== null && expires_in_days <= 3)
+          ? 'red'
+          : 'blue'
+      }
       className='cursor-pointer hover:opacity-80'
-      onClick={() => setCouponCode(code)}
+      onClick={() => setCouponCode(discount_code)}
     >
-      {code}
+      {discount_code}
     </Tag>
-  ))}
+  </Tooltip>
+))
+}
 </div>
 <Typography.Text type='secondary' className='text-xs mt-2 block'>
   Nhấp vào mã để sao chép, sau đó nhấn "Áp dụng"
@@ -676,16 +703,22 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     </div>
   </div>
   <Button
-    type='primary'
-    block
-    size='large'
-    onClick={() => navigate('/checkout', { state: { selectedItems } })}
-    className='h-14 text-base flex items-center justify-center'
-    disabled={selectedCartItems.length === 0}
-  >
-    <LockOutlined className='mr-2' />
-    Tiến hành thanh toán ({selectedCartItems.length})
-  </Button>
+  type='primary'
+  block
+  size='large'
+  onClick={() => navigate('/checkout', {
+    state: {
+      selectedItems,
+      applyDiscount: discountApplied, // ✅ thêm dòng này
+    }
+  })}
+  className='h-14 text-base flex items-center justify-center'
+  disabled={selectedCartItems.length === 0}
+>
+  <LockOutlined className='mr-2' />
+  Tiến hành thanh toán ({selectedCartItems.length})
+</Button>
+
 </Card>
 
 
