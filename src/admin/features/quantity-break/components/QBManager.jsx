@@ -10,9 +10,9 @@ import React, { useState } from 'react';
    InfoCircleOutlined,
  } from '@ant-design/icons';
  import { useNavigate } from 'react-router-dom';
- import { getQBs } from '@/service/qb';
- import { deleteQB } from '@/service/qb';
- 
+ import { getQBs, deleteQB, toggleRuleActive } from '@/service/qb';
+ import { Switch } from 'antd';
+
  const { confirm } = Modal;
  
  const QBManager = () => {
@@ -30,7 +30,17 @@ import React, { useState } from 'react';
        message.error('Xóa pricing rule thất bại!');
      },
    });
- 
+   const toggleMutation = useMutation({
+    mutationFn: ({ id, is_active }) => toggleRuleActive(id, is_active),
+    onSuccess: () => {
+      message.success('Đã cập nhật trạng thái');
+      queryClient.invalidateQueries(['quantityBreaks']);
+    },
+    onError: () => {
+      message.error('Cập nhật trạng thái thất bại');
+    },
+  });
+  
    const [searchTerm, setSearchTerm] = useState('');
    const [selectedRule, setSelectedRule] = useState(null);
    const [isModalOpen, setIsModalOpen] = useState(false);
@@ -139,6 +149,17 @@ import React, { useState } from 'react';
          return <Tag color={active ? 'green' : 'red'}>{active ? 'Đang áp dụng' : 'Hết hạn'}</Tag>;
        },
      },
+     {
+      title: 'Kích hoạt',
+      dataIndex: 'is_active',
+      key: 'is_active',
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) => toggleMutation.mutate({ id: record.id, is_active: checked })}
+        />
+      ),
+    },
      {
        title: 'Hành động',
        key: 'action',

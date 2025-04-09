@@ -23,7 +23,9 @@ import {
 import {
   getAllDiscounts,
   deleteDiscount,
+  toggleDiscountActive
 } from '@/service/discount';
+import { Switch } from 'antd';
 
 const { Title } = Typography;
 
@@ -46,7 +48,17 @@ const DiscountManager = () => {
       message.error('Không thể xoá mã giảm giá');
     },
   });
-
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, is_active }) => toggleDiscountActive(id, is_active),
+    onSuccess: () => {
+      message.success('Đã cập nhật trạng thái');
+      queryClient.invalidateQueries(['discounts']);
+    },
+    onError: () => {
+      message.error('Cập nhật trạng thái thất bại');
+    },
+  });
+  
   const columns = [
     {
       title: 'Mã',
@@ -102,6 +114,19 @@ const DiscountManager = () => {
         ) : (
           <Tag color="red">Ngưng áp dụng</Tag>
         ),
+    },
+    {
+      title: 'Kích hoạt',
+      dataIndex: 'is_active',
+      key: 'toggle',
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) =>
+            toggleMutation.mutate({ id: record.id, is_active: checked })
+          }
+        />
+      ),
     },
     {
       title: 'Hành động',

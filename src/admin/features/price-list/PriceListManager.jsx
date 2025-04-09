@@ -4,7 +4,8 @@ import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { getRules, deleteRule } from '@/service/cp';
+import { getRules, deleteRule, toggleRuleActive  } from '@/service/cp';
+import { Switch } from 'antd';
 
 const PriceListManager = () => {
   const navigate = useNavigate();
@@ -30,7 +31,17 @@ const PriceListManager = () => {
       message.error(`Xoá thất bại: ${err.message}`);
     },
   });
-
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, is_active }) => toggleRuleActive(id, is_active),
+    onSuccess: () => {
+      message.success('Đã cập nhật trạng thái');
+      queryClient.invalidateQueries(['price-list-rules']);
+    },
+    onError: () => {
+      message.error('Cập nhật trạng thái thất bại');
+    },
+  });
+  
   const columns = [
     {
       title: 'Tên',
@@ -78,6 +89,17 @@ const PriceListManager = () => {
       key: 'end_date',
       render: (val) =>
         val ? dayjs(val).format('DD/MM/YYYY') : <span className='text-gray-400'>Không giới hạn</span>,
+    },
+    {
+      title: 'Kích hoạt',
+      dataIndex: 'is_active',
+      key: 'is_active',
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) => toggleMutation.mutate({ id: record.id, is_active: checked })}
+        />
+      ),
     },
     {
       title: 'Hành động',

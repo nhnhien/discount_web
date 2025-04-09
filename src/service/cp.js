@@ -29,4 +29,9 @@ const deleteRule = async (id) => {
   return res.data;
 };
 
-export { getRules, getRule, deleteRule, createRule, updateRule };
+
+const toggleRuleActive = async (id, is_active) => {
+  const res = await apiClient.patch(`/api/cp/${id}/active`, { is_active });
+  return res.data;
+};
+export { getRules, getRule, deleteRule, createRule, updateRule, toggleRuleActive  };

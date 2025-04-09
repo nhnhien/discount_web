@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getRules, deleteRule } from '@/service/cp';
+import { getRules, deleteRule, toggleRuleActive } from '@/service/cp';
 import { Table, Button, Modal, message, Tag, Input } from 'antd';
 import { EditOutlined, DeleteOutlined, EyeOutlined, PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { Switch } from 'antd';
 
 const { confirm } = Modal;
 
@@ -27,7 +28,17 @@ const CPManager = () => {
     },
   });
   
-
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, is_active }) => toggleRuleActive(id, is_active),
+    onSuccess: () => {
+      message.success('Đã cập nhật trạng thái');
+      queryClient.invalidateQueries(['cp-rules']);
+    },
+    onError: () => {
+      message.error('Cập nhật trạng thái thất bại');
+    },
+  });
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRule, setSelectedRule] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,6 +106,18 @@ const CPManager = () => {
       key: 'createdAt',
       render: (createdAt) => <span>{new Date(createdAt).toLocaleString('vi-VN')}</span>,
     },
+    {
+      title: 'Kích hoạt',
+      dataIndex: 'is_active',
+      key: 'is_active',
+      render: (value, record) => (
+        <Switch
+          checked={value}
+          onChange={(checked) => toggleMutation.mutate({ id: record.id, is_active: checked })}
+        />
+      ),
+    },
+    
     {
       title: 'Hành động',
       key: 'action',

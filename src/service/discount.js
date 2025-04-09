@@ -78,9 +78,18 @@ export const updateDiscount = async (id, data) => {
   return res.data;
 };
 
-// ✅ Lấy danh sách mã giảm giá khả dụng theo user (cho trang /cart)
 // ✅ Lấy danh sách mã giảm giá khả dụng cho user
 export const getAvailableDiscounts = async (user_id) => {
   const res = await apiClient.get(`/api/discount/available?user_id=${user_id}`);
   return res.data;
+};
+
+// ✅ Bật/tắt trạng thái mã giảm giá
+export const toggleDiscountActive = async (id, is_active) => {
+  try {
+    const res = await apiClient.patch(`/api/discount/${id}/active`, { is_active });
+    return res.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể cập nhật trạng thái mã giảm giá');
+  }
 };

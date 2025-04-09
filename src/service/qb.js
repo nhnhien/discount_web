@@ -49,7 +49,11 @@ import apiClient from '@/config/axios.config';
    const res = await apiClient.post('/api/qb/apply-to-cart', data);
    return res.data;
  };
- 
+ const toggleRuleActive = async (id, is_active) => {
+  const res = await apiClient.patch(`/api/qb/${id}/active`, { is_active });
+  return res.data;
+};
+
  export {
    getQBs,
    getQB,
@@ -61,4 +65,5 @@ import apiClient from '@/config/axios.config';
    getQBsByVariant,
    getFilteredQBs,
    applyQBToCart,
+   toggleRuleActive
  };
