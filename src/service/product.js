@@ -13,10 +13,17 @@ const getProduct = async (userId = null) => {
 
 const getProductApplyCP = async (options = {}) => {
   try {
-    const { page = 1, limit = 10, search = '', categoryId = '', userId } = options;
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      categoryId = '',
+      userId,
+      discount, // ✅ thêm discount ở đây
+    } = options;
 
     console.log('📦 [API CALL] getProductApplyCP - Params:', {
-      page, limit, search, categoryId, userId,
+      page, limit, search, categoryId, userId, discount,
     });
 
     const res = await apiClient.get('/api/product', {
@@ -25,7 +32,8 @@ const getProductApplyCP = async (options = {}) => {
         limit,
         search,
         categoryId,
-        userId, // 🔥 cần thiết để truyền lên server
+        userId,
+        ...(discount !== undefined ? { discount } : {}), // ✅ chỉ thêm nếu discount được set
       },
     });
 

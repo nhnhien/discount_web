@@ -1,7 +1,7 @@
 import { Layout } from 'antd';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getAdminNavigationItems } from '../../../constants';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +10,45 @@ const { Sider } = Layout;
 const AdminSidebar = () => {
   const { t } = useTranslation();
   const [openMenus, setOpenMenus] = useState({});
-  const AdminNavigationItems = getAdminNavigationItems(t);
+  const location = useLocation();
+  
+  // Sử dụng useMemo để caching lại AdminNavigationItems
+  const AdminNavigationItems = useMemo(() => getAdminNavigationItems(t), [t]);
+
+  // Sửa useEffect để tránh infinite loop
+  useEffect(() => {
+    // Tìm menu cha của đường dẫn hiện tại và mở nó
+    const currentPath = location.pathname;
+    
+    let initialOpenMenus = {};
+    AdminNavigationItems.forEach(item => {
+      if (item.children) {
+        const hasActiveChild = item.children.some(child => 
+          child.link === currentPath || 
+          (currentPath.startsWith(child.link) && child.link !== '/')
+        );
+        
+        if (hasActiveChild) {
+          initialOpenMenus[item.id] = true;
+        }
+      }
+    });
+    
+    // Chỉ cập nhật state nếu có menu cần mở
+    if (Object.keys(initialOpenMenus).length > 0) {
+      setOpenMenus(prevState => {
+        // Chỉ cập nhật nếu có sự thay đổi
+        const hasChanges = Object.keys(initialOpenMenus).some(key => !prevState[key]);
+        if (!hasChanges) return prevState;
+        
+        return {
+          ...prevState,
+          ...initialOpenMenus
+        };
+      });
+    }
+  }, [location.pathname, AdminNavigationItems]); // Thêm dependency array
+
   const toggleMenu = (id) => {
     setOpenMenus((prev) => ({ ...prev, [id]: !prev[id] }));
   };

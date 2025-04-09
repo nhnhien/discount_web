@@ -208,12 +208,11 @@ const HomeScreen = () => {
             <Row gutter={[16, 24]}>
               {featuredProductsData.data.map(product => (
                 <Col xs={12} sm={8} md={6} key={product.id}>
-                  <ProductCard
-                    product={product}
-                    onAddToCart={() => console.log('Add to cart')}
-                    onToggleWishlist={() => console.log('Toggle wishlist')}
-                    onViewDetail={handleViewProductDetail}
-                  />
+<ProductCard
+  product={product}
+  onViewDetail={handleViewProductDetail}
+/>
+
                 </Col>
               ))}
             </Row>

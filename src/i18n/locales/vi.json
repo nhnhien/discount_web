@@ -67,10 +67,15 @@
     "start_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc"
   },
+  "nav": {
+    "discounted": "Sản phẩm đang giảm giá",
+    "non_discounted": "Sản phẩm không giảm giá"
+  },
   "home": {
     "sign_in": "Đăng nhập",
     "sign_up": "Đăng ký",
     "logout": "Đăng xuất",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "my_orders": "Đơn hàng của tôi"
   }
 }

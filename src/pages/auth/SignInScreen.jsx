@@ -32,13 +32,6 @@ const SignInScreen = () => {
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔁 Chuyển về trang chủ nếu đã đăng nhập
-  useEffect(() => {
-    if (currentUser) {
-      navigate('/');
-    }
-  }, [currentUser, navigate]);
-
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider.setCustomParameters({ prompt: 'select_account' }));
@@ -108,13 +101,21 @@ const SignInScreen = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${idToken}`,
         },
-        body: JSON.stringify(extraData), // 👈 Gửi thêm name, email, avatar nếu có
+        body: JSON.stringify(extraData),
       });
   
       const data = await response.json();
       if (response.ok) {
         dispatch(loginSuccess(data.user));
         message.success('Đăng nhập thành công');
+  
+        // ✅ Chuyển hướng theo vai trò
+        if (data.user.role === 'owner' || data.user.role === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
+        
       } else {
         throw new Error(data.message);
       }
@@ -123,6 +124,7 @@ const SignInScreen = () => {
       message.error('Không thể đồng bộ người dùng');
     }
   };
+  
   
 
   // 👉 UI render theo step

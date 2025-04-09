@@ -4,6 +4,7 @@ import cartReducer from './slice/cart';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { FLUSH, PAUSE, PERSIST, PURGE, REGISTER, REHYDRATE, persistReducer, persistStore } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import wishlistReducer from './slice/wishlist';
 
 const persistConfig = {
   key: 'root',
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   language: languageReducer,
   cart: cartReducer,
+  wishlist: wishlistReducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 

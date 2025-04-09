@@ -40,7 +40,10 @@ const Header = () => {
   const language = useSelector((state) => state.language.language);
   const currentUser = useSelector((state) => state.auth.currentUser);
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const wishlist = useSelector((state) => state.wishlist || []);
+  const wishlistCount = Array.isArray(wishlist)
+  ? wishlist.filter(item => item?.productId).length
+  : 0;
   const { data: cartData } = useCartSummary();
   const cartCount = cartData?.data?.item_count || 0;
 
@@ -74,6 +77,16 @@ const Header = () => {
       </Menu.Item>
     </Menu>
   );
+const navItems = [
+  {
+    label: t('nav.discounted'),
+    path: '/products?discount=true',
+  },
+  {
+    label: t('nav.non_discounted'),
+    path: '/products?discount=false',
+  },
+];
 
   return (
     <header className='sticky top-0 z-50 bg-white shadow-sm'>
@@ -81,7 +94,7 @@ const Header = () => {
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-4'>
             <Link to='/'>
-              <h1 className='text-2xl font-bold text-gray-800'>FashionStore</h1>
+              <h1 className='text-2xl font-bold text-gray-800'>IUWE STORE</h1>
             </Link>
             <Button
               type='text'
@@ -91,15 +104,38 @@ const Header = () => {
           </div>
 
           <div className='hidden md:flex flex-1 max-w-lg mx-4'>
-            <Input
-              placeholder='Tìm kiếm sản phẩm...'
-              prefix={<SearchOutlined className='text-gray-400' />}
-              className='w-full rounded-full hover:border-gray-400 focus:border-gray-500'
-            />
+          <Input.Search
+  placeholder='Tìm kiếm sản phẩm...'
+  allowClear
+  enterButton={<SearchOutlined />}
+  onSearch={(value) => {
+    if (value?.trim()) {
+      navigate(`/products?search=${encodeURIComponent(value.trim())}`);
+    }
+  }}
+  onPressEnter={(e) => {
+    const value = e.target.value;
+    if (value?.trim()) {
+      navigate(`/products?search=${encodeURIComponent(value.trim())}`);
+    }
+  }}
+  className='w-full rounded-full hover:border-gray-400 focus:border-gray-500'
+/>
+
+
           </div>
 
           <div className='flex items-center space-x-4 md:space-x-6'>
-            <Button type='text' shape='circle' icon={<HeartOutlined className='text-gray-600 text-xl' />} />
+          <Badge count={wishlistCount} size='small' offset={[-2, 2]} showZero={false}>
+  <Button
+    type='text'
+    shape='circle'
+    icon={<HeartOutlined className='text-gray-600 text-xl' />}
+    onClick={() => navigate('/wishlist')}
+  />
+</Badge>
+
+
             <Badge count={cartCount} offset={[-2, 2]}>
               <Button
                 type='text'
@@ -149,21 +185,24 @@ const Header = () => {
           </div>
         </div>
 
-        <nav
-          className={`mt-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 text-gray-600 
-            overflow-x-auto transition-all duration-300 ${menuOpen ? 'block' : 'hidden md:flex'}`}
-        >
-          {['Sản phẩm mới', 'Áo', 'Quần', 'Đầm/Váy', 'Phụ kiện', 'Sale'].map((item) => (
-            <a key={item} href='#' className='hover:text-gray-900 whitespace-nowrap'>
-              {item}
-            </a>
-          ))}
-          {currentUser && (
-            <Link to='/orders' className='hover:text-gray-900 whitespace-nowrap text-blue-600 font-medium'>
-              <UnorderedListOutlined className='mr-1' /> Đơn hàng của tôi
-            </Link>
-          )}
-        </nav>
+{/* Thay thế phần <nav> cũ bằng đoạn này: */}
+<nav
+  className={`mt-4 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6 text-gray-600 
+    overflow-x-auto transition-all duration-300 ${menuOpen ? 'block' : 'hidden md:flex'}`}
+>
+  {navItems.map((item) => (
+    <Link key={item.path} to={item.path} className='hover:text-gray-900 whitespace-nowrap'>
+      {item.label}
+    </Link>
+  ))}
+
+  {currentUser && (
+    <Link to='/orders' className='hover:text-gray-900 whitespace-nowrap text-blue-600 font-medium'>
+      <UnorderedListOutlined className='mr-1' /> {t('home.my_orders')}
+    </Link>
+  )}
+</nav>
+
       </div>
     </header>
   );

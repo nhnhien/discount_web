@@ -22,7 +22,6 @@ import {
 import {
   ShoppingCartOutlined,
   HeartOutlined,
-  ShareAltOutlined,
   CheckCircleFilled,
   InfoCircleOutlined,
   LeftOutlined,
@@ -39,6 +38,8 @@ import PriceTrendChart from './PriceTrendChart';
 import { cartService } from '@/service/cart';
 import { useQueryClient } from '@tanstack/react-query';
 import PriceComparison from './PriceComparison';
+import { useDispatch } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '@/context/slice/wishlist';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -51,6 +52,7 @@ const ProductDetail = () => {
   const currentUser = useSelector((state) => state.auth.currentUser);
   const userId = currentUser?.id;
 
+  
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [selectedAttributes, setSelectedAttributes] = useState({});
@@ -68,8 +70,17 @@ const ProductDetail = () => {
     });
     console.log('[ProductDetail] userId:', userId); // 👈 kiểm tra xem userId có đúng không
 
-  const product = productData?.data;
-  console.log('🟡 [DEBUG] Product:', product);
+
+    const product = productData?.data;
+
+    const dispatch = useDispatch();
+    const wishlist = useSelector((state) => state.wishlist) || [];
+    const isWishlisted = wishlist.some(
+      (item) =>
+        item.productId === product?.id &&
+        item.variantId === selectedVariant?.id
+    );
+      console.log('🟡 [DEBUG] Product:', product);
   console.log('🟡 [DEBUG] Product final_price:', product?.final_price);
   console.log('🟡 [DEBUG] Product appliedRule:', product?.appliedRule);
   console.log('🟡 [DEBUG] Selected variant:', selectedVariant);
@@ -80,21 +91,29 @@ const ProductDetail = () => {
     if (product?.has_variant && product.variants?.length > 0) {
       setAvailableVariants(product.variants);
   
-      // Nếu chưa có selectedAttributes thì set mặc định từ variant đầu tiên
-      if (!selectedVariant && product.variants[0]) {
-        const defaultAttrs = {};
-        product.variants[0].attributes?.forEach((attr) => {
-          defaultAttrs[attr.attribute_name.toLowerCase()] = attr.value;
-        });
+      const firstVariant = product.variants[0];
+      const defaultAttrs = {};
+      firstVariant.attributes?.forEach((attr) => {
+        defaultAttrs[attr.attribute_name.toLowerCase()] = attr.value;
+      });
   
-        setSelectedAttributes(defaultAttrs);
-        setSelectedVariant(product.variants[0]);
+      setSelectedAttributes(defaultAttrs);
+      setSelectedVariant(firstVariant);
+  
+      // 👉 Tìm index ảnh tương ứng với variant đầu tiên
+      const allImages = [product.image_url, ...(product.variants?.map((v) => v.image_url) || [])].filter(Boolean);
+      const index = allImages.findIndex((img) => img === firstVariant.image_url);
+      if (index >= 0) {
+        setCurrentImage(index); // ✅ Đặt ảnh hiện tại đúng với ảnh của variant đầu tiên
+      } else {
+        setCurrentImage(0);
       }
     } else {
       setSelectedVariant(null);
       setSelectedAttributes({});
+      setCurrentImage(0); // fallback
     }
-  }, [product]);
+  }, [product?.id]);
   
   
 
@@ -283,8 +302,27 @@ const ProductDetail = () => {
   };
 
   const handleAddToWishlist = () => {
-    message.info('Chức năng này sẽ được cập nhật trong thời gian tới!');
+    const payload = {
+      productId: product.id,
+      variantId: selectedVariant?.id || null,
+    };
+  
+    const isExist = wishlist.some(
+      (item) =>
+        item.productId === payload.productId &&
+        item.variantId === payload.variantId
+    );
+  
+    if (isExist) {
+      dispatch(removeFromWishlist(payload));
+      message.info('Đã bỏ khỏi danh sách yêu thích');
+    } else {
+      dispatch(addToWishlist(payload));
+      message.success('Đã thêm vào danh sách yêu thích');
+    }
   };
+  
+
 
   const handleShareProduct = () => {
     message.info('Chức năng này sẽ được cập nhật trong thời gian tới!');
@@ -435,18 +473,13 @@ const ProductDetail = () => {
                   </div>
                 </div>
                 <div className='flex gap-2'>
-                  <Button
-                    shape='circle'
-                    icon={<HeartOutlined />}
-                    onClick={handleAddToWishlist}
-                    className='flex items-center justify-center'
-                  />
-                  <Button
-                    shape='circle'
-                    icon={<ShareAltOutlined />}
-                    onClick={handleShareProduct}
-                    className='flex items-center justify-center'
-                  />
+                <Button
+  shape='circle'
+  icon={isWishlisted ? <HeartOutlined style={{ color: 'red' }} /> : <HeartOutlined />}
+  onClick={handleAddToWishlist}
+  className='flex items-center justify-center'
+/>
+
                 </div>
               </div>
 
@@ -654,40 +687,43 @@ const ProductDetail = () => {
                 )}
               </div>
             </TabPane>
-            <TabPane tab='Thông số kỹ thuật' key='specifications'>
-              <div className='py-4'>
-                <Empty description='Chưa có thông số kỹ thuật cho sản phẩm này' />
-              </div>
-            </TabPane>
             <TabPane
-              tab={
-                <span>
-                  <LineChartOutlined /> Lịch sử giá
-                </span>
-              }
-              key='price-history'
-            >
-              <div className='py-4'>
-                {!product.has_variant ? (
-                  <PriceTrendChart productId={product.id} isVariant={false} title='Lịch sử biến động giá sản phẩm' />
-                ) : (
-                  <div>
-                    <PriceTrendChart productId={product.id} isVariant={false} title='Lịch sử biến động giá sản phẩm' />
+  tab={
+    <span>
+      <LineChartOutlined /> Lịch sử giá
+    </span>
+  }
+  key='price-history'
+>
+  <div className='py-4'>
+    {/* Chỉ hiển thị biểu đồ cho sản phẩm không có variant */}
+    {!product.has_variant && (
+      <PriceTrendChart
+        productId={product.id}
+        isVariant={false}
+        title='Lịch sử biến động giá sản phẩm'
+      />
+    )}
 
-                    {selectedVariant && (
-                      <>
-                        <Divider orientation='left'>Lịch sử biến động giá biến thể hiện tại</Divider>
-                        <PriceTrendChart
-                          variantId={selectedVariant.id}
-                          isVariant={true}
-                          title={`Lịch sử biến động giá - ${selectedVariant.sku || 'Biến thể'}`}
-                        />
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            </TabPane>
+    {/* Hiển thị biểu đồ cho biến thể nếu có */}
+    {product.has_variant && selectedVariant && (
+      <>
+        <Divider orientation='left'>Lịch sử biến động giá biến thể hiện tại</Divider>
+        <PriceTrendChart
+          variantId={selectedVariant.id}
+          isVariant={true}
+          title={`Lịch sử biến động giá - ${selectedVariant.sku || 'Biến thể'}`}
+        />
+      </>
+    )}
+
+    {/* Trường hợp có variant nhưng chưa chọn */}
+    {product.has_variant && !selectedVariant && (
+      <Empty description='Hãy chọn biến thể để xem lịch sử giá' />
+    )}
+  </div>
+</TabPane>
+
   <TabPane
     tab={
       <span>

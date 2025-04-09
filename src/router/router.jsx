@@ -11,8 +11,8 @@ import ProductEditor from '../admin/features/product/ProductEditor';
 import CPManager from '@/admin/features/custom-pricing/components/CPManager';
 import CPEditor from '@/admin/features/custom-pricing/components/CPEditor';
 import ProductScreen from '@/pages/product/components/ProductScreen';
-import ProductMain from '@/pages/product/components/ProductMain';
-import ProductCard from '@/pages/product/components/ProductCard';
+import ProductDetail from '../pages/product/components/ProductDetail';
+import ProductCard from '../pages/product/components/ProductCard';
 import CartScreen from '@/pages/cart/components/CartScreen';
 import QBManager from '@/admin/features/quantity-break/components/QBManager';
 import QBEditor from '../admin/features/quantity-break/components/QBEditor';
@@ -27,6 +27,7 @@ import RequireRole from '@/components/auth/RequireRole';
 import DiscountManager from '@/admin/features/discount/components/DiscountManager';
 import DiscountEditor from '@/admin/features/discount/components/DiscountEditor';
 import CategoryManager from '@/admin/features/category/CategoryManager';
+import WishlistScreen from '../pages/wishlist/WishlistScreen';
 
 const mainRouter = createBrowserRouter([
   {
@@ -43,7 +44,7 @@ const mainRouter = createBrowserRouter([
       },
       {
         path: '/product/:id',
-        element: <ProductMain />,
+        element: <ProductDetail />,
       },
       {
         path: '/cart',
@@ -72,6 +73,10 @@ const mainRouter = createBrowserRouter([
       {
         path: '/profile',
         element: <ProfileScreen />,
+      },
+      {
+        path: '/wishlist',
+        element: <WishlistScreen />,
       },
     ],
   },

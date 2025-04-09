@@ -12,23 +12,34 @@ import {
 import {
   ShoppingCartOutlined,
   HeartOutlined,
+  HeartFilled,
   EyeOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { cartService } from '@/service/cart';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToWishlist, removeFromWishlist } from '@/context/slice/wishlist';
 
 const { Text } = Typography;
 const { Meta } = Card;
 
-const ProductCard = ({ product, onToggleWishlist, onViewDetail }) => {
+const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const currentUser = useSelector((state) => state.auth.currentUser);
+  const wishlist = useSelector((state) => state.wishlist) || [];
   const userId = currentUser?.id;
 
   if (!product) return null;
+
+  // 👉 Check yêu thích dựa trên cả productId và variantId
+  const isWishlisted = wishlist.some(
+    (item) =>
+      item.productId === product.id &&
+      item.variantId === (variant?.id || null)
+  );
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat('vi-VN', {
@@ -55,76 +66,79 @@ const ProductCard = ({ product, onToggleWishlist, onViewDetail }) => {
     const productToAdd = {
       userId,
       product_id: product.id,
-      variant_id: null,
+      variant_id: variant?.id || null,
       quantity: 1,
     };
 
     addToCartMutation.mutate(productToAdd);
   };
 
+  const handleToggleWishlist = () => {
+    const payload = {
+      productId: product.id,
+      variantId: variant?.id || null,
+    };
+
+    if (onToggleWishlist) {
+      onToggleWishlist(payload);
+    } else {
+      if (isWishlisted) {
+        dispatch(removeFromWishlist(payload));
+        message.info('Đã bỏ khỏi danh sách yêu thích');
+      } else {
+        dispatch(addToWishlist(payload));
+        message.success('Đã thêm vào danh sách yêu thích');
+      }
+    }
+  };
+
   const getPriceDisplay = () => {
     const isValidPrice = (p) => typeof p === 'number' && !isNaN(p) && p > 0;
-  
-    let finalPrice = product.final_price;
-    let originalPrice = product.original_price;
-  
-    // Nếu có biến thể thì lấy min/max giá từ variants
-    if (product.has_variant && Array.isArray(product.variants) && product.variants.length > 0) {
-      const finalPrices = product.variants.map(v => v.final_price).filter(isValidPrice);
-      const originalPrices = product.variants.map(v => v.original_price).filter(isValidPrice);
-  
-      const minPrice = Math.min(...finalPrices);
-      const maxPrice = Math.max(...finalPrices);
-  
-      return (
-        <div className='flex flex-col'>
-          <Text className='text-lg font-bold text-blue-600'>
-            {`Chỉ từ ${formatCurrency(minPrice)} đến ${formatCurrency(maxPrice)}`}
-          </Text>
-        </div>
-      );
-    }
-  
-    // Sản phẩm không có biến thể
+
+    const finalPrice = variant?.final_price ?? product.final_price;
+    const originalPrice = variant?.original_price ?? product.original_price;
+
     const hasDiscount = isValidPrice(originalPrice) && isValidPrice(finalPrice) && originalPrice > finalPrice;
-  
+
     return (
       <div className='flex items-center gap-2'>
         <Text className='text-lg font-bold text-blue-600'>
           {isValidPrice(finalPrice) ? formatCurrency(finalPrice) : 'Liên hệ'}
         </Text>
         {hasDiscount && (
-          <Text delete className='text-sm text-gray-500'>{formatCurrency(originalPrice)}</Text>
+          <Text delete className='text-sm text-gray-500'>
+            {formatCurrency(originalPrice)}
+          </Text>
         )}
       </div>
     );
   };
-  
-  
-  
-  
-  
 
   const hasValidPrices =
-  typeof product.original_price === 'number' &&
-  typeof product.final_price === 'number' &&
-  product.original_price > 0;
+    typeof product.original_price === 'number' &&
+    typeof product.final_price === 'number' &&
+    product.original_price > 0;
 
-const hasDiscount =
-  hasValidPrices && product.original_price > product.final_price;
+  const finalPrice = variant?.final_price ?? product.final_price;
+  const originalPrice = variant?.original_price ?? product.original_price;
 
-const discountPercent = hasDiscount
-  ? Math.round(((product.original_price - product.final_price) / product.original_price) * 100)
-  : 0;
+  const hasDiscount =
+    typeof originalPrice === 'number' &&
+    typeof finalPrice === 'number' &&
+    originalPrice > finalPrice;
 
+  const discountPercent = hasDiscount
+    ? Math.round(((originalPrice - finalPrice) / originalPrice) * 100)
+    : 0;
+
+  const imageUrl = variant?.image_url || product.image_url;
 
   return (
-<Badge.Ribbon
-  text={discountPercent > 0 ? `-${discountPercent}%` : ''}
-  color='red'
-  style={{ display: discountPercent > 0 ? 'block' : 'none' }}
->
-
+    <Badge.Ribbon
+      text={discountPercent > 0 ? `-${discountPercent}%` : ''}
+      color='red'
+      style={{ display: discountPercent > 0 ? 'block' : 'none' }}
+    >
       <Card
         hoverable
         onClick={() => navigate(`/product/${product.id}`)}
@@ -134,7 +148,7 @@ const discountPercent = hasDiscount
           <div className='relative h-64 overflow-hidden bg-gray-100 group'>
             <img
               alt={product.name}
-              src={product.image_url || 'https://via.placeholder.com/300'}
+              src={imageUrl || 'https://via.placeholder.com/300'}
               className='object-cover w-full h-full transition-transform duration-500 group-hover:scale-110'
               onError={(e) => (e.target.src = 'https://via.placeholder.com/300')}
             />
@@ -162,13 +176,13 @@ const discountPercent = hasDiscount
                     className='bg-white hover:bg-blue-500 hover:text-white'
                   />
                 </Tooltip>
-                <Tooltip title='Yêu thích'>
+                <Tooltip title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}>
                   <Button
                     shape='circle'
-                    icon={<HeartOutlined />}
+                    icon={isWishlisted ? <HeartFilled className='text-red-500' /> : <HeartOutlined />}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onToggleWishlist(product);
+                      handleToggleWishlist();
                     }}
                     className='bg-white hover:bg-blue-500 hover:text-white'
                   />
@@ -191,6 +205,7 @@ const discountPercent = hasDiscount
           title={
             <div className='font-medium text-base truncate' title={product.name}>
               {product.name}
+              {variant?.sku ? ` (${variant.sku})` : ''}
             </div>
           }
           description={
@@ -201,7 +216,7 @@ const discountPercent = hasDiscount
               </div>
               <div className='flex flex-wrap gap-1'>
                 {product.has_variant && <Tag color='blue'>Nhiều phiên bản</Tag>}
-                {product.stock_quantity <= 5 && <Tag color='red'>Sắp hết hàng</Tag>}
+                {(variant?.stock_quantity || product.stock_quantity) <= 5 && <Tag color='red'>Sắp hết hàng</Tag>}
                 {product.category?.name && <Tag color='green'>{product.category.name}</Tag>}
               </div>
               <div className='mt-auto pt-2'>{getPriceDisplay()}</div>
@@ -214,3 +229,4 @@ const discountPercent = hasDiscount
 };
 
 export default ProductCard;
+

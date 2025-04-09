@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Breadcrumbs from '../breadcrumb/Breadcrumbs';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
+import { FloatButton } from 'antd';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -58,6 +59,7 @@ const AdminLayout = () => {
           </div>
         </main>
       </div>
+      <FloatButton.BackTop />
     </div>
   );
 };
