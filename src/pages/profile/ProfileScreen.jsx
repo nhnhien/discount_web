@@ -16,7 +16,8 @@ import {
   Avatar,
   Badge,
   Tooltip,
-  Empty
+  Empty,
+  Select 
 } from 'antd';
 import { 
   UserOutlined, 
@@ -34,6 +35,7 @@ import { useSelector } from 'react-redux';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { updateProfile } from '@/service/user';
 import { addressService } from '@/service/address';
+import axios from 'axios';
 
 const { Title, Text } = Typography;
 const { TabPane } = Tabs;
@@ -131,7 +133,19 @@ const ProfileScreen = () => {
       });
     }
   };
-
+  const fetchProvinces = async () => {
+    const res = await axios.get('https://provinces.open-api.vn/api/?depth=1');
+    return res.data.map((province) => ({
+      label: province.name,
+      value: province.name,
+    }));
+  };
+  const { data: provinceOptions = [], isLoading: provinceLoading } = useQuery({
+    queryKey: ['provinces'],
+    queryFn: fetchProvinces,
+  });
+  
+  
   const showDeleteConfirm = (addressId) => {
     setConfirmDelete(addressId);
   };
@@ -405,14 +419,22 @@ const ProfileScreen = () => {
               maxLength={200} 
             />
           </Form.Item>
-          
           <Form.Item
-            label="Tỉnh / Thành phố"
-            name="city"
-            rules={[{ required: true, message: 'Vui lòng nhập tỉnh/thành phố' }]}
-          >
-            <Input placeholder="Ví dụ: TP. Hồ Chí Minh" prefix={<EnvironmentOutlined className="site-form-item-icon" />} />
-          </Form.Item>
+  label="Tỉnh / Thành phố"
+  name="city"
+  rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
+>
+  <Select
+    placeholder="Chọn tỉnh/thành phố"
+    loading={provinceLoading}
+    options={provinceOptions}
+    showSearch
+    filterOption={(input, option) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</Form.Item>
+
         </Form>
       </Modal>
 

@@ -17,4 +17,8 @@ export const addressService = {
     const res = await apiClient.delete(`/api/address/${id}`);
     return res.data;
   },
+  getAllCities: async () => {
+    const res = await apiClient.get('/api/address/admin/cities');
+    return res.data.data; // trả về chỉ danh sách các khu vực (city)
+  },
 };

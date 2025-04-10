@@ -50,6 +50,7 @@ import { orderService } from '@/service/order';
 import { addressService } from '@/service/address';
 import { paymentService } from '@/service/payment';
 import { useLocation } from 'react-router-dom';
+import axios from 'axios'; 
 
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
@@ -158,6 +159,16 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
             <Text>Phí vận chuyển:</Text>
             <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
           </div>
+          {cart?.shipping_fee === 0 && cart?.shipping_address?.city && (
+  <Alert
+    message="Bạn đã được miễn phí vận chuyển!"
+    type="success"
+    showIcon
+    style={{ marginTop: 12 }}
+  />
+)}
+
+
           {cart?.discount_amount > 0 && (
             <div className='flex justify-between mb-2'>
               <Text>Giảm giá:</Text>
@@ -435,13 +446,60 @@ const CheckoutScreen = () => {
   const addresses = addressData?.data || [];
   const cart = cartData?.data;
   const selectedCartItems = (cart?.items || []).filter((item) => selectedItemIds.includes(item.id));
-
+  // Thêm useEffect để đồng bộ selectedAddress từ cart khi dữ liệu cart được tải
+useEffect(() => {
+  if (cart?.shipping_address_id && !selectedAddress) {
+    setSelectedAddress(cart.shipping_address_id);
+  }
+}, [cart, selectedAddress]);
+// Thêm vào phần đầu của component, sau khi khai báo state và các hooks
+useEffect(() => {
+  // Kiểm tra xem trong cart có thông tin shipping_address_id không
+  if (cart?.shipping_address?.id) {
+    // Nếu có, đặt selectedAddress thành id của địa chỉ giao hàng
+    setSelectedAddress(cart.shipping_address.id);
+  }
+}, [cart]);
   // Auto-select the first address if there's only one and none is selected
-  useEffect(() => {
-    if (addresses.length === 1 && !selectedAddress) {
-      setSelectedAddress(addresses[0].id);
-    }
-  }, [addresses, selectedAddress]);
+// Đoạn code đồng bộ hai chiều
+useEffect(() => {
+  if (selectedAddress) {
+    // Cập nhật thông tin shipping_address
+    cartService.updateShippingInfo({ shipping_address_id: selectedAddress })
+      .then(() => {
+        // Force refetch giỏ hàng sau khi đã chọn địa chỉ
+        queryClient.invalidateQueries(['cart', selectedItemIds, applyDiscount]);
+      })
+      .catch(error => {
+        console.error("Error updating shipping address: ", error);
+      });
+  }
+}, [selectedAddress, selectedItemIds, applyDiscount, queryClient]);
+
+// Thêm useEffect mới để đồng bộ từ cart sang selectedAddress
+useEffect(() => {
+  if (cart?.shipping_address_id && !selectedAddress) {
+    setSelectedAddress(cart.shipping_address_id);
+  }
+}, [cart]);
+
+  
+  
+  // Khi người dùng chọn địa chỉ
+const handleSelectAddress = (addressId) => {
+  setSelectedAddress(addressId);
+  
+  // Cập nhật thông tin shipping_address
+  cartService.updateShippingInfo({ shipping_address_id: addressId })
+    .then(() => {
+      // Force refetch giỏ hàng sau khi đã chọn địa chỉ
+      queryClient.invalidateQueries(['cart', selectedItemIds, applyDiscount]);
+    })
+    .catch(error => {
+      console.error("Error updating shipping address: ", error);
+    });
+};
+  
 
   // Navigation between steps
   const next = () => {
@@ -508,24 +566,30 @@ const CheckoutScreen = () => {
   });
 
   // Handle place order
-  const handlePlaceOrder = () => {
-    if (!selectedCartItems.length) {
-      message.error('Không có sản phẩm nào trong giỏ hàng');
-      return;
-    }
+const handlePlaceOrder = () => {
+  if (!selectedCartItems.length) {
+    message.error('Không có sản phẩm nào trong giỏ hàng');
+    return;
+  }
 
-    createOrderMutation.mutate({
-      shipping_address_id: selectedAddress,
-      payment_method: paymentMethod,
-      items: selectedCartItems.map((item) => ({
-        product_id: item.product_id,
-        variant_id: item.variant_id,
-        quantity: item.quantity,
-      })),
-      cart_item_ids: selectedCartItems.map((item) => item.id),
-      discount_code: cart?.discount_code || null,
-    });
-  };
+  // Thêm kiểm tra địa chỉ
+  if (!selectedAddress) {
+    message.error('Vui lòng chọn địa chỉ giao hàng');
+    return;
+  }
+
+  createOrderMutation.mutate({
+    shipping_address_id: selectedAddress,
+    payment_method: paymentMethod,
+    items: selectedCartItems.map((item) => ({
+      product_id: item.product_id,
+      variant_id: item.variant_id,
+      quantity: item.quantity,
+    })),
+    cart_item_ids: selectedCartItems.map((item) => item.id),
+    discount_code: cart?.discount_code || null,
+  });
+};
 
   // Handle address form
   const handleAddAddress = () => {
@@ -549,15 +613,21 @@ const CheckoutScreen = () => {
     return addresses.find((addr) => addr.id === selectedAddress);
   };
 
+  
   // Province data for address form
-  const provinces = [
-    { value: 'HN', label: 'Hà Nội' },
-    { value: 'HCM', label: 'Hồ Chí Minh' },
-    { value: 'DN', label: 'Đà Nẵng' },
-    { value: 'HP', label: 'Hải Phòng' },
-    { value: 'CT', label: 'Cần Thơ' },
-  ];
 
+  const fetchProvinces = async () => {
+    const res = await axios.get('https://provinces.open-api.vn/api/?depth=1');
+    return res.data.map((province) => ({
+      label: province.name,
+      value: province.name, // dùng tên làm value
+    }));
+  };
+  const { data: provinceOptions = [], isLoading: provinceLoading } = useQuery({
+    queryKey: ['provinces'],
+    queryFn: fetchProvinces,
+  });
+  
   // Render các biểu tượng cho phương thức thanh toán
   const renderPaymentIcon = (method) => {
     switch (method) {
@@ -682,7 +752,7 @@ const CheckoutScreen = () => {
                         key={addr.id}
                         address={addr}
                         selected={selectedAddress === addr.id}
-                        onSelect={() => setSelectedAddress(addr.id)}
+                        onSelect={() => handleSelectAddress(addr.id)}
                         onDelete={(id) => deleteAddressMutation.mutate(id)}
                       />
                     ))}
@@ -889,10 +959,28 @@ const CheckoutScreen = () => {
                         <Text>Tạm tính:</Text>
                         <Text>{formatPrice(cart?.subtotal || 0)}</Text>
                       </div>
-                      <div className='flex justify-between mb-2'>
-                        <Text>Phí vận chuyển:</Text>
-                        <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
-                      </div>
+                      {cart?.shipping_address?.city ? (
+  <div className='flex justify-between mb-2'>
+    <Text>Phí vận chuyển:</Text>
+    <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
+  </div>
+) : (
+  <div className='flex justify-between mb-2'>
+    <Text>Phí vận chuyển:</Text>
+    <Text type="secondary">Vui lòng chọn địa chỉ</Text>
+  </div>
+)}
+{cart?.shipping_address?.city && cart?.shipping_fee === 0 && (
+  <Alert
+    message="Bạn đã được miễn phí vận chuyển!"
+    type="success"
+    showIcon
+    style={{ marginTop: 12 }}
+  />
+)}
+
+
+
                       {cart?.discount_amount > 0 && (
                         <div className='flex justify-between mb-2'>
                           <Text>Giảm giá:</Text>
@@ -1061,18 +1149,22 @@ const CheckoutScreen = () => {
               </Col>
             </Row>
             <Form.Item
-              name='city'
-              label='Tỉnh/Thành phố'
-              rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
-            >
-              <Select size='large' placeholder='Chọn tỉnh/thành phố' showSearch>
-                {provinces.map((p) => (
-                  <Option key={p.value} value={p.label}>
-                    {p.label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+  name='city'
+  label='Tỉnh/Thành phố'
+  rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
+>
+  <Select
+    size='large'
+    placeholder='Chọn tỉnh/thành phố'
+    loading={provinceLoading}
+    options={provinceOptions}
+    showSearch
+    filterOption={(input, option) =>
+      option.label.toLowerCase().includes(input.toLowerCase())
+    }
+  />
+</Form.Item>
+
             <Form.Item
               name='address'
               label='Địa chỉ cụ thể'

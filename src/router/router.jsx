@@ -28,6 +28,8 @@ import DiscountManager from '@/admin/features/discount/components/DiscountManage
 import DiscountEditor from '@/admin/features/discount/components/DiscountEditor';
 import CategoryManager from '@/admin/features/category/CategoryManager';
 import WishlistScreen from '../pages/wishlist/WishlistScreen';
+import ShippingFeeManager from '@/admin/features/shipping-fee/components/ShippingFeeManager';
+import ShippingFeeEditor from '@/admin/features/shipping-fee/components/ShippingFeeEditor';
 
 const mainRouter = createBrowserRouter([
   {
@@ -107,7 +109,9 @@ const mainRouter = createBrowserRouter([
       { path: 'discounts', element: <DiscountManager /> },
       { path: 'discount/create', element: <DiscountEditor /> },
       { path: 'discount/edit/:id', element: <DiscountEditor /> },
-      
+      { path: 'shipping-fee', element: <ShippingFeeManager /> },
+{ path: 'shipping-fee/create', element: <ShippingFeeEditor /> },
+{ path: 'shipping-fee/edit/:id', element: <ShippingFeeEditor /> },
       { path: '*', element: <NotFoundScreen /> },
     ],
   }

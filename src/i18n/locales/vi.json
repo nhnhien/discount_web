@@ -15,7 +15,8 @@
     "custom_pricing": "Giá tùy chỉnh",
     "price_list": "Bảng giá",
     "quantity_break": "Chiết khấu số lượng",
-    "voucher": "Mã giảm giá"
+    "voucher": "Mã giảm giá",
+    "shipping_fee": "Phí vận chuyển"
   },
   "cp": {
     "title": "Giá tùy chỉnh",

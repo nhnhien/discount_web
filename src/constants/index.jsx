@@ -3,6 +3,7 @@ import { IoPricetag } from 'react-icons/io5';
 import { FaUser, FaTags } from 'react-icons/fa';
 import { BsFillCartCheckFill } from 'react-icons/bs';
 import { RiDiscountPercentFill } from 'react-icons/ri';
+import { MdLocalShipping } from 'react-icons/md'; 
 
 const getAdminNavigationItems = (t) => [
   {
@@ -68,6 +69,13 @@ const getAdminNavigationItems = (t) => [
         link: '/admin/discounts/qb',
       },
     ],
+  },
+
+  {
+    id: 6,
+    title: t('sidebar.shipping_fee'),
+    icon: <MdLocalShipping size='18' />,
+    link: '/admin/shipping-fee',
   },
 ];
 export { getAdminNavigationItems };
