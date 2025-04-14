@@ -38,9 +38,10 @@ import TextArea from 'antd/es/input/TextArea';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as discountService from '@/service/discount'; // thay vì gọi từ cartService
-import { useRef } from 'react'; // THÊM DÒNG NÀY
-import { cartService } from '@/service/cart'; // ⚠️ thiếu dòng này
+import * as discountService from '@/service/discount'; 
+import { useRef } from 'react'; 
+import { cartService } from '@/service/cart'; 
+import { useTranslation } from 'react-i18next';
 
 const CartScreen = () => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const CartScreen = () => {
   const cartQueryKey = ['cart', userId]; 
   const [discountApplied, setDiscountApplied] = useState(false);
   const [availableCodes, setAvailableCodes] = useState([]);
-  
+  const { t } = useTranslation(); 
   const [wantApplyDiscount, setWantApplyDiscount] = useState(false); // Thêm state điều khiển
 
 
@@ -249,11 +250,12 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
           <ShoppingCartOutlined className='text-blue-500 text-6xl mb-4' />
           <Spin size='large' className='my-4' />
           <Typography.Title level={4} className='mt-4 font-normal text-gray-600'>
-            Đang tải giỏ hàng của bạn...
-          </Typography.Title>
-          <Typography.Text className='text-gray-500'>
-            Chúng tôi đang chuẩn bị giỏ hàng, vui lòng đợi trong giây lát
-          </Typography.Text>
+  {t('cart.loading_title')}
+</Typography.Title>
+<Typography.Text className='text-gray-500'>
+  {t('cart.loading_description')}
+</Typography.Text>
+
         </div>
       </div>
     );
@@ -268,16 +270,16 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
             description={
               <div>
                 <Typography.Title level={4} className='mt-4 font-normal text-gray-600'>
-                  Không thể tải giỏ hàng
+                {t('cart.load_failed')}
                 </Typography.Title>
                 <Typography.Text className='text-gray-500 block mb-4'>
-                  Đã xảy ra lỗi khi tải giỏ hàng. Vui lòng thử lại sau.
+                {t('cart.load_failed_description')}
                 </Typography.Text>
               </div>
             }
           />
           <Button type='primary' size='large' className='mt-4 px-8 h-12' onClick={() => navigate('/products')}>
-            Tiếp tục mua sắm
+          {t('cart.continue_shopping')}
           </Button>
         </div>
       </div>
@@ -308,11 +310,10 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                 <ShoppingCartOutlined style={{ fontSize: 80, color: '#3b82f6' }} />
               </div>
               <Typography.Title level={3} className='mt-2 font-medium'>
-                Giỏ hàng của bạn đang trống
+              {t('cart.empty')}
               </Typography.Title>
               <Typography.Paragraph className='text-gray-500 mb-8 max-w-md'>
-                Có vẻ như bạn chưa thêm bất kỳ sản phẩm nào vào giỏ hàng. Hãy tiếp tục mua sắm để tìm sản phẩm bạn yêu
-                thích.
+              {t('cart.empty_message')}
               </Typography.Paragraph>
               <Button
                 type='primary'
@@ -321,7 +322,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                 onClick={() => navigate('/products')}
                 className='h-12 px-8 text-base'
               >
-                Khám phá sản phẩm ngay
+  {t('cart.explore_products')}
               </Button>
 
               <div className='mt-12 grid grid-cols-2 md:grid-cols-4 gap-6 text-center'>
@@ -329,25 +330,25 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                   <div className='mb-3 rounded-full bg-orange-50 p-3'>
                     <TagOutlined style={{ fontSize: 24, color: '#f97316' }} />
                   </div>
-                  <Typography.Text strong>Ưu đãi độc quyền</Typography.Text>
+                  <Typography.Text strong>{t('cart.exclusive_offers')}</Typography.Text>
                 </div>
                 <div className='flex flex-col items-center'>
                   <div className='mb-3 rounded-full bg-green-50 p-3'>
                     <TruckOutlined style={{ fontSize: 24, color: '#22c55e' }} />
                   </div>
-                  <Typography.Text strong>Giao hàng nhanh</Typography.Text>
+                  <Typography.Text strong>{t('cart.fast_delivery')}</Typography.Text>
                 </div>
                 <div className='flex flex-col items-center'>
                   <div className='mb-3 rounded-full bg-blue-50 p-3'>
                     <SafetyOutlined style={{ fontSize: 24, color: '#3b82f6' }} />
                   </div>
-                  <Typography.Text strong>Đảm bảo chất lượng</Typography.Text>
+                  <Typography.Text strong>{t('cart.quality_assurance')}</Typography.Text>
                 </div>
                 <div className='flex flex-col items-center'>
                   <div className='mb-3 rounded-full bg-purple-50 p-3'>
                     <HeartOutlined style={{ fontSize: 24, color: '#8b5cf6' }} />
                   </div>
-                  <Typography.Text strong>Dịch vụ khách hàng</Typography.Text>
+                  <Typography.Text strong>{t('cart.customer_service')}</Typography.Text>
                 </div>
               </div>
             </div>
@@ -427,11 +428,11 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                     checked={selectedItems.length === items.length && items.length > 0}
                     onChange={handleSelectAll}
                   />
-                  Tất cả sản phẩm ({items.length})
+                  {t('cart.select_all')} ({items.length})
                 </Typography.Title>
 
                 <Button type='text' danger icon={<DeleteOutlined />} disabled={selectedItems.length === 0}>
-                  Xóa đã chọn ({selectedItems.length})
+                {t('cart.remove_selected')} ({selectedItems.length})
                 </Button>
               </div>
 
@@ -574,7 +575,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
               </div>
               <TextArea
                 rows={4}
-                placeholder='Nhập ghi chú của bạn (nếu có). Ví dụ: Thời gian nhận hàng, địa điểm cụ thể...'
+                placeholder={t('cart.order_note_placeholder')}
                 value={orderNote}
                 onChange={(e) => setOrderNote(e.target.value)}
                 onBlur={handleUpdateNote}
@@ -615,14 +616,14 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                   <div>
 <div className='flex'>
   <Input
-    placeholder='Nhập mã giảm giá'
+    placeholder={t('cart.enter_coupon')}
     value={couponCode}
     onChange={(e) => setCouponCode(e.target.value)}
     prefix={<TagOutlined className='text-gray-400' />}
     className='rounded-l-lg'
   />
   <Button type='primary' onClick={() => handleApplyCoupon()} className='rounded-r-lg'>
-    Áp dụng
+  {t('cart.apply_coupon')}
   </Button>
 </div>
 <div className='mt-3 flex flex-wrap gap-2'>
@@ -658,13 +659,13 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
 
               <Card className="rounded-xl border-0 shadow-sm">
   <Typography.Title level={4} className='mb-6'>
-    Thông tin thanh toán
+  {t('checkout.payment_info')}
   </Typography.Title>
 
   <div className='space-y-4 mb-6'>
     <div className='flex justify-between'>
       <Typography.Text className='text-gray-500'>
-        Tạm tính ({selectedCartItems.length} sản phẩm)
+      {t('checkout.items_total')} ({selectedCartItems.length} {t('product.quantity').toLowerCase()})
       </Typography.Text>
       <Typography.Text>{formatPrice(selectedSubtotal)}</Typography.Text>
     </div>
@@ -673,7 +674,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     {cart.discount_code && parseFloat(cart.discount_amount) > 0 && (
       <div className='flex justify-between'>
         <Typography.Text className='text-gray-500'>
-          Giảm giá <Tag color="green">{cart.discount_code}</Tag>
+        {t('cart.discount')}  <Tag color="green">{cart.discount_code}</Tag>
         </Typography.Text>
         <Typography.Text className='text-red-500 font-medium'>
           -{formatPrice(cart.discount_amount)}
@@ -682,7 +683,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     )}
 
     <div className='flex justify-between'>
-      <Typography.Text className='text-gray-500'>Phí vận chuyển</Typography.Text>
+      <Typography.Text className='text-gray-500'>  {t('cart.shipping')}</Typography.Text>
       <Typography.Text className={selectedSubtotal >= freeShippingThreshold ? 'text-green-500 font-medium' : ''}>
         {selectedSubtotal >= freeShippingThreshold ? 'Miễn phí' : 'Tính khi thanh toán'}
       </Typography.Text>
@@ -693,13 +694,14 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
 
   <div className='flex justify-between mb-6'>
     <Typography.Text strong className='text-lg'>
-      Tổng cộng
+    {t('cart.total')}
     </Typography.Text>
     <div className='text-right'>
 <Typography.Text strong className='text-blue-600 text-2xl'>
   {formatPrice(finalTotal)}
 </Typography.Text>
-      <div className='text-gray-500 text-xs'>(Đã bao gồm VAT nếu có)</div>
+      <div className='text-gray-500 text-xs'>  ({t('checkout.vat_note', 'Đã bao gồm VAT nếu có')})
+</div>
     </div>
   </div>
   <Button
@@ -716,7 +718,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
   disabled={selectedCartItems.length === 0}
 >
   <LockOutlined className='mr-2' />
-  Tiến hành thanh toán ({selectedCartItems.length})
+  {t('cart.proceed_to_checkout')} ({selectedCartItems.length})
 </Button>
 
 </Card>

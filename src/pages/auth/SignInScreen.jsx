@@ -18,6 +18,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from '@/context/slice/auth';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = 'http://localhost:8000/api/auth/sync-user';
 
@@ -25,6 +26,7 @@ const SignInScreen = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.auth.currentUser);
+  const { t } = useTranslation();
 
   const [step, setStep] = useState('method'); // method | phone | otp
   const [phone, setPhone] = useState('');
@@ -46,7 +48,7 @@ const SignInScreen = () => {
       });
     } catch (error) {
       console.error('Đăng nhập thất bại:', error);
-      message.error('Đăng nhập thất bại!');
+      message.error(t('auth.login_failed'));
     }
   };
   
@@ -62,24 +64,24 @@ const SignInScreen = () => {
   };
 
   const handleSendOtp = async () => {
-    if (!phone) return message.error('Vui lòng nhập số điện thoại');
+    if (!phone) return message.error(t('auth.enter_phone_required'));
     try {
       setLoading(true);
       const appVerifier = setupRecaptcha();
       const result = await signInWithPhoneNumber(auth, phone, appVerifier);
       setConfirmationResult(result);
       setStep('otp');
-      message.success('Đã gửi mã OTP');
+      message.success(t('auth.otp_sent'));
     } catch (error) {
       console.error(error);
-      message.error('Gửi OTP thất bại');
+      message.error(t('auth.otp_failed'));
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp) return message.error('Vui lòng nhập mã OTP');
+    if (!otp) return message.error(t('auth.enter_otp_required'));
     try {
       setLoading(true);
       const result = await confirmationResult.confirm(otp);
@@ -87,7 +89,7 @@ const SignInScreen = () => {
       await syncUserWithBackend(idToken);
     } catch (error) {
       console.error(error);
-      message.error('Xác minh OTP thất bại');
+      message.error(t('auth.otp_verify_failed'));
     } finally {
       setLoading(false);
     }
@@ -107,7 +109,7 @@ const SignInScreen = () => {
       const data = await response.json();
       if (response.ok) {
         dispatch(loginSuccess(data.user));
-        message.success('Đăng nhập thành công');
+        message.success(t('auth.login_success'));
   
         // ✅ Chuyển hướng theo vai trò
         if (data.user.role === 'owner' || data.user.role === 'admin') {
@@ -121,7 +123,7 @@ const SignInScreen = () => {
       }
     } catch (error) {
       console.error('Đồng bộ thất bại:', error);
-      message.error('Không thể đồng bộ người dùng');
+      message.error(t('auth.sync_failed'));
     }
   };
   
@@ -133,48 +135,57 @@ const SignInScreen = () => {
       case 'phone':
         return (
           <>
-            <h2 className='text-lg font-semibold mb-4'>Nhập số điện thoại</h2>
-            <Input
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder='+84xxxxxxxxx'
-              className='mb-4'
-            />
-            <div id='recaptcha-container' />
-            <Button type='primary' loading={loading} className='w-full' onClick={handleSendOtp}>
-              Gửi mã OTP
-            </Button>
-            <Button type='link' className='mt-2' onClick={() => setStep('method')}>
-              Quay lại
-            </Button>
+<h2 className='text-lg font-semibold mb-4'>{t('auth.enter_phone')}</h2>
+
+<Input
+  value={phone}
+  onChange={(e) => setPhone(e.target.value)}
+  placeholder='+84xxxxxxxxx'
+  className='mb-4'
+/>
+
+<Button type='primary' loading={loading} className='w-full' onClick={handleSendOtp}>
+  {t('auth.send_otp')}
+</Button>
+
+<Button type='link' className='mt-2' onClick={() => setStep('method')}>
+  {t('auth.back')}
+</Button>
+
           </>
         );
       case 'otp':
         return (
           <>
-            <h2 className='text-lg font-semibold mb-4'>Nhập mã OTP</h2>
-            <Input
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              placeholder='Nhập mã OTP'
-              prefix={<LockOutlined />}
-              className='mb-4'
-            />
-            <Button type='primary' loading={loading} className='w-full' onClick={handleVerifyOtp}>
-              Xác minh OTP
-            </Button>
+<h2 className='text-lg font-semibold mb-4'>{t('auth.enter_otp')}</h2>
+
+<Input
+  value={otp}
+  onChange={(e) => setOtp(e.target.value)}
+  placeholder={t('auth.enter_otp')}
+  prefix={<LockOutlined />}
+  className='mb-4'
+/>
+
+<Button type='primary' loading={loading} className='w-full' onClick={handleVerifyOtp}>
+  {t('auth.verify_otp')}
+</Button>
+
           </>
         );
       default:
         return (
           <>
-            <h2 className='text-lg font-semibold mb-4'>Chọn phương thức đăng nhập</h2>
-            <Button type='primary' icon={<GoogleOutlined />} className='w-full mb-3' onClick={handleGoogleLogin}>
-              Đăng nhập với Google
-            </Button>
-            <Button icon={<PhoneOutlined />} className='w-full' onClick={() => setStep('phone')}>
-              Đăng nhập bằng số điện thoại
-            </Button>
+<h2 className='text-lg font-semibold mb-4'>{t('auth.choose_method')}</h2>
+
+<Button type='primary' icon={<GoogleOutlined />} className='w-full mb-3' onClick={handleGoogleLogin}>
+  {t('auth.google_login')}
+</Button>
+
+<Button icon={<PhoneOutlined />} className='w-full' onClick={() => setStep('phone')}>
+  {t('auth.phone_login')}
+</Button>
+
           </>
         );
     }
