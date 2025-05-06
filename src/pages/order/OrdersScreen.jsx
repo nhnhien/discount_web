@@ -41,37 +41,37 @@ const getStatusDetails = (status) => {
     'pending': { 
       color: 'orange', 
       icon: <ClockCircleOutlined />, 
-      text: 'Đang xử lý',
+      text: 'Pending',
       description: 'Đơn hàng đang được xử lý'
     },
     'processing': { 
       color: 'blue', 
       icon: <LoadingOutlined />, 
-      text: 'Đang chuẩn bị',
+      text: 'Processing',
       description: 'Đơn hàng đang được chuẩn bị'
     },
     'shipping': { 
       color: 'cyan', 
       icon: <TruckOutlined />, 
-      text: 'Đang giao hàng',
+      text: 'Shipping',
       description: 'Đơn hàng đang được vận chuyển'
     },
     'delivered': { 
       color: 'green', 
       icon: <CheckCircleOutlined />, 
-      text: 'Đã giao hàng',
+      text: 'Delivered',
       description: 'Đơn hàng đã được giao thành công'
     },
     'cancelled': { 
       color: 'red', 
       icon: <ExclamationCircleOutlined />, 
-      text: 'Đã hủy',
+      text: 'Cancelled',
       description: 'Đơn hàng đã bị hủy'
     },
     'completed': { 
       color: 'green', 
       icon: <FileDoneOutlined />, 
-      text: 'Hoàn thành',
+      text: 'Completed',
       description: 'Đơn hàng đã hoàn thành'
     },
   };
@@ -87,10 +87,10 @@ const getStatusDetails = (status) => {
 // Helper function to format payment method display
 const formatPaymentMethod = (method) => {
   const methodMap = {
-    'cod': 'Thanh toán khi nhận hàng (COD)',
-    'bank_transfer': 'Chuyển khoản ngân hàng',
-    'credit_card': 'Thẻ tín dụng/ghi nợ',
-    'momo': 'Ví điện tử MoMo',
+    'cod': 'Cash on Delivery (COD)',
+    'bank_transfer': 'Bank Transfer',
+    'credit_card': 'Credit/Debit Card',
+    'momo': 'MoMo E-wallet',
     'zalopay': 'ZaloPay'
   };
 
@@ -134,7 +134,7 @@ const OrdersScreen = () => {
       <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
         <ShoppingCartOutlined style={{ fontSize: 64, color: '#1890ff', marginBottom: 24 }} />
         <Spin size="large" />
-        <div className="mt-4 text-gray-600 text-lg">Đang tải thông tin đơn hàng của bạn...</div>
+        <div className="mt-4 text-gray-600 text-lg">Loading your orders...</div>
       </div>
     );
   }
@@ -143,12 +143,12 @@ const OrdersScreen = () => {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <ExclamationCircleOutlined style={{ fontSize: 64, color: '#ff4d4f', marginBottom: 24 }} />
-        <Title level={3}>Không thể tải thông tin đơn hàng</Title>
+        <Title level={3}>Unable to load order information</Title>
         <Text className="text-gray-600">
-          Đã xảy ra lỗi khi tải thông tin đơn hàng. Vui lòng thử lại sau.
+        An error occurred while loading your orders. Please try again later.
         </Text>
         <div className="mt-6">
-          <Button type="primary">Thử lại</Button>
+          <Button type="primary">Retry</Button>
         </div>
       </div>
     );
@@ -169,10 +169,10 @@ const OrdersScreen = () => {
             description={
               <div className="mt-4">
                 <Title level={4} className="font-normal text-gray-600">
-                  Bạn chưa có đơn hàng nào
+                You don't have any orders yet
                 </Title>
                 <Text className="text-gray-500 block mb-6">
-                  Hãy tiếp tục mua sắm để tìm những sản phẩm phù hợp với bạn
+                Continue shopping to find products that suit you
                 </Text>
                 <Button 
                   type="primary" 
@@ -180,7 +180,7 @@ const OrdersScreen = () => {
                   icon={<ShoppingOutlined />}
                   className="mt-2"
                 >
-                  Mua sắm ngay
+                  Shop Now
                 </Button>
               </div>
             }
@@ -195,7 +195,7 @@ const OrdersScreen = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         <Title level={2} className="mb-6 flex items-center">
           <ShoppingOutlined className="mr-3" />
-          Lịch sử đơn hàng
+          Order History
           <Badge count={orders.length} className="ml-3" style={{ backgroundColor: '#1890ff' }} />
         </Title>
 
@@ -204,7 +204,7 @@ const OrdersScreen = () => {
           <Col xs={24} sm={12} md={6}>
             <Card className="rounded-xl shadow-sm border-0 h-full">
               <Statistic 
-                title="Tổng đơn hàng" 
+                title="Total Orders" 
                 value={orders.length} 
                 prefix={<ShoppingOutlined />}
                 valueStyle={{ color: '#1890ff' }}
@@ -214,7 +214,7 @@ const OrdersScreen = () => {
           <Col xs={24} sm={12} md={6}>
             <Card className="rounded-xl shadow-sm border-0 h-full">
               <Statistic 
-                title="Đang xử lý" 
+                title="Pending" 
                 value={orderCounts['pending'] || 0} 
                 prefix={<ClockCircleOutlined />}
                 valueStyle={{ color: '#faad14' }}
@@ -224,7 +224,7 @@ const OrdersScreen = () => {
           <Col xs={24} sm={12} md={6}>
             <Card className="rounded-xl shadow-sm border-0 h-full">
               <Statistic 
-                title="Đang giao hàng" 
+                title="Shipping" 
                 value={orderCounts['shipping'] || 0} 
                 prefix={<TruckOutlined />}
                 valueStyle={{ color: '#13c2c2' }}
@@ -234,7 +234,7 @@ const OrdersScreen = () => {
           <Col xs={24} sm={12} md={6}>
             <Card className="rounded-xl shadow-sm border-0 h-full">
               <Statistic 
-                title="Hoàn thành" 
+                title="Completed" 
                 value={orderCounts['completed'] || 0} 
                 prefix={<CheckCircleOutlined />}
                 valueStyle={{ color: '#52c41a' }}
@@ -262,7 +262,7 @@ const OrdersScreen = () => {
                       <div className="flex items-center mb-3">
                         <ShoppingOutlined className="text-blue-500 text-lg mr-2" />
                         <Title level={4} style={{ margin: 0 }}>
-                          Đơn hàng #{order.order_number}
+                        Order #{order.order_number}
                         </Title>
                         <Tag 
                           icon={statusDetails.icon} 
@@ -276,22 +276,22 @@ const OrdersScreen = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                         <div className="flex items-center">
                           <CalendarOutlined className="text-gray-400 mr-2" />
-                          <Text className="text-gray-600">Ngày đặt: {formatDate(order.created_at || new Date())}</Text>
+                          <Text className="text-gray-600">Order Date: {formatDate(order.created_at || new Date())}</Text>
                         </div>
                         
                         <div className="flex items-center">
                           <InboxOutlined className="text-gray-400 mr-2" />
-                          <Text className="text-gray-600">Số sản phẩm: {order.items?.length || '-'}</Text>
+                          <Text className="text-gray-600">Items: {order.items?.length || '-'}</Text>
                         </div>
                         
                         <div className="flex items-center">
                           <CreditCardOutlined className="text-gray-400 mr-2" />
-                          <Text className="text-gray-600">Thanh toán: {formatPaymentMethod(order.payment_method)}</Text>
+                          <Text className="text-gray-600">Payment: {formatPaymentMethod(order.payment_method)}</Text>
                         </div>
                         
                         <div className="flex items-center">
                           <DollarOutlined className="text-gray-400 mr-2" />
-                          <Text className="text-gray-600">Tổng cộng: <span className="font-medium text-blue-600">{formatPrice(order.total_amount)}</span></Text>
+                          <Text className="text-gray-600">Total: <span className="font-medium text-blue-600">{formatPrice(order.total_amount)}</span></Text>
                         </div>
                       </div>
                     </div>
@@ -305,7 +305,7 @@ const OrdersScreen = () => {
                         size="large"
                       >
                         <Link to={`/order-success/${order.id}`}>
-                          Xem chi tiết
+                        View Details
                         </Link>
                       </Button>
                       
@@ -314,7 +314,7 @@ const OrdersScreen = () => {
                           type="dashed" 
                           className="flex items-center"
                         >
-                          Đánh giá
+                          Review
                         </Button>
                       )}
                     </div>
@@ -345,7 +345,7 @@ const OrdersScreen = () => {
                               </Text>
                               <div className="flex justify-between mt-1">
                                 <Text type="secondary" className="text-xs">
-                                  SL: {item.quantity}
+                                Qty: {item.quantity}
                                 </Text>
                                 <Text className="text-xs text-blue-600">
                                   {formatPrice(item.unit_price)}
@@ -358,7 +358,7 @@ const OrdersScreen = () => {
                         {order.items.length > 3 && (
                           <div className="flex items-center justify-center">
                             <Button type="link">
-                              +{order.items.length - 3} sản phẩm khác
+                              +{order.items.length - 3} more products
                             </Button>
                           </div>
                         )}
@@ -371,7 +371,7 @@ const OrdersScreen = () => {
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <Title level={5} className="flex items-center">
                         <TruckOutlined className="mr-2" />
-                        Thông tin vận chuyển
+                        Shipping Information
                       </Title>
                       <Timeline>
                         {order.tracking_info.map((info, index) => (

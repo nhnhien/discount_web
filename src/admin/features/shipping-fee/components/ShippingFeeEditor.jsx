@@ -17,7 +17,7 @@ const ShippingFeeEditor = () => {
       const res = await shippingFeeService.getById(id);
       form.setFieldsValue(res);
     } catch {
-      message.error('Không thể tải dữ liệu');
+      message.error('Failed to load data');
     }
   };
 
@@ -26,7 +26,7 @@ const ShippingFeeEditor = () => {
       const cities = await addressService.getAllCities();
       setAddressOptions(cities); // Set the fetched cities in the state
     } catch {
-      message.error('Không thể tải danh sách khu vực');
+      message.error('Failed to load area list');
     }
   };
 
@@ -42,28 +42,28 @@ const ShippingFeeEditor = () => {
       console.log("ID đang xử lý:", id); // ✅ để debug
       if (id) {
         await shippingFeeService.update(id, values);
-        message.success('Cập nhật thành công');
+        message.success('Update successful');
       } else {
         await shippingFeeService.create(values);
-        message.success('Tạo mới thành công');
+        message.success('Create successful');
       }
       navigate('/admin/shipping-fee');
     } catch (error) {
-      message.error('Lưu dữ liệu thất bại');
+      message.error('Failed to save data');
     }
   };
   
 
   return (
     <div>
-      <h2>{id ? 'Chỉnh sửa phí vận chuyển' : 'Tạo phí vận chuyển'}</h2>
+      <h2>{id ? 'Edit Shipping Fee' : 'Create Shipping Fee'}</h2>
       <Form layout="vertical" form={form} onFinish={onFinish} initialValues={{ is_active: true }}>
         <Form.Item
-          label="Khu vực"
+          label="Area"
           name="region"
-          rules={[{ required: true, message: 'Vui lòng chọn khu vực' }]}
+          rules={[{ required: true, message: 'Please select an area' }]}
         >
-          <Select placeholder="Chọn khu vực" allowClear>
+          <Select placeholder="Select area" allowClear>
             {addressOptions.map((city) => (
               <Option key={city} value={city}>
                 {city}
@@ -73,24 +73,24 @@ const ShippingFeeEditor = () => {
         </Form.Item>
 
         <Form.Item
-          label="Phương thức vận chuyển"
+          label="Shipping Method"
           name="method"
-          rules={[{ required: true, message: 'Vui lòng nhập phương thức' }]}
+          rules={[{ required: true, message: 'Please enter shipping method' }]}
         >
           <Input />
         </Form.Item>
 
-        <Form.Item label="Phí (VND)" name="fee" rules={[{ required: true, message: 'Vui lòng nhập phí' }]}>
+        <Form.Item label="Fee (VND)" name="fee" rules={[{ required: true, message: 'Please enter fee' }]}>
           <InputNumber style={{ width: '100%' }} min={0} />
         </Form.Item>
 
-        <Form.Item label="Kích hoạt" name="is_active" valuePropName="checked">
+        <Form.Item label="Active" name="is_active" valuePropName="checked">
           <Switch />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            {id ? 'Cập nhật' : 'Tạo mới'}
+            {id ? 'Update' : 'Create'}
           </Button>
         </Form.Item>
       </Form>

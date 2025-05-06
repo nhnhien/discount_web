@@ -156,9 +156,9 @@ const ProductManager = () => {
   }
 
   const getStockStatusTag = (quantity) => {
-    if (quantity > 20) return <Tag color="success">Còn hàng</Tag>
-    if (quantity > 0) return <Tag color="warning">Sắp hết</Tag>
-    return <Tag color="error">Hết hàng</Tag>
+    if (quantity > 20) return <Tag color="success">In stock</Tag>
+    if (quantity > 0) return <Tag color="warning">Low stock</Tag>
+    return <Tag color="error">Out of stock</Tag>
   }
 
   const handleExportExcel = () => {
@@ -184,7 +184,7 @@ const ProductManager = () => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }}>
       <Card className={`bg-gray-50 mb-4 ${screens.xs ? "p-2" : ""}`}>
         <Title level={5} className="mb-3">
-          Chi tiết biến thể sản phẩm
+        Product variant details
         </Title>
         {screens.xs ? (
           <List
@@ -198,19 +198,19 @@ const ProductManager = () => {
                       <Text copyable>{variant.sku}</Text>
                     </div>
                     <div className="flex justify-between">
-                      <Text strong>Giá gốc:</Text>
+                      <Text strong>Original price:</Text>
                       <Text type="secondary">{formatVND(variant.original_price)}</Text>
                     </div>
                     <div className="flex justify-between">
-                      <Text strong>Giá cuối:</Text>
+                      <Text strong>Final price:</Text>
                       <Text type="success">{formatVND(variant.final_price)}</Text>
                     </div>
                     <div className="flex justify-between">
-                      <Text strong>Tồn kho:</Text>
+                      <Text strong>Stock:</Text>
                       {getStockStatusTag(variant.stock_quantity)}
                     </div>
                     <div>
-                      <Text strong>Thuộc tính:</Text>
+                      <Text strong>Attributes:</Text>
                       <div className="mt-1">
                         <Space wrap size={[0, 4]}>
                           {variant.attributes.map((attr, index) => (
@@ -252,25 +252,25 @@ const ProductManager = () => {
       render: (sku) => <Text copyable>{sku}</Text>,
     },
     {
-      title: "Giá gốc",
+      title: "Original price",
       dataIndex: "original_price",
       key: "original_price",
       render: (price) => <Text type="secondary">{formatVND(price)}</Text>,
     },
     {
-      title: "Giá cuối",
+      title: "Final price",
       dataIndex: "final_price",
       key: "final_price",
       render: (price) => <Text strong>{formatVND(price)}</Text>,
     },
     {
-      title: "Tồn kho",
+      title: "Stock",
       dataIndex: "stock_quantity",
       key: "stock_quantity",
       render: (quantity) => getStockStatusTag(quantity),
     },
     {
-      title: "Thuộc tính",
+      title: "Attributes",
       dataIndex: "attributes",
       key: "attributes",
       render: (attributes) => (
@@ -285,7 +285,7 @@ const ProductManager = () => {
 
   const columns = [
     {
-      title: "Ảnh",
+      title: "Image",
       dataIndex: "image_url",
       key: "image_url",
       width: 100,
@@ -303,7 +303,7 @@ const ProductManager = () => {
       ),
     },
     {
-      title: "Tên sản phẩm",
+      title: "Product name",
       dataIndex: "name",
       key: "name",
       render: (name, record) => (
@@ -322,13 +322,13 @@ const ProductManager = () => {
             <Tag color="cyan" icon={<TagsOutlined />}>
               {getCategoryName(record.category_id)}
             </Tag>
-            {record.has_variant && <Tag color="purple">Có biến thể</Tag>}
+            {record.has_variant && <Tag color="purple">Has variants</Tag>}
           </div>
         </div>
       ),
     },
     {
-      title: "Mô tả",
+      title: "Description",
       dataIndex: "description",
       key: "description",
       ellipsis: {
@@ -344,7 +344,7 @@ const ProductManager = () => {
       ),
     },
     {
-      title: "Giá",
+      title: "Price",
       key: "price",
       render: (_, record) => {
         const rule = record.appliedRule
@@ -362,7 +362,7 @@ const ProductManager = () => {
 
           return (
             <div>
-              <Text type="secondary">Giá từ:</Text>{" "}
+              <Text type="secondary">Price from:</Text>{" "}
               <Text strong className="text-red-600 ml-1">
                 {formatVND(minPrice)}
               </Text>
@@ -391,14 +391,14 @@ const ProductManager = () => {
       },
     },
     {
-      title: "Tồn kho",
+      title: "Stock",
       key: "stock",
       responsive: ["lg"],
       render: (_, record) => (
         <div>
           {record.has_variant ? (
             <Badge count={record.variants?.length || 0} showZero overflowCount={99}>
-              <Text type="secondary">Biến thể</Text>
+              <Text type="secondary">Variant</Text>
             </Badge>
           ) : (
             getStockStatusTag(record.stock_quantity)
@@ -452,13 +452,13 @@ const ProductManager = () => {
   }
 
   const headerStatistics = [
-    { title: "Tổng sản phẩm", value: products?.data?.length || 0, icon: <ShoppingOutlined /> },
+    { title: "Total products", value: products?.data?.length || 0, icon: <ShoppingOutlined /> },
     {
-      title: "Sản phẩm biến thể",
+      title: "Product variants",
       value: products?.data?.filter((p) => p.has_variant).length || 0,
       icon: <TagsOutlined />,
     },
-    { title: "Danh mục", value: categories?.data?.length || 0, icon: <TagsOutlined /> },
+    { title: "Category", value: categories?.data?.length || 0, icon: <TagsOutlined /> },
   ]
 
   const renderDrawerContent = () => {
@@ -480,7 +480,7 @@ const ProductManager = () => {
         <Divider />
 
         <div className="mb-6">
-          <Title level={5}>Thông tin sản phẩm</Title>
+          <Title level={5}>Product Details</Title>
           <Text>{selectedProduct.description}</Text>
         </div>
 
@@ -575,7 +575,7 @@ const ProductManager = () => {
 
   const renderFilterDrawer = () => (
     <Drawer
-      title="Bộ lọc"
+      title="Filters"
       placement="right"
       onClose={() => setFilterDrawerVisible(false)}
       open={filterDrawerVisible}
@@ -583,9 +583,9 @@ const ProductManager = () => {
     >
       <div className="flex flex-col gap-4">
         <div>
-          <Text strong>Tìm kiếm</Text>
+          <Text strong>Search</Text>
           <Search
-            placeholder="Tìm kiếm sản phẩm"
+            placeholder="Search products"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             allowClear
@@ -594,9 +594,9 @@ const ProductManager = () => {
         </div>
 
         <div>
-          <Text strong>Danh mục</Text>
+          <Text strong>Category</Text>
           <Select
-            placeholder="Chọn danh mục"
+            placeholder="Select category"
             value={categoryFilter}
             allowClear
             onChange={(value) => setCategoryFilter(value)}
@@ -620,7 +620,7 @@ const ProductManager = () => {
             }}
             block
           >
-            Reset bộ lọc
+            Reset filters
           </Button>
         </div>
       </div>
@@ -719,15 +719,15 @@ const ProductManager = () => {
         pageSize: 10,
         size: "small",
         showSizeChanger: false,
-        showTotal: (total) => `Tổng ${total} sản phẩm`,
+        showTotal: (total) => `Total ${total} products`,
       }}
       locale={{
         emptyText: (
           <div className="text-center py-8">
             <Title level={5} type="secondary">
-              Không tìm thấy sản phẩm
+              No products found
             </Title>
-            <Text type="secondary">Hãy thử thay đổi bộ lọc hoặc thêm sản phẩm mới</Text>
+            <Text type="secondary">Try changing filters or add new products</Text>
           </div>
         ),
       }}
@@ -749,7 +749,7 @@ const ProductManager = () => {
 
         <div className="flex justify-between items-center mb-4">
           <Title level={4} className="mb-0">
-            Quản lý sản phẩm
+          Product management
           </Title>
           {screens.md && (
             <Space>
@@ -757,7 +757,7 @@ const ProductManager = () => {
                 icon={viewMode === "table" ? <AppstoreOutlined /> : <MenuOutlined />}
                 onClick={() => setViewMode(viewMode === "table" ? "list" : "table")}
               >
-                {viewMode === "table" ? "Xem dạng lưới" : "Xem dạng bảng"}
+                {viewMode === "table" ? "View in grid" : "Xem dạng bảng"}
               </Button>
             </Space>
           )}
@@ -767,7 +767,7 @@ const ProductManager = () => {
           {screens.md ? (
             <div className="flex flex-wrap gap-2 items-center">
               <Search
-                placeholder="Tìm kiếm sản phẩm"
+                placeholder="Search products"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 allowClear
@@ -775,7 +775,7 @@ const ProductManager = () => {
                 style={{ width: screens.lg ? 250 : 200 }}
               />
               <Select
-                placeholder="Chọn danh mục"
+                placeholder="Select category"
                 value={categoryFilter}
                 allowClear
                 onChange={(value) => setCategoryFilter(value)}
@@ -794,7 +794,7 @@ const ProductManager = () => {
                 </Button>
               )}
               <Select
-                placeholder="Chọn người dùng để xem giá"
+                placeholder="Select user to view prices"
                 value={selectedUser?.id}
                 allowClear
                 style={{ width: 250 }}
@@ -815,7 +815,7 @@ const ProductManager = () => {
             </div>
           ) : (
             <Button icon={<FilterOutlined />} onClick={() => setFilterDrawerVisible(true)}>
-              Bộ lọc {(searchTerm || categoryFilter) && <Badge count="!" />}
+              Filters {(searchTerm || categoryFilter) && <Badge count="!" />}
             </Button>
           )}
 
@@ -826,7 +826,7 @@ const ProductManager = () => {
               onClick={() => navigate("create")}
               className="bg-green-600 hover:bg-green-700"
             >
-              {screens.sm ? "Thêm sản phẩm" : "Thêm"}
+              {screens.sm ? "Add product" : "Add"}
             </Button>
             <Button icon={<UploadOutlined />} onClick={() => setImportModalVisible(true)}>
               {screens.sm ? "Import Excel" : "Import"}
@@ -873,7 +873,7 @@ const ProductManager = () => {
                     pageSize: 10,
                     showSizeChanger: screens.lg,
                     showQuickJumper: screens.lg,
-                    showTotal: (total) => `Tổng ${total} sản phẩm`,
+                    showTotal: (total) => `Total ${total} products`,
                     size: screens.sm ? "default" : "small",
                   }}
                   bordered={false}
@@ -888,12 +888,12 @@ const ProductManager = () => {
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <Title level={4} type="secondary">
-              Không tìm thấy sản phẩm
+              No products found
             </Title>
-            <Text type="secondary">Hãy thử thay đổi bộ lọc hoặc thêm sản phẩm mới</Text>
+            <Text type="secondary">Try changing filters or add new products</Text>
             <div className="mt-4">
               <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate("create")}>
-                Thêm sản phẩm
+              Add product
               </Button>
             </div>
           </div>
@@ -901,7 +901,7 @@ const ProductManager = () => {
       </div>
 
       <Drawer
-        title="Chi tiết sản phẩm"
+        title="Product Details"
         width={screens.xs ? "100%" : 520}
         placement={screens.xs ? "bottom" : "right"}
         onClose={() => setDetailsVisible(false)}
@@ -911,7 +911,7 @@ const ProductManager = () => {
           selectedProduct && (
             <Space>
               <Button onClick={() => navigate(`edit/${selectedProduct.id}`)} icon={<EditOutlined />} type="primary">
-                Chỉnh sửa
+                Edit
               </Button>
             </Space>
           )

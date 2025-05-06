@@ -10,7 +10,7 @@ const ProductSelector = ({ value = [], onChange, products }) => {
 
   const columns = [
     {
-      title: 'Chọn',
+      title: 'Select',
       dataIndex: 'id',
       key: 'id',
       render: (id, record) => (
@@ -22,7 +22,7 @@ const ProductSelector = ({ value = [], onChange, products }) => {
       ),
     },
     {
-      title: 'Sản phẩm',
+      title: 'Product',
       dataIndex: 'name',
       key: 'name',
       render: (_, record) => (
@@ -31,14 +31,14 @@ const ProductSelector = ({ value = [], onChange, products }) => {
           <Typography.Text strong>
             {record.name}
             {record.has_variant && (
-              <span className='ml-2 text-xs text-gray-500'>(Có biến thể – không áp dụng)</span>
+              <span className='ml-2 text-xs text-gray-500'>(Has variants - not applicable)</span>
             )}
           </Typography.Text>
         </div>
       ),
     },
     {
-      title: 'Giá',
+      title: 'Price',
       dataIndex: 'original_price',
       key: 'original_price',
       render: (price) => (

@@ -7,10 +7,10 @@ export const useUploadMutation = () => {
   return useMutation({
     mutationFn: uploadImage,
     onSuccess: (data, variables, context) => {
-      message.success('Ảnh đã được tải lên thành công!');
+      message.success('Image uploaded successfully!');
     },
     onError: (error) => {
-      message.error('Có lỗi khi tải ảnh lên!');
+      message.error('Failed to upload image!');
       console.error('Upload Error:', error);
     },
   });

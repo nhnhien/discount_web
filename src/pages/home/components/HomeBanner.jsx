@@ -8,8 +8,8 @@ const HomeBanner = () => {
             className='w-full h-full object-cover rounded-lg'
           />
           <div className='absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-30 text-white'>
-            <h3 className='text-3xl font-semibold'>Sản phẩm mới</h3>
-            <p className='text-lg'>Cập nhật xu hướng thời trang mới nhất</p>
+            <h3 className='text-3xl font-semibold'>New Arrivals</h3>
+            <p className='text-lg'>Stay updated with the latest fashion trends</p>
           </div>
         </div>
         <div className='relative h-[800px]'>
@@ -19,8 +19,8 @@ const HomeBanner = () => {
             className='w-full h-full object-cover rounded-lg'
           />
           <div className='absolute inset-0 flex flex-col justify-center items-center bg-black bg-opacity-30 text-white'>
-            <h3 className='text-3xl font-semibold'>Sản phẩm bán chạy</h3>
-            <p className='text-lg'>Lựa chọn hàng đầu của khách hàng B2B</p>
+            <h3 className='text-3xl font-semibold'>Best Sellers</h3>
+            <p className='text-lg'>Top Picks for B2B Customers</p>
           </div>
         </div>
       </div>

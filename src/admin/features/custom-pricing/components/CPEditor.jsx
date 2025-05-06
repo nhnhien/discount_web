@@ -47,17 +47,17 @@ const CPEditor = ({ initialData = {} }) => {
   const { t } = useTranslation();
 
   const CPFormSchema = z.object({
-    title: z.string().min(1, { message: 'Tên chương trình không được để trống' }),
+    title: z.string().min(1, { message: 'Program name cannot be empty' }),
     discount_type: z.string(),
-    discount_value: z.number().min(0, { message: 'Giá trị giảm giá phải lớn hơn hoặc bằng 0' }),
+    discount_value: z.number().min(0, { message: 'Discount value must be greater than or equal to 0' }),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
     customer_type: z.string(),
-    selected_customers: z.array(z.number()).min(1, { message: 'Chọn ít nhất 1 khách hàng' }),
+    selected_customers: z.array(z.number()).min(1, { message: 'Select at least 1 customer' }),
     market_type: z.string(),
-    selected_markets: z.array(z.number()).min(1, { message: 'Chọn ít nhất 1 thị trường' }),
+    selected_markets: z.array(z.number()).min(1, { message: 'Select at least 1 market' }),
     product_type: z.string(),
-    selected_products: z.array(z.number()).min(1, { message: 'Chọn ít nhất 1 sản phẩm' }),
+    selected_products: z.array(z.number()).min(1, { message: 'Select at least 1 product' }),
   });
   const defaultValues = useMemo(() => {
     return cpEditData?.data
@@ -122,22 +122,22 @@ const CPEditor = ({ initialData = {} }) => {
   const createCPMutation = useMutation({
     mutationFn: createRule,
     onSuccess: () => {
-      message.success('Tạo chương trình giảm giá thành công');
+      message.success('Discount program created successfully');
       navigate('/admin/discounts/cp');
     },
     onError: (error) => {
-      message.error('Tạo chương trình giảm giá thất bại');
+      message.error('Failed to create discount program');
     },
   });
 
   const updateCPMutation = useMutation({
     mutationFn: (data) => updateRule(id, data),
     onSuccess: () => {
-      message.success('Cập nhật chương trình giảm giá thành công');
+      message.success('Discount program updated successfully');
       navigate('/admin/discounts/cp');
     },
     onError: (error) => {
-      message.error('Cập nhật chương trình giảm giá thất bại');
+      message.error('Failed to update discount program');
     },
   });
   const allMarkets = useMemo(() => markets?.data?.map((m) => m.id) || [], [markets]);
@@ -219,7 +219,7 @@ const CPEditor = ({ initialData = {} }) => {
 
   return (
     <div className='p-6 rounded-lg max-w-[1100px] mx-auto max-h-[80vh] '>
-      <h2 className='text-2xl font-semibold mb-6'>{initialData.id ? 'Chỉnh sửa' : 'Tạo mới'} Custom Pricing</h2>
+      <h2 className='text-2xl font-semibold mb-6'>{initialData.id ? 'Edit' : 'Create'} Custom Pricing</h2>
       <Form layout='vertical' onFinish={handleSubmit(onSubmit)} className='space-y-6'>
         <div className='grid grid-cols-12 gap-6'>
           <label className='ml-4 font-medium text-base col-span-5'>{t('cp.general_info')}</label>
@@ -227,15 +227,15 @@ const CPEditor = ({ initialData = {} }) => {
             <Controller
               name='title'
               control={control}
-              rules={{ required: 'Tên chương trình không được để trống' }}
+              rules={{ required: 'Program name cannot be empty' }}
               render={({ field }) => (
                 <Form.Item
-                  label='Tên giảm giá'
+                  label='Discount name'
                   required
                   validateStatus={errors.title ? 'error' : ''}
                   help={errors.title?.message}
                 >
-                  <Input {...field} placeholder='Nhập tên chương trình' />
+                  <Input {...field} placeholder='Enter program name' />
                 </Form.Item>
               )}
             />
@@ -294,15 +294,15 @@ const CPEditor = ({ initialData = {} }) => {
                 name='discount_value'
                 control={control}
                 rules={{
-                  min: { value: 0, message: 'Giá trị giảm giá phải lớn hơn hoặc bằng 0' },
+                  min: { value: 0, message: 'Discount value must be greater than or equal to 0' },
                   max:
                     watch('discount_type') === 'percentage'
-                      ? { value: 100, message: 'Giá trị giảm giá phải nhỏ hơn hoặc bằng 100%' }
+                      ? { value: 100, message: 'Discount value must be less than or equal to 100%' }
                       : undefined,
                 }}
                 render={({ field }) => (
                   <Form.Item
-                    label='Giá trị'
+                    label='Value'
                     required
                     validateStatus={errors.discount_value ? 'error' : ''}
                     help={errors.discount_value?.message}
@@ -316,7 +316,7 @@ const CPEditor = ({ initialData = {} }) => {
                         field.onChange(value);
                       }}
                       value={field.value ?? ''}
-                      placeholder={`Nhập ${watch('discount_type') === 'percentage' ? 'phần trăm' : 'số tiền'}`}
+                      placeholder={`Enter ${watch('discount_type') === 'percentage' ? 'percentage' : 'amount'}`}
                       addonAfter={watch('discount_type') === 'percentage' ? '%' : 'VND'}
                     />
                   </Form.Item>
@@ -327,7 +327,7 @@ const CPEditor = ({ initialData = {} }) => {
         </div>
 
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Chọn thị trường</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Select market</label>
           <Card className='w-full p-4 shadow-sm space-y-4 col-span-7'>
             <Controller
               name='market_type'
@@ -350,13 +350,13 @@ const CPEditor = ({ initialData = {} }) => {
                     name='selected_markets'
                     control={control}
                     rules={{
-                      validate: (value) => value?.length > 0 || 'Chọn ít nhất 1 thị trường',
+                      validate: (value) => value?.length > 0 || 'Select at least 1 market',
                     }}
                     render={({ field }) => {
                       return (
                         <Select
                           mode='multiple'
-                          placeholder='Chọn thị trường'
+                          placeholder='Select markets'
                           options={markets?.data?.map((m) => ({
                             label: m.name === 'VietNam' ? '🇻🇳 VN' : '🇬🇧 US-UK',
                             value: m.id,
@@ -375,7 +375,7 @@ const CPEditor = ({ initialData = {} }) => {
           </Card>
         </div>
         <div className='grid grid-cols-12 gap-6 '>
-          <label className='ml-4 font-medium text-base col-span-5'>Áp dụng cho khách hàng</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Apply to customers</label>
           <Card className='w-full p-4 shadow-sm col-span-7'>
             <Controller
               name='customer_type'
@@ -383,8 +383,8 @@ const CPEditor = ({ initialData = {} }) => {
               render={({ field }) => (
                 <>
                   <Radio.Group {...field} className='flex flex-col space-y-3'>
-                    <Radio value='all'>Tất cả khách hàng</Radio>
-                    <Radio value='specific'>Chọn khách hàng cụ thể</Radio>
+                    <Radio value='all'>All customers</Radio>
+                    <Radio value='specific'>Select specific customers</Radio>
                   </Radio.Group>
                   <div className='pt-4'>
                     {customer_type === 'specific' && (
@@ -396,12 +396,12 @@ const CPEditor = ({ initialData = {} }) => {
                           name='selected_customers'
                           control={control}
                           rules={{
-                            validate: (value) => value?.length > 0 || 'Chon ít nhất 1 khách hàng',
+                            validate: (value) => value?.length > 0 || 'Select at least 1 customer',
                           }}
                           render={({ field }) => (
                             <Select
                               mode='multiple'
-                              placeholder='Chọn khach hàng'
+                              placeholder='Select customers'
                               options={customers?.data?.map((m) => ({
                                 label: m.name,
                                 value: m.id,
@@ -419,7 +419,7 @@ const CPEditor = ({ initialData = {} }) => {
           </Card>
         </div>
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Áp dụng cho sản phẩm</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Apply to products</label>
           <Card className='w-full p-4 shadow-sm col-span-7'>
             <Controller
               name='product_type'
@@ -427,12 +427,12 @@ const CPEditor = ({ initialData = {} }) => {
               render={({ field }) => (
                 <>
                   <Radio.Group {...field} className='flex flex-col space-y-3'>
-                    <Radio value='product'>Tất cả sản phẩm</Radio>
-                    <Radio value='specific'>Sản phẩm cụ thể</Radio>
+                    <Radio value='product'>All products</Radio>
+                    <Radio value='specific'>Specific products</Radio>
                   </Radio.Group>
                   {product_type === 'specific' && (
   <div className='p-4 max-h-[400px] overflow-y-auto border border-gray-200 rounded-lg'>
-    <label className='ml-4 font-medium text-base'>Áp dụng cho sản phẩm</label>
+    <label className='ml-4 font-medium text-base'>Apply to products</label>
     <Form.Item
       validateStatus={errors.selected_products ? 'error' : ''}
       help={errors.selected_products?.message}
@@ -441,7 +441,7 @@ const CPEditor = ({ initialData = {} }) => {
         name='selected_products'
         control={control}
         rules={{
-          validate: (value) => value?.length > 0 || 'Chọn ít nhất 1 sản phẩm',
+          validate: (value) => value?.length > 0 || 'Select at least 1 product',
         }}
         render={({ field }) => (
           <ProductSelector products={productsNoVariant} {...field} />
@@ -481,7 +481,7 @@ const CPEditor = ({ initialData = {} }) => {
                 onClick={() => setOpenPreviewProduct(true)}
                 className='flex items-center gap-2 border-gray-300'
               >
-                Xem trước
+                Preview
               </Button>
               <Button
                 type='primary'
@@ -491,11 +491,11 @@ const CPEditor = ({ initialData = {} }) => {
                 }}
                 className='flex items-center gap-2'
               >
-                Tạo
+                Create
               </Button>
             </Space>
             <Modal
-              title='Danh sách sản phẩm được áp dụng'
+              title='List of applied products'
               open={openPreviewProduct}
               onCancel={() => setOpenPreviewProduct(false)}
               width={800}

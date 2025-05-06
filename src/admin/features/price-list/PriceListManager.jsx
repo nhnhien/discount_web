@@ -24,39 +24,39 @@ const PriceListManager = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteRule,
     onSuccess: () => {
-      message.success('Đã xoá thành công Price List');
+      message.success('Price List deleted successfully');
       queryClient.invalidateQueries(['price-list-rules']); // ✅ đúng key
     },
     onError: (err) => {
-      message.error(`Xoá thất bại: ${err.message}`);
+      message.error(`Delete failed: ${err.message}`);
     },
   });
   const toggleMutation = useMutation({
     mutationFn: ({ id, is_active }) => toggleRuleActive(id, is_active),
     onSuccess: () => {
-      message.success('Đã cập nhật trạng thái');
+      message.success('Status updated successfully');
       queryClient.invalidateQueries(['price-list-rules']);
     },
     onError: () => {
-      message.error('Cập nhật trạng thái thất bại');
+      message.error('Failed to update status');
     },
   });
   
   const columns = [
     {
-      title: 'Tên',
+      title: 'Name',
       dataIndex: 'title',
       key: 'title',
       render: (text) => <span className='font-medium'>{text}</span>,
     },
     {
-      title: 'Mô tả',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
-      render: (text) => text || <span className='italic text-gray-400'>Không có</span>,
+      render: (text) => text || <span className='italic text-gray-400'>None</span>,
     },
     {
-      title: 'Giảm giá',
+      title: 'Discount',
       dataIndex: 'discount_value',
       key: 'discount',
       render: (_, record) => {
@@ -72,26 +72,26 @@ const PriceListManager = () => {
             </Tag>
           );
         }
-        return <Tag color='default'>Tuỳ chỉnh theo sản phẩm</Tag>;
+        return <Tag color='default'>Custom by product</Tag>;
       },
     },
     
     {
-      title: 'Ngày bắt đầu',
+      title: 'Start Date',
       dataIndex: 'start_date',
       key: 'start_date',
       render: (val) =>
         val ? dayjs(val).format('DD/MM/YYYY') : <span className='text-gray-400'>---</span>,
     },
     {
-      title: 'Ngày kết thúc',
+      title: 'End Date',
       dataIndex: 'end_date',
       key: 'end_date',
       render: (val) =>
-        val ? dayjs(val).format('DD/MM/YYYY') : <span className='text-gray-400'>Không giới hạn</span>,
+        val ? dayjs(val).format('DD/MM/YYYY') : <span className='text-gray-400'>No limit</span>,
     },
     {
-      title: 'Kích hoạt',
+      title: 'Activation',
       dataIndex: 'is_active',
       key: 'is_active',
       render: (value, record) => (
@@ -102,7 +102,7 @@ const PriceListManager = () => {
       ),
     },
     {
-      title: 'Hành động',
+      title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
@@ -113,10 +113,10 @@ const PriceListManager = () => {
             Sửa
           </Button>
           <Popconfirm
-            title='Bạn có chắc chắn xoá Price List này không?'
+            title='Are you sure you want to delete this Price List?'
             onConfirm={() => deleteMutation.mutate(record.id)}
-            okText='Xoá'
-            cancelText='Huỷ'
+            okText='Delete'
+            cancelText='Cancel'
           >
             <Button danger icon={<DeleteOutlined />} loading={deleteMutation.isLoading}>
               Xoá
@@ -131,7 +131,7 @@ const PriceListManager = () => {
   return (
     <div className='p-6'>
       <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-2xl font-semibold'>Danh sách Price List</h2>
+        <h2 className='text-2xl font-semibold'>Price List Management</h2>
         <Button
           type='primary'
           icon={<PlusOutlined />}

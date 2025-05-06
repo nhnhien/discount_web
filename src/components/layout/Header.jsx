@@ -67,10 +67,10 @@ const Header = () => {
   const userMenu = (
     <Menu>
       <Menu.Item key='profile' icon={<UserOutlined />} onClick={() => navigate('/profile')}>
-        Hồ sơ cá nhân
+      Profile
       </Menu.Item>
       <Menu.Item key='orders' icon={<UnorderedListOutlined />} onClick={() => navigate('/orders')}>
-        Đơn hàng của tôi
+      My Orders
       </Menu.Item>
       <Menu.Item key='logout' icon={<LogoutOutlined />} onClick={handleLogout}>
         {t('home.logout')}
@@ -105,7 +105,7 @@ const navItems = [
 
           <div className='hidden md:flex flex-1 max-w-lg mx-4'>
           <Input.Search
-  placeholder='Tìm kiếm sản phẩm...'
+  placeholder='Search for products...'
   allowClear
   enterButton={<SearchOutlined />}
   onSearch={(value) => {

@@ -12,7 +12,6 @@ import CPManager from '@/admin/features/custom-pricing/components/CPManager';
 import CPEditor from '@/admin/features/custom-pricing/components/CPEditor';
 import ProductScreen from '@/pages/product/components/ProductScreen';
 import ProductDetail from '../pages/product/components/ProductDetail';
-import ProductCard from '../pages/product/components/ProductCard';
 import CartScreen from '@/pages/cart/components/CartScreen';
 import QBManager from '@/admin/features/quantity-break/components/QBManager';
 import QBEditor from '../admin/features/quantity-break/components/QBEditor';

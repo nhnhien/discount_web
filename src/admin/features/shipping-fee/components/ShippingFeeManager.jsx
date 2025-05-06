@@ -18,7 +18,7 @@ const ShippingFeeManager = () => {
   
       setData(sorted);
     } catch (error) {
-      message.error('Lỗi khi tải danh sách phí vận chuyển');
+      message.error('Error loading shipping fee list');
     } finally {
       setLoading(false);
     }
@@ -28,20 +28,20 @@ const ShippingFeeManager = () => {
   const handleToggle = async (id, isActive) => {
     try {
       await shippingFeeService.toggle(id, isActive);
-      message.success('Cập nhật trạng thái thành công');
+      message.success('Status updated successfully');
       fetchShippingFees();
     } catch {
-      message.error('Không thể cập nhật trạng thái');
+      message.error('Failed to update status');
     }
   };
 
   const handleDelete = async (id) => {
     try {
       await shippingFeeService.remove(id);
-      message.success('Đã xoá phí vận chuyển');
+      message.success('Shipping fee deleted');
       fetchShippingFees();
     } catch {
-      message.error('Xoá thất bại');
+      message.error('Delete failed');
     }
   };
 
@@ -51,29 +51,29 @@ const ShippingFeeManager = () => {
 
   const columns = [
     {
-      title: 'Khu vực',
+      title: 'Area',
       dataIndex: 'region',
       render: (value, record) => {
         const createdAt = new Date(record.createdAt);
-        const isNew = (Date.now() - createdAt.getTime()) < 5 * 60 * 1000; // 5 phút
+        const isNew = (Date.now() - createdAt.getTime()) < 5 * 60 * 1000; // 5 minutes
     
         return (
           <>
-            {value} {isNew && <Tag color="green">Mới</Tag>}
+            {value} {isNew && <Tag color="green">New</Tag>}
           </>
         );
       }
     },
     {
-      title: 'Phương thức',
+      title: 'Method',
       dataIndex: 'method',
     },
     {
-      title: 'Phí (VND)',
+      title: 'Fee (VND)',
       dataIndex: 'fee',
     },
     {
-      title: 'Kích hoạt',
+      title: 'Active',
       dataIndex: 'is_active',
       render: (value, record) => (
         <Switch
@@ -83,17 +83,17 @@ const ShippingFeeManager = () => {
       ),
     },
     {
-      title: 'Hành động',
+      title: 'Actions',
       render: (_, record) => (
         <Space>
-<Button onClick={() => navigate(`/admin/shipping-fee/edit/${record.id}`)}>Sửa</Button>
+          <Button onClick={() => navigate(`/admin/shipping-fee/edit/${record.id}`)}>Edit</Button>
           <Popconfirm
-            title="Bạn có chắc muốn xoá không?"
+            title="Are you sure you want to delete?"
             onConfirm={() => handleDelete(record.id)}
-            okText="Xoá"
-            cancelText="Huỷ"
+            okText="Delete"
+            cancelText="Cancel"
           >
-            <Button danger>Xoá</Button>
+            <Button danger>Delete</Button>
           </Popconfirm>
         </Space>
       ),
@@ -102,9 +102,9 @@ const ShippingFeeManager = () => {
 
   return (
     <div>
-      <h2>Quản lý phí vận chuyển</h2>
+      <h2>Shipping Fee Management</h2>
       <Button type="primary" onClick={() => navigate('/admin/shipping-fee/create')} style={{ marginBottom: 16 }}>
-        Tạo mới
+        Create New
       </Button>
       <Table dataSource={data} columns={columns} rowKey="id" loading={loading} />
     </div>

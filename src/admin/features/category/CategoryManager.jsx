@@ -160,13 +160,13 @@ const CategoryManager = () => {
       width: 80,
     },
     {
-      title: 'Tên danh mục',
+      title: 'Category Name',
       dataIndex: 'name',
       key: 'name',
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Mô tả',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
       ellipsis: {
@@ -179,7 +179,7 @@ const CategoryManager = () => {
       ),
     },
     {
-      title: 'Hình ảnh',
+      title: 'Image',
       dataIndex: 'image_url',
       key: 'image_url',
       width: 120,
@@ -197,14 +197,14 @@ const CategoryManager = () => {
         ),
     },
     {
-      title: 'Số lượng sản phẩm',
+      title: 'Number of products',
       dataIndex: 'product_count',
       key: 'product_count',
       width: 150,
       render: (_, record) => <span>{record.product_count || 0}</span>,
     },
     {
-      title: 'Thao tác',
+      title: 'Action',
       key: 'action',
       width: 150,
       render: (_, record) => (
@@ -257,13 +257,13 @@ const CategoryManager = () => {
       <Card
         title={
           <div className="flex items-center">
-            <Title level={4} style={{ margin: 0 }}>Quản lý danh mục</Title>
+            <Title level={4} style={{ margin: 0 }}>Category management</Title>
           </div>
         }
         extra={
           <Space>
             <Input
-              placeholder="Tìm kiếm danh mục"
+              placeholder="Search categories"
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -275,7 +275,7 @@ const CategoryManager = () => {
               icon={<PlusOutlined />} 
               onClick={handleAddCategory}
             >
-              Thêm danh mục
+              Add category
             </Button>
             <Button 
               icon={<ReloadOutlined />} 
@@ -297,7 +297,7 @@ const CategoryManager = () => {
             pagination={{
               pageSize: 10,
               showSizeChanger: true,
-              showTotal: (total) => `Tổng ${total} danh mục`,
+              showTotal: (total) => `Total ${total} categories`,
             }}
             locale={{
               emptyText: 'Không có danh mục nào',
@@ -321,7 +321,7 @@ const CategoryManager = () => {
         >
           <Form.Item
             name="name"
-            label="Tên danh mục"
+            label="Category name"
             rules={[{ required: true, message: 'Vui lòng nhập tên danh mục' }]}
           >
             <Input placeholder="Nhập tên danh mục" />
@@ -329,7 +329,7 @@ const CategoryManager = () => {
           
           <Form.Item
             name="description"
-            label="Mô tả"
+            label="Description"
           >
             <Input.TextArea 
               placeholder="Nhập mô tả cho danh mục" 

@@ -85,7 +85,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
       }
     },
     {
-      title: 'Sàn TMĐT',
+      title: 'Marketplace',
       dataIndex: 'source',
       key: 'source',
       width: '15%',
@@ -101,7 +101,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
         switch(source) {
           case 'our_store':
             tagColor = 'blue';
-            return <Tag color={tagColor}>Cửa hàng của chúng tôi</Tag>;
+            return <Tag color={tagColor}>Our Store</Tag>;
           case 'tiki':
             tagColor = 'green';
             break;
@@ -134,7 +134,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
             )}
             {record.similarity && (
               <Tag color="blue" className="text-xs mt-1" size="small">
-                Độ tương đồng: {Math.round(record.similarity * 100)}%
+                Similarity: {Math.round(record.similarity * 100)}%
               </Tag>
             )}
           </div>
@@ -142,12 +142,12 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
       },
     },
     {
-      title: 'Sản phẩm',
+      title: 'Product',
       dataIndex: 'title',
       key: 'title',
       width: '30%',
       render: (title, record) => {
-        const displayTitle = title || record.name || 'Sản phẩm';
+        const displayTitle = title || record.name || 'Product';
         
         return (
           <div>
@@ -167,7 +167,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
       }
     },
     {
-      title: 'Giá',
+      title: 'Price',
       dataIndex: 'price',
       key: 'price',
       width: '20%',
@@ -186,14 +186,14 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
             priceComparison = (
               <Text type="success" className="flex items-center">
                 <RiseOutlined className="mr-1" />
-                Rẻ hơn {formatVND(priceDiffValue)} so với cửa hàng của chúng tôi
+                Cheaper by {formatVND(priceDiffValue)} compared to our store
               </Text>
             );
           } else if (priceDiffValue < 0) {
             priceComparison = (
               <Text type="danger" className="flex items-center">
                 <FallOutlined className="mr-1" />
-                Đắt hơn {formatVND(Math.abs(priceDiffValue))} so với cửa hàng của chúng tôi
+                More expensive by {formatVND(Math.abs(priceDiffValue))} compared to our store
               </Text>
             );
           }
@@ -221,13 +221,13 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
       },
     },
     {
-      title: 'Thao tác',
+      title: 'Action',
       key: 'action',
       width: '10%',
       render: (_, record) => {
         if (record.source === 'our_store') return null;
         
-        let tooltipText = `Xem trên ${record.source.charAt(0).toUpperCase() + record.source.slice(1)}`;
+        let tooltipText = `View on ${record.source.charAt(0).toUpperCase() + record.source.slice(1)}`;
         
         return (
           <Tooltip title={tooltipText}>
@@ -237,7 +237,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
               onClick={() => window.open(record.url, '_blank')}
               size="middle"
             >
-              Xem
+              View
             </Button>
           </Tooltip>
         );
@@ -250,7 +250,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
       title={
         <div className="flex items-center">
           <ShoppingCartOutlined className="mr-2 text-blue-500" />
-          <span>So sánh giá với sàn TMĐT</span>
+          <span>Compare Prices on Marketplaces</span>
         </div>
       }
       extra={
@@ -260,14 +260,14 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
           onClick={handleCompare}
           loading={isLoading}
         >
-          So sánh giá
+          Compare Prices
         </Button>
       }
       className="mt-6"
     >
       {!comparisonData && !isLoading && !isError && (
         <Empty 
-          description="Nhấn nút so sánh giá để xem giá sản phẩm trên các sàn thương mại điện tử" 
+          description="Press the Compare Prices button to view prices from marketplaces" 
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         />
       )}
@@ -280,8 +280,8 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
 
       {isError && (
         <Alert
-          message="Lỗi khi so sánh giá"
-          description={error?.message || "Không thể lấy thông tin so sánh giá"}
+          message="Error fetching price comparison"
+          description={error?.message || "No matching products found"}
           type="error"
           showIcon
         />
@@ -292,7 +292,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
           {comparisonData.comparisons.length === 0 ? (
             <Alert
               message="Không tìm thấy sản phẩm tương đương"
-              description="Không tìm thấy sản phẩm tương đương trên các sàn thương mại điện tử. Có thể do mã SKU không trùng khớp hoặc sản phẩm không có trên sàn."
+              description="No equivalent products found on marketplaces. The SKU might not match or the product might not exist on the marketplaces."
               type="info"
               showIcon
             />

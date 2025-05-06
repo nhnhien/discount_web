@@ -87,7 +87,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
       }}
     >
       <Title level={4} style={{ color: 'white', margin: 0 }}>
-        <ShoppingOutlined /> Thông tin đơn hàng
+        <ShoppingOutlined /> 	Order Information
       </Title>
     </div>
 
@@ -152,16 +152,16 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
 
         <div style={{ fontSize: '15px' }}>
           <div className='flex justify-between mb-2'>
-            <Text>Tạm tính:</Text>
+            <Text>Subtotal:</Text>
             <Text>{formatPrice(cart?.subtotal || 0)}</Text>
           </div>
           <div className='flex justify-between mb-2'>
-            <Text>Phí vận chuyển:</Text>
+            <Text>Shipping Fee:</Text>
             <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
           </div>
           {cart?.shipping_fee === 0 && cart?.shipping_address?.city && (
   <Alert
-    message="Bạn đã được miễn phí vận chuyển!"
+    message="You have received free shipping!"
     type="success"
     showIcon
     style={{ marginTop: 12 }}
@@ -171,13 +171,13 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
 
           {cart?.discount_amount > 0 && (
             <div className='flex justify-between mb-2'>
-              <Text>Giảm giá:</Text>
+              <Text>Discount:</Text>
               <Text style={{ color: '#f5222d' }}>-{formatPrice(cart.discount_amount)}</Text>
             </div>
           )}
           <Divider style={{ margin: '12px 0' }} />
           <div className='flex justify-between mb-4'>
-            <Text strong style={{ fontSize: '16px' }}>Tổng cộng:</Text>
+            <Text strong style={{ fontSize: '16px' }}>Total:</Text>
             <Text strong style={{ fontSize: '18px', color: '#1890ff' }}>
               {formatPrice(cart?.total_amount || 0)}
             </Text>
@@ -191,7 +191,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                 size='large' 
                 style={{ flex: 1 }}
               >
-                Quay lại
+                Go Back
               </Button>
             )}
             {currentStep === CHECKOUT_STEPS.CONFIRMATION ? (
@@ -207,7 +207,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                   flex: currentStep > 0 ? 2 : 1,
                 }}
               >
-                Đặt hàng
+                	Place Order
               </Button>
             ) : (
               <Button
@@ -221,7 +221,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                   flex: currentStep > 0 ? 2 : 1,
                 }}
               >
-                Tiếp tục
+                	Continue
               </Button>
             )}
           </div>
@@ -257,7 +257,7 @@ const AddressCard = ({ address, selected, onSelect, onDelete }) => (
           </div>
           {selected && (
             <Tag color="success" style={{ marginLeft: '8px' }}>
-              <CheckCircleOutlined /> Địa chỉ đã chọn
+              <CheckCircleOutlined /> Selected Address
             </Tag>
           )}
         </div>
@@ -304,7 +304,7 @@ const PaymentMethodCard = ({ value, selected, title, description, icon, onClick 
             {title}
             {selected && (
               <Tag color="success" style={{ marginLeft: '8px', padding: '0 4px' }}>
-                <CheckCircleOutlined /> Đã chọn
+                <CheckCircleOutlined /> Selected
               </Tag>
             )}
           </Text>
@@ -379,7 +379,7 @@ const ProductList = ({ items }) => (
                     <Tag color="blue">{item.variant_name}</Tag>
                   )}
                   <Tag color="green">
-                    <ClockCircleOutlined /> Còn hàng
+                    <ClockCircleOutlined /> In Stock
                   </Tag>
                   <Tag color="default">
                     <Text>SL: {item.quantity}</Text>
@@ -387,7 +387,7 @@ const ProductList = ({ items }) => (
                 </div>
                 <div>
                   <Space>
-                    <Text type="secondary">Đơn giá: {formatPrice(item.unit_price)}</Text>
+                    <Text type="secondary">Unit Price: {formatPrice(item.unit_price)}</Text>
                     {item.original_price > 0 && item.unit_price < item.original_price && (
                       <Text delete type="secondary">
                         {formatPrice(item.original_price)}
@@ -397,7 +397,7 @@ const ProductList = ({ items }) => (
                   {item.discount_amount > 0 && (
                     <div>
                       <Text type="secondary" style={{ fontStyle: 'italic', color: '#f5222d' }}>
-                        Đã áp dụng mã giảm giá
+                      Discount code applied
                       </Text>
                     </div>
                   )}
@@ -537,19 +537,19 @@ const handleSelectAddress = (addressId) => {
           if (data.success && data.paymentUrl) {
             window.location.href = data.paymentUrl;
           } else {
-            message.error('Không thể khởi tạo thanh toán VNPay');
+            message.error('Unable to initiate VNPay payment');
           }
         } catch (error) {
-          message.error('Lỗi kết nối tới cổng thanh toán');
+          message.error('Connection error to payment gateway');
         }
       } else {
-        message.success('Đặt hàng thành công!');
+        message.success('Order placed successfully!');
         queryClient.invalidateQueries({ queryKey: ['cart'] });
         navigate(`/order-success/${orderId}`);
       }
     },
     onError: (err) => {
-      message.error(err?.response?.data?.message || 'Đặt hàng thất bại. Vui lòng thử lại sau.');
+      message.error(err?.response?.data?.message || 'Order failed. Please try again later.');
     },
   });
 
@@ -557,24 +557,24 @@ const handleSelectAddress = (addressId) => {
   const deleteAddressMutation = useMutation({
     mutationFn: addressService.deleteAddress,
     onSuccess: () => {
-      message.success('Xoá địa chỉ thành công');
+      message.success('Address deleted successfully');
       refetchAddresses();
     },
     onError: () => {
-      message.error('Không thể xoá địa chỉ');
+      message.error('Unable to delete address');
     },
   });
 
   // Handle place order
 const handlePlaceOrder = () => {
   if (!selectedCartItems.length) {
-    message.error('Không có sản phẩm nào trong giỏ hàng');
+    message.error('No products in the cart');
     return;
   }
 
   // Thêm kiểm tra địa chỉ
   if (!selectedAddress) {
-    message.error('Vui lòng chọn địa chỉ giao hàng');
+    message.error('Please select a delivery address');
     return;
   }
 
@@ -601,11 +601,11 @@ const handlePlaceOrder = () => {
     try {
       const values = await form.validateFields();
       await addressService.createAddress(values);
-      message.success('Thêm địa chỉ thành công');
+      message.success('Address added successfully');
       setIsAddressModalVisible(false);
       refetchAddresses();
     } catch (err) {
-      message.error('Không thể thêm địa chỉ');
+      message.error('Unable to add address');
     }
   };
 
@@ -672,9 +672,9 @@ const handlePlaceOrder = () => {
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <span>
-                Không có sản phẩm nào để thanh toán. <br />
+                No products available for checkout. <br />
                 <Button type="primary" onClick={() => navigate('/cart')} style={{ marginTop: '16px' }}>
-                  Quay lại giỏ hàng
+                Return to Cart
                 </Button>
               </span>
             }
@@ -690,7 +690,7 @@ const handlePlaceOrder = () => {
         {/* Header và Steps */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Title level={2} style={{ marginBottom: '24px', color: '#1890ff' }}>
-            <ShoppingOutlined /> Thanh toán
+            <ShoppingOutlined /> Payment
           </Title>
 
           <Steps 
@@ -699,19 +699,19 @@ const handlePlaceOrder = () => {
             style={{ maxWidth: '800px', margin: '0 auto' }}
           >
             <Step 
-              title='Địa chỉ' 
+              title='Address' 
               icon={<EnvironmentOutlined />} 
-              description={selectedAddress ? 'Đã chọn' : 'Chọn địa chỉ'}
+              description={selectedAddress ? 'Selected' : 'Select address'}
             />
             <Step 
-              title='Thanh toán' 
+              title='Payment' 
               icon={<CreditCardOutlined />} 
               description={currentStep > CHECKOUT_STEPS.ADDRESS ? getPaymentMethodLabel(paymentMethod) : ''}
             />
             <Step 
-              title='Xác nhận' 
+              title='Confirm' 
               icon={<CheckCircleOutlined />} 
-              description={currentStep === CHECKOUT_STEPS.CONFIRMATION ? 'Xác nhận đơn hàng' : ''}
+              description={currentStep === CHECKOUT_STEPS.CONFIRMATION ? 'Confirm Order' : ''}
             />
           </Steps>
         </div>
@@ -724,12 +724,12 @@ const handlePlaceOrder = () => {
               <Card
                 title={
                   <div style={{ fontSize: '18px' }}>
-                    <EnvironmentOutlined /> Chọn địa chỉ giao hàng
+                    <EnvironmentOutlined /> Select Delivery Address
                   </div>
                 }
                 extra={
                   <Button onClick={handleAddAddress} icon={<PlusOutlined />} type='primary'>
-                    Thêm địa chỉ mới
+                    	Add New Address
                   </Button>
                 }
                 style={{
@@ -761,7 +761,7 @@ const handlePlaceOrder = () => {
                   <Empty 
                     description={
                       <span>
-                        Chưa có địa chỉ nào. Vui lòng thêm địa chỉ mới.
+                        	No addresses found. Please add a new address.
                         <br />
                         <Button 
                           type="primary" 
@@ -769,7 +769,7 @@ const handlePlaceOrder = () => {
                           onClick={handleAddAddress}
                           style={{ marginTop: '16px' }}
                         >
-                          Thêm địa chỉ mới
+                          	Add New Address
                         </Button>
                       </span>
                     } 
@@ -784,7 +784,7 @@ const handlePlaceOrder = () => {
               <Card
                 title={
                   <div style={{ fontSize: '18px' }}>
-                    <CreditCardOutlined /> Phương thức thanh toán
+                    <CreditCardOutlined /> Payment Method
                   </div>
                 }
                 style={{
@@ -801,8 +801,8 @@ const handlePlaceOrder = () => {
                     <PaymentMethodCard 
                       value="cod"
                       selected={paymentMethod === 'cod'}
-                      title="Thanh toán khi nhận hàng (COD)"
-                      description="Thanh toán bằng tiền mặt khi nhận được hàng"
+                      title="Cash on Delivery (COD)"
+                      description="Pay with cash upon receiving the order"
                       icon={<DollarOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#faad14' }} />}
                       onClick={() => setPaymentMethod('cod')}
                     />
@@ -810,8 +810,8 @@ const handlePlaceOrder = () => {
                     <PaymentMethodCard 
                       value="bank_transfer"
                       selected={paymentMethod === 'bank_transfer'}
-                      title="Chuyển khoản ngân hàng"
-                      description="Chuyển khoản qua tài khoản ngân hàng"
+                      title="Bank Transfer"
+                      description="Transfer to a bank account"
                       icon={<CreditCardOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#52c41a' }} />}
                       onClick={() => setPaymentMethod('bank_transfer')}
                     />
@@ -820,7 +820,7 @@ const handlePlaceOrder = () => {
                       value="vnpay"
                       selected={paymentMethod === 'vnpay'}
                       title="VNPay"
-                      description="Thanh toán qua cổng VNPay với thẻ ATM/Visa/Master"
+                      description="Pay via VNPay gateway with ATM/Visa/MasterCard"
                       icon={
                         <div
                           style={{
@@ -849,13 +849,13 @@ const handlePlaceOrder = () => {
                 </Radio.Group>
 
                 <Alert
-                  message="Thông tin thanh toán"
+                  message="Payment Information"
                   description={
                     <div>
                       <ul style={{ paddingLeft: '20px', margin: '8px 0' }}>
-                        <li>Đơn hàng sẽ được xử lý sau khi xác nhận thanh toán</li>
-                        <li>Vui lòng không đóng trình duyệt khi đang trong quá trình thanh toán</li>
-                        <li>Bạn sẽ nhận được email xác nhận khi đơn hàng được xử lý</li>
+                        <li>The order will be processed after payment confirmation</li>
+                        <li>Please do not close the browser during payment processing</li>
+                        <li>You will receive a confirmation email once the order is processed</li>
                       </ul>
                     </div>
                   }
@@ -871,7 +871,7 @@ const handlePlaceOrder = () => {
               <Card
                 title={
                   <div style={{ fontSize: '18px' }}>
-                    <CheckCircleOutlined /> Xác nhận đơn hàng
+                    <CheckCircleOutlined /> Confirm Order
                   </div>
                 }
                 style={{
@@ -884,7 +884,7 @@ const handlePlaceOrder = () => {
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                       <EnvironmentOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
-                      Thông tin giao hàng
+                      Shipping Information
                     </Title>
                     {getSelectedAddress() && (
                       <Card style={{ 
@@ -916,7 +916,7 @@ const handlePlaceOrder = () => {
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                       <CreditCardOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
-                      Phương thức thanh toán
+                      Payment Method
                     </Title>
                     <Card style={{ 
                       background: '#f9f9f9', 
@@ -926,8 +926,8 @@ const handlePlaceOrder = () => {
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         {renderPaymentIcon(paymentMethod)}
                         <Text strong>
-                          {paymentMethod === 'cod' ? 'Thanh toán khi nhận hàng (COD)' : 
-                           paymentMethod === 'bank_transfer' ? 'Chuyển khoản ngân hàng' : 'VNPay'}
+                          {paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 
+                           paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'VNPay'}
                         </Text>
                       </div>
                     </Card>
@@ -937,7 +937,7 @@ const handlePlaceOrder = () => {
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                       <ShoppingOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
-                      Chi tiết đơn hàng ({selectedCartItems.length} sản phẩm)
+                      Order Details ({selectedCartItems.length} products)
                     </Title>
                     <ProductList items={selectedCartItems} />
                   </div>
@@ -956,23 +956,23 @@ const handlePlaceOrder = () => {
                       }}
                     >
                       <div className='flex justify-between mb-2'>
-                        <Text>Tạm tính:</Text>
+                        <Text>Subtotal:</Text>
                         <Text>{formatPrice(cart?.subtotal || 0)}</Text>
                       </div>
                       {cart?.shipping_address?.city ? (
   <div className='flex justify-between mb-2'>
-    <Text>Phí vận chuyển:</Text>
+    <Text>Shipping Fee:</Text>
     <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
   </div>
 ) : (
   <div className='flex justify-between mb-2'>
-    <Text>Phí vận chuyển:</Text>
+    <Text>Shipping Fee:</Text>
     <Text type="secondary">Vui lòng chọn địa chỉ</Text>
   </div>
 )}
 {cart?.shipping_address?.city && cart?.shipping_fee === 0 && (
   <Alert
-    message="Bạn đã được miễn phí vận chuyển!"
+    message="You have received free shipping!"
     type="success"
     showIcon
     style={{ marginTop: 12 }}
@@ -983,13 +983,13 @@ const handlePlaceOrder = () => {
 
                       {cart?.discount_amount > 0 && (
                         <div className='flex justify-between mb-2'>
-                          <Text>Giảm giá:</Text>
+                          <Text>Discount:</Text>
                           <Text style={{ color: '#f5222d' }}>-{formatPrice(cart.discount_amount)}</Text>
                         </div>
                       )}
                       <Divider style={{ margin: '12px 0' }} />
                       <div className='flex justify-between'>
-                        <Text strong style={{ fontSize: '16px' }}>Tổng cộng:</Text>
+                        <Text strong style={{ fontSize: '16px' }}>Total:</Text>
                         <Text strong style={{ fontSize: '18px', color: '#1890ff' }}>
                           {formatPrice(cart?.total_amount || 0)}
                         </Text>
@@ -1003,24 +1003,24 @@ const handlePlaceOrder = () => {
                       message={
                         <Title level={5} style={{ margin: 0, color: '#fa8c16' }}>
                           <InfoCircleOutlined style={{ marginRight: '8px' }} />
-                          Thông tin chuyển khoản
+                          Bank Transfer Information
                         </Title>
                       }
                       description={
                         <div>
                           <Paragraph style={{ margin: '0 0 8px 0' }}>
-                            Vui lòng chuyển khoản với nội dung:{' '}
+                          Please transfer with the following reference:{' '}
                             <Text strong copyable>{`DH-${(Math.random() * 1000000).toFixed(0)}`}</Text>
                           </Paragraph>
                           <ul style={{ paddingLeft: '20px', margin: '0' }}>
                             <li style={{ marginBottom: '4px' }}>
-                              Ngân hàng: <Text strong>Vietcombank</Text>
+                            Bank: <Text strong>Vietcombank</Text>
                             </li>
                             <li style={{ marginBottom: '4px' }}>
-                              Số tài khoản: <Text strong copyable>1234567890</Text>
+                            Account Number: <Text strong copyable>1234567890</Text>
                             </li>
                             <li>
-                              Chủ tài khoản: <Text strong>CÔNG TY TNHH ABC</Text>
+                            Account Holder: <Text strong>COMPANY</Text>
                             </li>
                           </ul>
                         </div>
@@ -1033,12 +1033,12 @@ const handlePlaceOrder = () => {
 
                   {/* Thông tin thêm */}
                   <Alert
-                    message="Lưu ý khi đặt hàng"
+                    message="Order Notes"
                     description={
                       <ul style={{ paddingLeft: '20px', margin: '0' }}>
-                        <li>Đơn hàng sẽ được giao trong 2-3 ngày làm việc</li>
-                        <li>Bạn có thể kiểm tra tình trạng đơn hàng trong mục "Đơn hàng của tôi"</li>
-                        <li>Liên hệ hotline 1900xxxx nếu cần hỗ trợ thêm</li>
+                        <li>Orders will be delivered within 2-3 business days</li>
+                        <li>You can check your order status in "My Orders"</li>
+                        <li>Contact hotline 1900xxxx for further assistance</li>
                       </ul>
                     }
                     type="info"
@@ -1075,25 +1075,25 @@ const handlePlaceOrder = () => {
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                       <TruckOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
-                      <Text strong>Giao hàng nhanh</Text>
+                      <Text strong>Fast delivery</Text>
                     </div>
-                    <Text type="secondary">Giao hàng trong 2-3 ngày làm việc</Text>
+                    <Text type="secondary">Delivery within 2–3 business days</Text>
                   </div>
                   
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                       <SafetyOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
-                      <Text strong>Đảm bảo chất lượng</Text>
+                      <Text strong>Quality assurance</Text>
                     </div>
-                    <Text type="secondary">Sản phẩm chính hãng, được kiểm tra chất lượng trước khi giao</Text>
+                    <Text type="secondary">Genuine products, quality-checked before delivery</Text>
                   </div>
                   
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                       <LockOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
-                      <Text strong>Thanh toán an toàn</Text>
+                      <Text strong>Secure payment</Text>
                     </div>
-                    <Text type="secondary">Bảo mật thông tin thanh toán của bạn</Text>
+                    <Text type="secondary">Your payment information is protected</Text>
                   </div>
                 </Card>
               )}
@@ -1105,7 +1105,7 @@ const handlePlaceOrder = () => {
         <Modal
           title={
             <div style={{ fontSize: '18px' }}>
-              <PlusOutlined /> Thêm địa chỉ mới
+              <PlusOutlined /> 	Add New Address
             </div>
           }
           open={isAddressModalVisible}
@@ -1121,8 +1121,8 @@ const handlePlaceOrder = () => {
               <Col span={12}>
                 <Form.Item 
                   name='full_name' 
-                  label='Họ và tên' 
-                  rules={[{ required: true, message: 'Vui lòng nhập họ tên' }]}
+                  label='Full Name' 
+                  rules={[{ required: true, message: 'Please enter your full name' }]}
                 >
                   <Input 
                     size='large' 
@@ -1134,10 +1134,10 @@ const handlePlaceOrder = () => {
               <Col span={12}>
                 <Form.Item
                   name='phone_number'
-                  label='Số điện thoại'
+                  label='Phone Number'
                   rules={[
-                    { required: true, message: 'Vui lòng nhập số điện thoại' },
-                    { pattern: /^[0-9]{10}$/, message: 'Số điện thoại không hợp lệ' }
+                    { required: true, message: 'Please enter your phone number' },
+                    { pattern: /^[0-9]{10}$/, message: 'Invalid phone number' }
                   ]}
                 >
                   <Input 
@@ -1150,8 +1150,8 @@ const handlePlaceOrder = () => {
             </Row>
             <Form.Item
   name='city'
-  label='Tỉnh/Thành phố'
-  rules={[{ required: true, message: 'Vui lòng chọn tỉnh/thành phố' }]}
+  label='Province/City'
+  rules={[{ required: true, message: 'Please select a province/city' }]}
 >
   <Select
     size='large'
@@ -1167,8 +1167,8 @@ const handlePlaceOrder = () => {
 
             <Form.Item
               name='address'
-              label='Địa chỉ cụ thể'
-              rules={[{ required: true, message: 'Vui lòng nhập địa chỉ cụ thể' }]}
+              label='Specific Address'
+              rules={[{ required: true, message: 'Please enter a specific address' }]}
             >
               <Input.TextArea 
                 rows={3} 
@@ -1189,7 +1189,7 @@ const getPaymentMethodLabel = (method) => {
     case 'cod':
       return 'Thanh toán khi nhận hàng';
     case 'bank_transfer':
-      return 'Chuyển khoản ngân hàng';
+      return 'Bank Transfer';
     case 'vnpay':
       return 'VNPay';
     default:

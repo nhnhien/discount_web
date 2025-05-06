@@ -23,21 +23,21 @@ import React, { useState } from 'react';
    const mutation = useMutation({
      mutationFn: deleteQB,
      onSuccess: () => {
-       message.success('Xóa pricing rule thành công!');
+       message.success('Pricing rule deleted successfully!');
        queryClient.invalidateQueries(['quantityBreaks']);
      },
      onError: () => {
-       message.error('Xóa pricing rule thất bại!');
+       message.error('Failed to delete pricing rule!');
      },
    });
    const toggleMutation = useMutation({
     mutationFn: ({ id, is_active }) => toggleRuleActive(id, is_active),
     onSuccess: () => {
-      message.success('Đã cập nhật trạng thái');
+      message.success('Status updated successfully');
       queryClient.invalidateQueries(['quantityBreaks']);
     },
     onError: () => {
-      message.error('Cập nhật trạng thái thất bại');
+      message.error('Failed to update status');
     },
   });
   
@@ -47,11 +47,11 @@ import React, { useState } from 'react';
  
    const showDeleteConfirm = (id) => {
      confirm({
-       title: 'Bạn có chắc muốn xóa pricing rule này?',
+       title: 'Are you sure you want to delete this pricing rule?',
        icon: <ExclamationCircleOutlined />,
-       okText: 'Xóa',
+       okText: 'Delete',
        okType: 'danger',
-       cancelText: 'Hủy',
+       cancelText: 'Cancel',
        onOk() {
          mutation.mutate(id);
        },
@@ -79,7 +79,7 @@ import React, { useState } from 'react';
  
    const columns = [
      {
-       title: 'Tiêu đề',
+       title: 'Title',
        dataIndex: 'title',
        key: 'title',
        render: (text, record) => (
@@ -94,7 +94,7 @@ import React, { useState } from 'react';
        ),
      },
      {
-       title: 'Số lượng tối thiểu',
+       title: 'Minimum Quantity',
        dataIndex: 'qb_rules',
        key: 'minimum_quantity',
        render: (rules) => {
@@ -104,7 +104,7 @@ import React, { useState } from 'react';
        },
      },
      {
-       title: 'Mức giảm lớn nhất',
+       title: 'Maximum Discount',
        dataIndex: 'qb_rules',
        key: 'max_discount',
        render: (rules) => {
@@ -120,7 +120,7 @@ import React, { useState } from 'react';
        },
      },
      {
-       title: 'Số mức giá',
+       title: 'Number of Price Tiers',
        dataIndex: 'qb_rules',
        key: 'tiers',
        render: (rules) => {
@@ -129,7 +129,7 @@ import React, { useState } from 'react';
        },
      },
      {
-       title: 'Thời gian áp dụng',
+       title: 'Application Period',
        key: 'time_range',
        render: (_, record) => {
          const startDate = new Date(record.start_date).toLocaleDateString('vi-VN');
@@ -142,7 +142,7 @@ import React, { useState } from 'react';
        },
      },
      {
-       title: 'Trạng thái',
+       title: 'Status',
        key: 'status',
        render: (_, record) => {
          const active = isRuleActive(record);
@@ -150,7 +150,7 @@ import React, { useState } from 'react';
        },
      },
      {
-      title: 'Kích hoạt',
+      title: 'Activation',
       dataIndex: 'is_active',
       key: 'is_active',
       render: (value, record) => (
@@ -161,7 +161,7 @@ import React, { useState } from 'react';
       ),
     },
      {
-       title: 'Hành động',
+       title: 'Actions',
        key: 'action',
        render: (_, record) => (
          <Space>
@@ -192,8 +192,8 @@ import React, { useState } from 'react';
      <div className='p-6 bg-white shadow-md rounded-lg'>
        <div className='flex justify-between items-center mb-6'>
          <div>
-           <h2 className='text-2xl font-bold text-gray-800'>Quản lý Giá theo Số lượng</h2>
-           <p className='text-gray-500 mt-1'>Thiết lập các mức giá giảm dựa trên số lượng sản phẩm</p>
+           <h2 className='text-2xl font-bold text-gray-800'>Quantity-Based Pricing Management</h2>
+           <p className='text-gray-500 mt-1'>Set up discount tiers based on product quantity</p>
          </div>
          <Button
            type='primary'
@@ -202,13 +202,13 @@ import React, { useState } from 'react';
            className='bg-blue-500 hover:bg-blue-600'
            onClick={handleAddRule}
          >
-           Thêm Mức Giá Mới
+           Add New Price Tier
          </Button>
        </div>
  
        <div className='mb-5'>
          <Input
-           placeholder='Tìm kiếm pricing rule...'
+           placeholder='Search pricing rules...'
            prefix={<InfoCircleOutlined className='text-gray-400' />}
            className='rounded-lg py-2'
            allowClear
@@ -221,18 +221,18 @@ import React, { useState } from 'react';
          columns={columns}
          rowKey='id'
          loading={isLoading}
-         pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `Tổng ${total} mục` }}
+         pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (total) => `Total ${total} items` }}
          className='shadow-sm border rounded-lg'
        />
  
        <Modal
-         title={<h3 className='text-lg font-bold'>Chi tiết Pricing Rule</h3>}
+         title={<h3 className='text-lg font-bold'>Pricing Rule Details</h3>}
          open={isModalOpen}
          onCancel={() => setIsModalOpen(false)}
          width={600}
          footer={[
            <Button key='close' size='large' onClick={() => setIsModalOpen(false)}>
-             Đóng
+             Close
            </Button>,
          ]}
        >
@@ -240,41 +240,41 @@ import React, { useState } from 'react';
            <div className='space-y-4'>
              <div className='bg-gray-50 p-4 rounded-lg'>
                <p className='font-semibold text-lg text-gray-800'>{selectedRule.title}</p>
-               <p className='text-gray-600 mt-1'>{selectedRule.description || 'Không có mô tả'}</p>
+               <p className='text-gray-600 mt-1'>{selectedRule.description || 'No description'}</p>
              </div>
  
              <div>
-               <h4 className='font-semibold mb-2 text-gray-700'>Thông tin cơ bản</h4>
+               <h4 className='font-semibold mb-2 text-gray-700'>Basic Information</h4>
                <div className='grid grid-cols-2 gap-3'>
                  <div>
-                   <span className='text-gray-500'>Ngày bắt đầu:</span>
+                   <span className='text-gray-500'>Start Date:</span>
                    <p>{new Date(selectedRule.start_date).toLocaleDateString('vi-VN')}</p>
                  </div>
                  <div>
-                   <span className='text-gray-500'>Ngày kết thúc:</span>
+                   <span className='text-gray-500'>End Date:</span>
                    <p>
                      {selectedRule.end_date
                        ? new Date(selectedRule.end_date).toLocaleDateString('vi-VN')
-                       : 'Không giới hạn'}
+                       : 'No limit'}
                    </p>
                  </div>
                  <div>
-                   <span className='text-gray-500'>Trạng thái:</span>
+                   <span className='text-gray-500'>Status:</span>
                    <p>
                      <Tag color={isRuleActive(selectedRule) ? 'green' : 'red'}>
-                       {isRuleActive(selectedRule) ? 'Đang áp dụng' : 'Hết hạn'}
+                       {isRuleActive(selectedRule) ? 'Active' : 'Expired'}
                      </Tag>
                    </p>
                  </div>
                  <div>
-                   <span className='text-gray-500'>Ngày tạo:</span>
+                   <span className='text-gray-500'>Created Date:</span>
                    <p>{new Date(selectedRule.createdAt).toLocaleString('vi-VN')}</p>
                  </div>
                </div>
              </div>
  
              <div>
-               <h4 className='font-semibold mb-2 text-gray-700'>Các mức giảm giá</h4>
+               <h4 className='font-semibold mb-2 text-gray-700'>Discount Levels</h4>
                <Table
                  dataSource={selectedRule.qb_rules}
                  pagination={false}
@@ -282,23 +282,23 @@ import React, { useState } from 'react';
                  rowKey='quantity'
                  columns={[
                    {
-                     title: 'Từ số lượng',
+                     title: 'From Quantity',
                      dataIndex: 'quantity',
                      key: 'quantity',
                      render: (value) => <span className='font-medium'>{value}</span>,
                    },
                    {
-                     title: 'Loại giảm giá',
+                     title: 'Discount Type',
                      dataIndex: 'discount_type',
                      key: 'discount_type',
                      render: (type) => (
                        <Tag color={type === 'percentage' ? 'green' : 'blue'}>
-                         {type === 'percentage' ? 'Phần trăm' : 'Giảm trực tiếp'}
+                         {type === 'percentage' ? 'Percentage' : 'Fixed Amount'}
                        </Tag>
                      ),
                    },
                    {
-                     title: 'Giá trị',
+                     title: 'Value',
                      dataIndex: 'value',
                      key: 'value',
                      render: (value, record) => (
@@ -313,7 +313,7 @@ import React, { useState } from 'react';
  
              {selectedRule.products && selectedRule.products.length > 0 && (
                <div>
-                 <h4 className='font-semibold mb-2 text-gray-700'>Sản phẩm áp dụng</h4>
+                 <h4 className='font-semibold mb-2 text-gray-700'>Applied Products</h4>
                  <div className='flex flex-wrap gap-2'>
                    {selectedRule.products.map((product) => (
                      <Tag key={product.id}>{product.name}</Tag>
@@ -324,7 +324,7 @@ import React, { useState } from 'react';
  
              {selectedRule.variants && selectedRule.variants.length > 0 && (
                <div>
-                 <h4 className='font-semibold mb-2 text-gray-700'>Biến thể áp dụng</h4>
+                 <h4 className='font-semibold mb-2 text-gray-700'>Applied Variants</h4>
                  <div className='flex flex-wrap gap-2'>
                    {selectedRule.variants.map((variant) => (
                      <Tag key={variant.id}>{variant.sku}</Tag>
@@ -335,7 +335,7 @@ import React, { useState } from 'react';
  
              {selectedRule.customers && selectedRule.customers.length > 0 && (
                <div>
-                 <h4 className='font-semibold mb-2 text-gray-700'>Khách hàng áp dụng</h4>
+                 <h4 className='font-semibold mb-2 text-gray-700'>Applied Customers</h4>
                  <div className='flex flex-wrap gap-2'>
                    {selectedRule.customers.map((customer) => (
                      <Tag key={customer.id}>{customer.name}</Tag>
@@ -346,7 +346,7 @@ import React, { useState } from 'react';
  
              {selectedRule.markets && selectedRule.markets.length > 0 && (
                <div>
-                 <h4 className='font-semibold mb-2 text-gray-700'>Thị trường áp dụng</h4>
+                 <h4 className='font-semibold mb-2 text-gray-700'>Applied Markets</h4>
                  <div className='flex flex-wrap gap-2'>
                    {selectedRule.markets.map((market) => (
                      <Tag key={market.id}>{market.name}</Tag>

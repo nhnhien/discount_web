@@ -15,18 +15,18 @@ const Footer = () => {
       <div className='container mx-auto px-4 py-12'>
         <Row gutter={[24, 24]}>
           <Col xs={24} md={8}>
-            <h3 className='text-lg font-semibold mb-4'>Hỗ trợ khách hàng</h3>
+            <h3 className='text-lg font-semibold mb-4'>Customer Support</h3>
             <div className='space-y-2 text-gray-600'>
               <p>Hotline: 1900 1234</p>
               <p>Email: support@fashionstore.com</p>
-              <p>Giờ làm việc: 8:00 - 22:00</p>
+              <p>Working hours: 8:00 AM - 10:00 PM</p>
             </div>
           </Col>
 
           <Col xs={24} md={8}>
-            <h3 className='text-lg font-semibold mb-4'>Về chúng tôi</h3>
+            <h3 className='text-lg font-semibold mb-4'>About Us</h3>
             <div className='flex flex-col space-y-2'>
-              {['Giới thiệu', 'Tuyển dụng', 'Hệ thống cửa hàng'].map((item) => (
+              {['About', 'Careers', 'Store Locator'].map((item) => (
                 <a key={item} href='#' className='text-gray-600 hover:text-gray-900'>
                   {item}
                 </a>
@@ -35,9 +35,9 @@ const Footer = () => {
           </Col>
 
           <Col xs={24} md={8}>
-            <h3 className='text-lg font-semibold mb-4'>Chính sách</h3>
+            <h3 className='text-lg font-semibold mb-4'>Policies</h3>
             <div className='flex flex-col space-y-2'>
-              {['Bảo mật thông tin', 'Chính sách đổi trả', 'Điều khoản dịch vụ'].map((item) => (
+              {['	Privacy Policy', 'Return Policy', 'Terms of Service'].map((item) => (
                 <a key={item} href='#' className='text-gray-600 hover:text-gray-900'>
                   {item}
                 </a>

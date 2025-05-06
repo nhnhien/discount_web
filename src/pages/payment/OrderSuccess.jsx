@@ -164,15 +164,15 @@ const OrderSuccess = () => {
           status="success"
           title={
             <div className="text-green-600 text-2xl">
-              Đặt hàng thành công!
+              Order placed successfully!
             </div>
           }
           subTitle={
             <div className="text-gray-600">
-              <p className="mb-2">Cảm ơn bạn đã mua sắm tại cửa hàng của chúng tôi</p>
+              <p className="mb-2">Thank you for shopping with us!</p>
               <Badge status="processing" color="green" text={
                 <span className="font-medium">
-                  Mã đơn hàng: <span className="text-blue-600">{order.order_number || `#${order.id}`}</span>
+                  Order ID: <span className="text-blue-600">{order.order_number || `#${order.id}`}</span>
                 </span>
               } />
             </div>
@@ -187,7 +187,7 @@ const OrderSuccess = () => {
                 onClick={() => navigate('/')}
                 className="min-w-[160px]"
               >
-                Tiếp tục mua sắm
+                Continue Shopping
               </Button>
               <Button
                 key="orders"
@@ -196,14 +196,14 @@ const OrderSuccess = () => {
                 onClick={() => navigate('/orders')}
                 className="min-w-[160px]"
               >
-                Xem đơn hàng của tôi
+                View My Orders
               </Button>
               <Button
                 key="print"
                 icon={<PrinterOutlined />}
                 onClick={() => window.print()}
               >
-                In đơn hàng
+                Print order
               </Button>
             </Space>
           }
@@ -215,7 +215,7 @@ const OrderSuccess = () => {
         className="mb-6 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-lg"
         title={
           <div className="flex items-center text-gray-800">
-            <ClockCircleOutlined className="mr-2" /> Trạng thái đơn hàng
+            <ClockCircleOutlined className="mr-2" /> Order status
           </div>
         }
       >
@@ -225,10 +225,10 @@ const OrderSuccess = () => {
           responsive
           className="px-4 py-4"
         >
-          <Step title="Đặt hàng" description={formatDate(order.created_at)} icon={<ShoppingOutlined />} />
-          <Step title="Xử lý" description="Đang chuẩn bị" icon={<ShopOutlined />} />
-          <Step title="Vận chuyển" description="Đang giao hàng" icon={<CarOutlined />} />
-          <Step title="Hoàn thành" description="Giao hàng thành công" icon={<CheckCircleOutlined />} />
+          <Step title="Place order" description={formatDate(order.created_at)} icon={<ShoppingOutlined />} />
+          <Step title="Processing" description="Preparing" icon={<ShopOutlined />} />
+          <Step title="Shipping" description="Out for delivery" icon={<CarOutlined />} />
+          <Step title="Completed" description="Delivered successfully" icon={<CheckCircleOutlined />} />
         </Steps>
 
         <Divider className="my-4" />
@@ -239,7 +239,7 @@ const OrderSuccess = () => {
               <div className="flex items-center">
                 <CalendarOutlined className="text-gray-500 mr-2" />
                 <span>
-                  <Text type="secondary">Ngày đặt hàng:</Text>{' '}
+                  <Text type="secondary">Order date:</Text>{' '}
                   <Text strong>{formatDate(order.created_at)}</Text>
                 </span>
               </div>
@@ -263,7 +263,7 @@ const OrderSuccess = () => {
           <Card 
             title={
               <div className="flex items-center text-gray-800">
-                <UserOutlined className="mr-2" /> Thông tin giao hàng
+                <UserOutlined className="mr-2" /> Shipping information
               </div>
             }
             className="shadow-sm hover:shadow-md transition-shadow duration-300 h-full rounded-lg"
@@ -272,7 +272,7 @@ const OrderSuccess = () => {
               <div className="flex items-start">
                 <UserOutlined className="text-blue-500 mr-3 mt-1" />
                 <div>
-                  <div className="text-gray-500 text-sm mb-1">Người nhận</div>
+                  <div className="text-gray-500 text-sm mb-1">Recipient</div>
                   <div className="font-medium">{order.shippingAddress?.full_name || 'Không có thông tin'}</div>
                 </div>
               </div>
@@ -280,7 +280,7 @@ const OrderSuccess = () => {
               <div className="flex items-start">
                 <PhoneOutlined className="text-green-500 mr-3 mt-1" />
                 <div>
-                  <div className="text-gray-500 text-sm mb-1">Số điện thoại</div>
+                  <div className="text-gray-500 text-sm mb-1">Phone number</div>
                   <div className="font-medium">{order.shippingAddress?.phone_number || 'Không có thông tin'}</div>
                 </div>
               </div>
@@ -288,7 +288,7 @@ const OrderSuccess = () => {
               <div className="flex items-start">
                 <EnvironmentOutlined className="text-red-500 mr-3 mt-1" />
                 <div>
-                  <div className="text-gray-500 text-sm mb-1">Địa chỉ</div>
+                  <div className="text-gray-500 text-sm mb-1">Address</div>
                   <div className="font-medium">
                     {order.shippingAddress?.address}{order.shippingAddress?.city ? `, ${order.shippingAddress.city}` : ''}
                   </div>
@@ -298,7 +298,7 @@ const OrderSuccess = () => {
               <div className="flex items-start">
                 <DollarOutlined className="text-orange-500 mr-3 mt-1" />
                 <div>
-                  <div className="text-gray-500 text-sm mb-1">Phương thức thanh toán</div>
+                  <div className="text-gray-500 text-sm mb-1">Payment Method</div>
                   <Tag color="blue">{order.payment_method}</Tag>
                 </div>
               </div>
@@ -310,7 +310,7 @@ const OrderSuccess = () => {
           <Card 
             title={
               <div className="flex items-center text-gray-800">
-                <ShoppingOutlined className="mr-2" /> Tóm tắt đơn hàng
+                <ShoppingOutlined className="mr-2" /> Order summary
               </div>
             }
             className="shadow-sm hover:shadow-md transition-shadow duration-300 h-full rounded-lg"
@@ -318,14 +318,14 @@ const OrderSuccess = () => {
             <Row gutter={[16, 16]}>
               <Col span={12}>
                 <Statistic 
-                  title={<span className="text-gray-600">Tổng sản phẩm</span>} 
+                  title={<span className="text-gray-600">Total Items</span>} 
                   value={getTotalItems()} 
                   prefix={<GiftOutlined />} 
                 />
               </Col>
               <Col span={12}>
                 <Statistic 
-                  title={<span className="text-gray-600">Tổng tiền</span>} 
+                  title={<span className="text-gray-600">Total Amount</span>} 
                   value={parseInt(order.total_amount).toLocaleString() + '₫'} 
                   prefix={<DollarOutlined />}
                   valueStyle={{ color: '#1677ff' }}
@@ -340,7 +340,7 @@ const OrderSuccess = () => {
                 {
                   children: (
                     <div className="flex justify-between items-center w-full">
-                      <span>Tạm tính</span>
+                      <span>Subtotal</span>
                       <span>{parseInt(order.sub_total || order.total_amount).toLocaleString()}₫</span>
                     </div>
                   )
@@ -348,7 +348,7 @@ const OrderSuccess = () => {
                 {
                   children: (
                     <div className="flex justify-between items-center w-full">
-                      <span>Phí vận chuyển</span>
+                      <span>Shipping Fee</span>
                       <span>{parseInt(order.shipping_fee || 0).toLocaleString()}₫</span>
                     </div>
                   )
@@ -356,7 +356,7 @@ const OrderSuccess = () => {
                 {
                   children: (
                     <div className="flex justify-between items-center w-full">
-                      <span>Giảm giá</span>
+                      <span>Discount</span>
                       <span>-{parseInt(order.discount || 0).toLocaleString()}₫</span>
                     </div>
                   )
@@ -365,7 +365,7 @@ const OrderSuccess = () => {
                   color: 'blue',
                   children: (
                     <div className="flex justify-between items-center w-full font-medium">
-                      <span>Tổng thanh toán</span>
+                      <span>Grand Total</span>
                       <span className="text-blue-600 text-lg">{parseInt(order.total_amount).toLocaleString()}₫</span>
                     </div>
                   )
@@ -381,7 +381,7 @@ const OrderSuccess = () => {
         className="mt-6 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-lg"
         title={
           <div className="flex items-center text-gray-800">
-            <ShoppingOutlined className="mr-2" /> Chi tiết sản phẩm đã đặt
+            <ShoppingOutlined className="mr-2" /> Ordered product details
           </div>
         }
       >
@@ -413,7 +413,7 @@ const OrderSuccess = () => {
                   }
                   description={
                     <div className="text-gray-500 space-y-1 mt-1">
-                      <div>Số lượng: {item.quantity}</div>
+                      <div>Quantity: {item.quantity}</div>
                       {item.sku && <div>SKU: {item.sku}</div>}
                     </div>
                   }
@@ -438,12 +438,12 @@ const OrderSuccess = () => {
         <div className="flex justify-end p-4">
           <div className="bg-gray-50 p-4 rounded-lg shadow-sm max-w-xs w-full">
             <div className="flex justify-between mb-2">
-              <Text>Tạm tính:</Text>
+              <Text>Subtotal:</Text>
               <Text>{parseInt(order.sub_total || order.total_amount).toLocaleString()}₫</Text>
             </div>
             {order.shipping_fee ? (
               <div className="flex justify-between mb-2">
-                <Text>Phí vận chuyển:</Text>
+                <Text>Shipping fee:</Text>
                 <Text>{parseInt(order.shipping_fee).toLocaleString()}₫</Text>
               </div>
             ) : null}
@@ -455,7 +455,7 @@ const OrderSuccess = () => {
             ) : null}
             <Divider className="my-2" />
             <div className="flex justify-between">
-              <Text strong>Tổng tiền:</Text>
+              <Text strong>Total:</Text>
               <Text strong className="text-blue-600 text-xl">
                 {parseInt(order.total_amount).toLocaleString()}₫
               </Text>
@@ -470,7 +470,7 @@ const OrderSuccess = () => {
           className="mt-6 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-lg"
           title={
             <div className="flex items-center text-gray-800">
-              <InfoCircleOutlined className="mr-2" /> Ghi chú đơn hàng
+              <InfoCircleOutlined className="mr-2" /> Order Notes
             </div>
           }
         >
@@ -482,10 +482,10 @@ const OrderSuccess = () => {
       <div className="mt-8 text-center">
         <Space>
           <Button type="primary" icon={<HomeOutlined />} onClick={() => navigate('/')}>
-            Về trang chủ
+          Back to homepage
           </Button>
           <Button icon={<ShoppingOutlined />} onClick={() => navigate('/orders')}>
-            Xem đơn hàng của tôi
+          View My Orders
           </Button>
         </Space>
       </div>

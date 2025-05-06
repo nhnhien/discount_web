@@ -69,7 +69,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
     return (
       <Card className="mb-4 shadow-sm">
         <Empty 
-          description="Không thể tải danh mục sản phẩm" 
+          description="Failed to load product categories" 
           image={Empty.PRESENTED_IMAGE_SIMPLE} 
         />
       </Card>
@@ -87,7 +87,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
       title={
         <div className="flex items-center">
           <AppstoreOutlined className="mr-2" />
-          <span>Danh mục sản phẩm</span>
+          <span>Product Categories</span>
         </div>
       } 
       className="mb-4 shadow-sm"
@@ -99,7 +99,7 @@ const CategoryFilter = ({ onCategorySelect }) => {
         items={[
           {
             key: 'all',
-            label: 'Tất cả sản phẩm',
+            label: 'All Products',
             onClick: () => {
               handleCategoryClick(null);
             },

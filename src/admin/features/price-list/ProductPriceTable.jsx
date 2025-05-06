@@ -76,7 +76,7 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
       ),
     },
     {
-      title: 'Sản phẩm',
+      title: 'Product',
       dataIndex: 'name',
       render: (_, record) => (
         <div className='flex items-center gap-2'>
@@ -100,7 +100,7 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
       ),
     },
     {
-      title: 'Thuộc tính',
+      title: 'Attributes',
       dataIndex: 'attributes',
       render: (_, record) =>
         record.attributes?.length > 0 ? (
@@ -112,7 +112,7 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
             ))}
           </div>
         ) : (
-          <Typography.Text type='secondary'>Không có</Typography.Text>
+          <Typography.Text type='secondary'>None</Typography.Text>
         ),
     },
     {
@@ -121,7 +121,7 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
       render: (sku) => <Typography.Text code>{sku}</Typography.Text>,
     },
     {
-      title: 'Giá tuỳ chỉnh (₫)',
+      title: 'Custom Price (₫)',
       dataIndex: 'amount',
       render: (_, record) => (
         <InputNumber
@@ -130,7 +130,7 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
           onChange={(value) => handleAmountChange(record, Number(value) || 0)}
           disabled={!selectedKeys.includes(record.key)}
           style={{ width: '100%' }}
-          placeholder='Nhập giá'
+          placeholder='Enter price'
         />
       ),
     },

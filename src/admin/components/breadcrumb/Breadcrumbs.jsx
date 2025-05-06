@@ -2,13 +2,21 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Breadcrumb } from 'antd';
 
+// const breadcrumbMap = {
+//   '/admin': 'Trang chủ',
+//   '/admin/product': 'Sản phẩm',
+//   '/admin/product/create': 'Thêm sản phẩm',
+//   '/admin/orders': 'Đơn hàng',
+//   '/admin/discounts': 'Giảm giá',
+//   '/admin/discount/cp/create': 'Tạo custom pricing', 
+// };
 const breadcrumbMap = {
-  '/admin': 'Trang chủ',
-  '/admin/product': 'Sản phẩm',
-  '/admin/product/create': 'Thêm sản phẩm',
-  '/admin/orders': 'Đơn hàng',
-  '/admin/discounts': 'Giảm giá',
-  '/admin/discount/cp/create': 'Tạo custom pricing', 
+  '/admin': 'Home',
+  '/admin/product': 'Products',
+  '/admin/product/create': 'Add Product',
+  '/admin/orders': 'Orders',
+  '/admin/discounts': 'Discounts',
+  '/admin/discount/cp/create': 'Create Custom Pricing',
 };
 
 const Breadcrumbs = () => {

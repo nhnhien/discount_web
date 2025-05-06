@@ -69,29 +69,29 @@ const CPManager = () => {
 
   const columns = [
     {
-      title: 'Giảm giá',
+      title: 'Discount',
       dataIndex: 'title',
       key: 'title',
       render: (text) => <span className='font-semibold'>{text}</span>,
     },
     {
-      title: 'Loại giảm giá',
+      title: 'Discount type',
       dataIndex: 'discount_type',
       key: 'discount_type',
       render: (type) => (
         <Tag color={type === 'percentage' ? 'green' : 'blue'}>
-          {type === 'percentage' ? 'Phần trăm' : 'Giảm trực tiếp'}
+          {type === 'percentage' ? 'Percentage' : 'Direct discount'}
         </Tag>
       ),
     },
     {
-      title: 'Giá trị',
+      title: 'Value',
       dataIndex: 'discount_value',
       key: 'discount_value',
       render: (value, record) => (record.discount_type === 'percentage' ? `${value}%` : `${value}₫`),
     },
     {
-      title: 'Thời gian',
+      title: 'Time period',
       dataIndex: 'start_date',
       key: 'start_date',
       render: (_, record) => (
@@ -101,13 +101,13 @@ const CPManager = () => {
       ),
     },
     {
-      title: 'Thời gian tạo',
+      title: 'Creation time',
       dataIndex: 'createdAt',
       key: 'createdAt',
       render: (createdAt) => <span>{new Date(createdAt).toLocaleString('vi-VN')}</span>,
     },
     {
-      title: 'Kích hoạt',
+      title: 'Activate',
       dataIndex: 'is_active',
       key: 'is_active',
       render: (value, record) => (
@@ -119,7 +119,7 @@ const CPManager = () => {
     },
     
     {
-      title: 'Hành động',
+      title: 'Action',
       key: 'action',
       render: (_, record) => (
         <div className='flex space-x-2'>
@@ -143,19 +143,19 @@ const CPManager = () => {
   return (
     <div className='p-6 bg-white shadow-md rounded-lg'>
       <div className='flex justify-between items-center mb-4'>
-        <h2 className='text-xl font-bold text-gray-800'>Quản lý Rules</h2>
+        <h2 className='text-xl font-bold text-gray-800'>Manage Rules</h2>
         <Button
           type='primary'
           icon={<PlusOutlined />}
           className='bg-blue-500 hover:bg-blue-600'
           onClick={handleAddRule}
         >
-          Thêm Rule
+          Add rule
         </Button>
       </div>
 
       <Input
-        placeholder='Tìm kiếm rule...'
+        placeholder='Search rules...'
         className='mb-4'
         allowClear
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -189,7 +189,7 @@ const CPManager = () => {
             </p>
             <p>
               <strong>Loại giảm giá:</strong>{' '}
-              {selectedRule.discount_type === 'percentage' ? 'Phần trăm' : 'Giảm trực tiếp'}
+              {selectedRule.discount_type === 'percentage' ? 'Percentage' : 'Direct discount'}
             </p>
             <p>
               <strong>Giá trị:</strong>{' '}

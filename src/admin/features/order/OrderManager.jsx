@@ -81,7 +81,7 @@ const OrderManager = () => {
   const updatePaymentMutation = useMutation({
     mutationFn: ({ id, data }) => orderService.updatePaymentStatus(id, data),
     onSuccess: () => {
-      message.success('Cập nhật thanh toán thành công');
+      message.success('Status updated successfully');
       queryClient.invalidateQueries(['admin-orders']);
     },
   });
@@ -89,7 +89,7 @@ const OrderManager = () => {
   const updateDeliveryMutation = useMutation({
     mutationFn: ({ id, data }) => orderService.updateDelivery(id, data),
     onSuccess: () => {
-      message.success('Cập nhật giao hàng thành công');
+      message.success('Delivery status updated successfully');
       queryClient.invalidateQueries(['admin-orders']);
     },
   });
@@ -97,24 +97,24 @@ const OrderManager = () => {
   const cancelOrderMutation = useMutation({
     mutationFn: ({ id, reason }) => orderService.cancelOrder(id, reason),
     onSuccess: () => {
-      message.success('Hủy đơn hàng thành công');
+      message.success('Order cancelled successfully');
       queryClient.invalidateQueries(['admin-orders']);
     },
   });
 
   const handleUpdateStatus = (orderId, currentStatus) => {
     confirm({
-      title: 'Xác nhận đơn hàng?',
+      title: 'Confirm order?',
       icon: <DeliveredProcedureOutlined />,
-      content: `Chuyển trạng thái đơn hàng từ "${currentStatus}" sang "confirmed"?`,
+      content: `Change order status from "${currentStatus}" to "confirmed"?`,
       onOk: () => {
         orderService
           .updateOrderStatus(orderId, {
             status: 'confirmed',
-            notes: 'Xác nhận bởi admin',
+            notes: 'Confirmed by admin',
           })
           .then(() => {
-            message.success('Cập nhật trạng thái thành công');
+            message.success('Status updated successfully');
             queryClient.invalidateQueries(['admin-orders']);
           });
       },
@@ -123,7 +123,7 @@ const OrderManager = () => {
 
   const handleUpdatePayment = (order) => {
     confirm({
-      title: 'Cập nhật trạng thái thanh toán',
+      title: 'Update payment status',
       icon: <CreditCardOutlined />,
       content: (
         <Select
@@ -151,7 +151,7 @@ const OrderManager = () => {
 
   const handleUpdateDelivery = (order) => {
     confirm({
-      title: 'Cập nhật trạng thái giao hàng',
+      title: 'Update delivery status',
       icon: <TruckOutlined />,
       content: (
         <Select
@@ -179,21 +179,21 @@ const OrderManager = () => {
 
   const handleCancelOrder = (order) => {
     confirm({
-      title: 'Hủy đơn hàng',
+      title: 'Cancel order',
       icon: <StopOutlined />,
       content: (
         <Input.TextArea
           rows={3}
-          placeholder="Lý do hủy đơn"
+          placeholder="Cancellation reason"
           onChange={(e) => (order._cancelReason = e.target.value)}
         />
       ),
       okType: 'danger',
-      okText: 'Hủy đơn',
+      okText: 'Cancel order',
       onOk: () => {
         cancelOrderMutation.mutate({
           id: order.id,
-          reason: order._cancelReason || 'Hủy bởi admin',
+          reason: order._cancelReason || 'Cancelled by admin',
         });
       },
     });
@@ -206,12 +206,12 @@ const OrderManager = () => {
 
   const columns = [
     {
-      title: 'Mã đơn',
+      title: 'Order Number',
       dataIndex: 'order_number',
       render: (text) => <Text strong>{text}</Text>,
     },
     {
-      title: 'Khách hàng',
+      title: 'Customer',
       dataIndex: ['customer', 'name'],
       render: (_, record) => (
         <>
@@ -221,30 +221,30 @@ const OrderManager = () => {
       ),
     },
     {
-      title: 'Tổng tiền',
+      title: 'Total Amount',
       dataIndex: 'total_amount',
       render: (val) => formatVND(val),
     },
     {
-      title: 'Thanh toán',
+      title: 'Payment',
       dataIndex: 'payment_status',
       render: (status) => <Tag color={paymentColors[status]}>{status}</Tag>,
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'status',
       render: (status) => <Tag color={statusColors[status]}>{status}</Tag>,
     },
     {
-      title: 'Ngày tạo',
+      title: 'Order Date',
       dataIndex: 'created_at',
       render: (val) => dayjs(val).format('DD/MM/YYYY HH:mm'),
     },
     {
-      title: 'Hành động',
+      title: 'Actions',
       render: (_, record) => (
         <Space>
-          <Tooltip title="Chi tiết">
+          <Tooltip title="View Details">
             <Button icon={<EyeOutlined />} onClick={() => showDetails(record)} />
           </Tooltip>
           {record.status === 'pending' && (
@@ -263,16 +263,16 @@ const OrderManager = () => {
   return (
     <div className="p-4 bg-white rounded shadow">
       <div className="flex justify-between flex-wrap gap-3 mb-4">
-        <Title level={4}>Quản lý đơn hàng</Title>
+        <Title level={4}>Order Management</Title>
         <Space>
           <Search
-            placeholder="Tìm kiếm đơn"
+            placeholder="Search orders"
             allowClear
             onSearch={setSearch}
             style={{ width: 200 }}
           />
           <Select
-            placeholder="Lọc trạng thái"
+            placeholder="Filter by status"
             value={statusFilter}
             onChange={setStatusFilter}
             allowClear
@@ -285,7 +285,7 @@ const OrderManager = () => {
             ))}
           </Select>
           <Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-            Làm mới
+            Refresh
           </Button>
         </Space>
       </div>
@@ -306,33 +306,33 @@ const OrderManager = () => {
 
       <Drawer
         open={detailsVisible}
-        title={`Chi tiết đơn hàng ${selectedOrder?.order_number}`}
+        title={`Order Details ${selectedOrder?.order_number}`}
         onClose={() => setDetailsVisible(false)}
         width={600}
       >
         {selectedOrder && (
           <>
             <Descriptions bordered column={1} size="small">
-              <Descriptions.Item label="Trạng thái">
+              <Descriptions.Item label="Status">
                 <Tag color={statusColors[selectedOrder.status]}>{selectedOrder.status}</Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Thanh toán">
+              <Descriptions.Item label="Payment">
                 <Tag color={paymentColors[selectedOrder.payment_status]}>{selectedOrder.payment_status}</Tag>
               </Descriptions.Item>
-              <Descriptions.Item label="Ngày đặt">
+              <Descriptions.Item label="Order Date">
                 {dayjs(selectedOrder.created_at).format('DD/MM/YYYY HH:mm')}
               </Descriptions.Item>
-              <Descriptions.Item label="Tổng cộng">
+              <Descriptions.Item label="Total">
                 {formatVND(selectedOrder.total_amount)}
               </Descriptions.Item>
               {selectedOrder.discount_amount > 0 && (
-                <Descriptions.Item label="Giảm giá">
+                <Descriptions.Item label="Discount">
                   {formatVND(selectedOrder.discount_amount)} ({selectedOrder.discount?.discount_code})
                 </Descriptions.Item>
               )}
             </Descriptions>
 
-            <Divider orientation="left">Sản phẩm</Divider>
+            <Divider orientation="left">Products</Divider>
             <List
               dataSource={selectedOrder.items}
               renderItem={(item) => (
@@ -346,7 +346,7 @@ const OrderManager = () => {
               )}
             />
 
-            <Divider orientation="left">Giao hàng</Divider>
+            <Divider orientation="left">Shipping</Divider>
             <div>
               <Text strong>{selectedOrder.shippingAddress?.full_name}</Text>
               <div>{selectedOrder.shippingAddress?.address}, {selectedOrder.shippingAddress?.city}</div>

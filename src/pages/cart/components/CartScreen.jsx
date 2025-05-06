@@ -93,28 +93,28 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
       await cartService.updateCartItem(itemId, newQuantity);
       queryClient.invalidateQueries(['cart']);
     } catch (err) {
-      message.error('Lỗi khi cập nhật số lượng');
+      message.error('Error updating quantity');
     }
   };
   
   const handleRemoveItem = async (itemId) => {
     try {
       await cartService.removeCartItem(itemId);
-      message.success('Đã xóa sản phẩm khỏi giỏ hàng');
+      message.success('Item removed from cart');
       queryClient.invalidateQueries(['cart']);
     } catch (err) {
-      message.error('Lỗi khi xóa sản phẩm');
+      message.error('Error removing item');
     }
   };
   
   const handleApplyCoupon = async (code = couponCode) => {
     if (!code) {
-      message.warning('Vui lòng nhập mã giảm giá');
+      message.warning('Please enter a discount code');
       return;
     }
     
     if (selectedItems.length === 0) {
-      message.warning('Vui lòng chọn ít nhất một sản phẩm để áp dụng mã giảm giá');
+      message.warning('Please select at least one product to apply discount');
       return;
     }
   
@@ -125,15 +125,15 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
       });
       
       if (result?.success) {
-        message.success(result.message || 'Áp dụng mã giảm giá thành công');
+        message.success(result.message || 'Discount code applied successfully');
         setDiscountApplied(true);
         setWantApplyDiscount(true);
         queryClient.invalidateQueries(['cart', userId, { apply_discount: true, selected_item_ids: selectedItems }]);
       } else {
-        message.error(result?.message || 'Không áp dụng được mã giảm giá');
+        message.error(result?.message || 'Failed to apply discount code');
       }
     } catch (err) {
-      message.error(err?.response?.data?.message || 'Có lỗi khi áp dụng mã');
+      message.error(err?.response?.data?.message || 'Error applying discount');
     }
   };
   
@@ -166,7 +166,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
          const isValid = availableCodes.some((d) => d.discount_code === cart.discount_code);
       if (!isValid) {
         handleRemoveCoupon(); // Gỡ mã
-        message.warning(`Mã ${cart.discount_code} không còn hợp lệ và đã được gỡ`);
+        message.warning(`Code ${cart.discount_code} is no longer valid and has been removed`);
       }
     }
   }, [cart?.discount_code, availableCodes]);
@@ -177,17 +177,17 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
   
     try {
       await cartService.updateShippingInfo({ note: orderNote.trim() });
-      message.success('Đã lưu ghi chú đơn hàng');
+      message.success('Order note saved');
       queryClient.invalidateQueries(['cart']);
     } catch (err) {
-      message.error(err?.response?.data?.message || 'Không thể lưu ghi chú');
+      message.error(err?.response?.data?.message || 'Failed to save order note');
     }
   };
   
   const handleRemoveCoupon = async () => {
     try {
       await cartService.removeDiscount(selectedItems);
-      message.success('Đã hủy mã giảm giá');
+      message.success('Discount code removed');
       setCouponCode('');
       setDiscountApplied(false);
       setWantApplyDiscount(false); // Không áp lại mã giảm giá
@@ -199,7 +199,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
         { apply_discount: false, selected_item_ids: selectedItems.join(',') }
       ]);
     } catch (err) {
-      message.error('Không thể hủy mã giảm giá');
+      message.error('Failed to remove discount code');
     }
   };
   
@@ -297,10 +297,10 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
         <div className='container mx-auto px-4 py-12 max-w-4xl'>
           <div className='flex items-center mb-8'>
             <Button type='text' icon={<ArrowLeftOutlined />} onClick={() => navigate('/products')} className='mr-2'>
-              Tiếp tục mua sắm
+            Continue shopping
             </Button>
             <Typography.Title level={3} className='m-0'>
-              Giỏ hàng
+            Shopping Cart
             </Typography.Title>
           </div>
 
@@ -376,11 +376,11 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
             onClick={() => navigate('/products')}
             className='mr-2 flex items-center text-gray-600 hover:text-blue-500'
           >
-            Tiếp tục mua sắm
+            Continue shopping
           </Button>
           <Typography.Title level={3} className='m-0 flex items-center'>
             <ShoppingCartOutlined className='mr-2' />
-            Giỏ hàng của bạn
+            Your cart
             <Badge count={items.length} className='ml-3' style={{ backgroundColor: '#3b82f6' }} />
           </Typography.Title>
         </div>
@@ -392,14 +392,14 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
               <div className='flex items-center'>
                 <TruckOutlined className='text-2xl mr-3' />
                 <Typography.Title level={5} className='m-0 text-white'>
-                  Miễn phí vận chuyển cho đơn hàng từ {formatPrice(freeShippingThreshold)}
+                Free shipping for orders from {formatPrice(freeShippingThreshold)}
                 </Typography.Title>
               </div>
             </div>
             <div className='mt-4'>
               <div className='flex justify-between mb-2'>
                 <Typography.Text>
-                  Thêm {formatPrice(amountToFreeShipping)} nữa để được miễn phí vận chuyển
+                Add {formatPrice(amountToFreeShipping)} more to get free shipping
                 </Typography.Text>
                 <Typography.Text strong>{progressPercent}%</Typography.Text>
               </div>
@@ -488,11 +488,11 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
 
                             {item.stock_quantity > 0 ? (
                               <Tag color='success' icon={<ClockCircleOutlined />} className='mr-0'>
-                                Còn hàng
+                                In stock
                               </Tag>
                             ) : (
                               <Tag color='error' className='mr-0'>
-                                Hết hàng
+                                	Out of stock
                               </Tag>
                             )}
                           </div>
@@ -500,7 +500,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                           {parseFloat(item.discount_amount) > 0 && (
                             <div className='mt-2'>
                               <Tag color='red' icon={<TagOutlined />}>
-                                Giảm {formatPrice(item.discount_amount)}
+                              Discount {formatPrice(item.discount_amount)}
                               </Tag>
                             </div>
                           )}
@@ -543,7 +543,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                               icon={<HeartOutlined />}
                               className='text-gray-500 hover:text-pink-500 hover:bg-pink-50 mr-1'
                             >
-                              Lưu
+                              Save
                             </Button>
                             <Button
                               type='text'
@@ -552,7 +552,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                               onClick={() => handleRemoveItem(item.id)}
                               className='hover:bg-red-50'
                             >
-                              Xóa
+                              Remove
                             </Button>
                           </div>
                         </div>
@@ -567,9 +567,9 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
               <div className='flex items-center mb-4'>
                 <MessageOutlined className='text-xl text-blue-500 mr-3' />
                 <Typography.Title level={5} className='m-0'>
-                  Ghi chú đơn hàng
+                Order Note
                 </Typography.Title>
-                <Tooltip title='Thông tin thêm về đơn hàng hoặc yêu cầu đặc biệt khi giao hàng'>
+                <Tooltip title='Additional order notes or special delivery requests'>
                   <InfoCircleOutlined className='ml-2 text-gray-400' />
                 </Tooltip>
               </div>
@@ -592,7 +592,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                 <div className='bg-gradient-to-r from-orange-500 to-amber-500 -mx-6 -mt-6 py-4 px-6 text-white flex items-center mb-4'>
                   <GiftOutlined className='text-2xl mr-3' />
                   <Typography.Title level={5} className='m-0 text-white'>
-                    Mã giảm giá
+                  Discount Code
                   </Typography.Title>
                 </div>
 
@@ -603,14 +603,14 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
                         <Tag color='success' className='mr-2 text-base px-2 py-1'>
                           {cart.discount_code}
                         </Tag>
-                        <Typography.Text type='success'>Đã áp dụng</Typography.Text>
+                        <Typography.Text type='success'>Applied</Typography.Text>
                       </div>
                       <Button danger type='link' size='small' onClick={handleRemoveCoupon}>
-  Hủy
+                      Remove
 </Button>
 
                     </div>
-                    <div className='text-red-500 font-medium mt-2'>Giảm: {formatPrice(discount_amount)}</div>
+                    <div className='text-red-500 font-medium mt-2'>Discount: {formatPrice(discount_amount)}</div>
                   </div>
                 ) : (
                   <div>
@@ -650,7 +650,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
 }
 </div>
 <Typography.Text type='secondary' className='text-xs mt-2 block'>
-  Nhấp vào mã để sao chép, sau đó nhấn "Áp dụng"
+Click on a code to copy, then click "Apply"
 </Typography.Text>
 
                   </div>
@@ -685,7 +685,7 @@ const finalTotal = Math.max(selectedSubtotal - discountAmount, 0);
     <div className='flex justify-between'>
       <Typography.Text className='text-gray-500'>  {t('cart.shipping')}</Typography.Text>
       <Typography.Text className={selectedSubtotal >= freeShippingThreshold ? 'text-green-500 font-medium' : ''}>
-        {selectedSubtotal >= freeShippingThreshold ? 'Miễn phí' : 'Tính khi thanh toán'}
+        {selectedSubtotal >= freeShippingThreshold ? 'Free' : 'Calculated at checkout'}
       </Typography.Text>
     </div>
   </div>

@@ -34,9 +34,19 @@ const SignInScreen = () => {
   const [confirmationResult, setConfirmationResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    // Clean up recaptcha when component unmounts
+    return () => {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+    };
+  }, []);
+
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, provider.setCustomParameters({ prompt: 'select_account' }));
+      const result = await signInWithPopup(auth, provider);
       const user = result.user;
       const idToken = await user.getIdToken();
   
@@ -52,29 +62,58 @@ const SignInScreen = () => {
     }
   };
   
-
   const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible',
-        callback: () => {},
-      });
+    // Clear existing recaptcha if it exists
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (error) {
+        console.error("Error clearing reCAPTCHA:", error);
+      }
+      window.recaptchaVerifier = null;
     }
-    return window.recaptchaVerifier;
+    
+    try {
+      // Create a new recaptcha verifier with minimal options
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible'
+      });
+      
+      window.recaptchaVerifier = verifier;
+      return verifier;
+    } catch (error) {
+      console.error("RecaptchaVerifier creation error:", error);
+      message.error("Could not set up verification. Please try again.");
+      throw error;
+    }
   };
 
   const handleSendOtp = async () => {
     if (!phone) return message.error(t('auth.enter_phone_required'));
+    
     try {
       setLoading(true);
+      
+      // Format phone number correctly if it doesn't start with +
+      const formattedPhone = phone.startsWith('+') ? phone : `+${phone}`;
+      
+      console.log("Setting up reCAPTCHA...");
       const appVerifier = setupRecaptcha();
-      const result = await signInWithPhoneNumber(auth, phone, appVerifier);
+      
+      console.log("Sending OTP to:", formattedPhone);
+      const result = await signInWithPhoneNumber(auth, formattedPhone, appVerifier);
+      
+      console.log("OTP sent successfully");
       setConfirmationResult(result);
       setStep('otp');
       message.success(t('auth.otp_sent'));
     } catch (error) {
-      console.error(error);
-      message.error(t('auth.otp_failed'));
+      console.error('OTP Error:', error);
+      // More detailed error message to help with debugging
+      const errorMsg = error.code 
+        ? `${t('auth.otp_failed')}: ${error.code}` 
+        : `${t('auth.otp_failed')}: ${error.message}`;
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -127,65 +166,62 @@ const SignInScreen = () => {
     }
   };
   
-  
-
   // 👉 UI render theo step
   const renderStep = () => {
     switch (step) {
       case 'phone':
         return (
           <>
-<h2 className='text-lg font-semibold mb-4'>{t('auth.enter_phone')}</h2>
+            <h2 className='text-lg font-semibold mb-4'>{t('auth.enter_phone')}</h2>
 
-<Input
-  value={phone}
-  onChange={(e) => setPhone(e.target.value)}
-  placeholder='+84xxxxxxxxx'
-  className='mb-4'
-/>
+            <Input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder='+84xxxxxxxxx'
+              className='mb-4'
+            />
 
-<Button type='primary' loading={loading} className='w-full' onClick={handleSendOtp}>
-  {t('auth.send_otp')}
-</Button>
+            <div id="recaptcha-container"></div>
 
-<Button type='link' className='mt-2' onClick={() => setStep('method')}>
-  {t('auth.back')}
-</Button>
+            <Button type='primary' loading={loading} className='w-full' onClick={handleSendOtp}>
+              {t('auth.send_otp')}
+            </Button>
 
+            <Button type='link' className='mt-2' onClick={() => setStep('method')}>
+              {t('auth.back')}
+            </Button>
           </>
         );
       case 'otp':
         return (
           <>
-<h2 className='text-lg font-semibold mb-4'>{t('auth.enter_otp')}</h2>
+            <h2 className='text-lg font-semibold mb-4'>{t('auth.enter_otp')}</h2>
 
-<Input
-  value={otp}
-  onChange={(e) => setOtp(e.target.value)}
-  placeholder={t('auth.enter_otp')}
-  prefix={<LockOutlined />}
-  className='mb-4'
-/>
+            <Input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder={t('auth.enter_otp')}
+              prefix={<LockOutlined />}
+              className='mb-4'
+            />
 
-<Button type='primary' loading={loading} className='w-full' onClick={handleVerifyOtp}>
-  {t('auth.verify_otp')}
-</Button>
-
+            <Button type='primary' loading={loading} className='w-full' onClick={handleVerifyOtp}>
+              {t('auth.verify_otp')}
+            </Button>
           </>
         );
       default:
         return (
           <>
-<h2 className='text-lg font-semibold mb-4'>{t('auth.choose_method')}</h2>
+            <h2 className='text-lg font-semibold mb-4'>{t('auth.choose_method')}</h2>
 
-<Button type='primary' icon={<GoogleOutlined />} className='w-full mb-3' onClick={handleGoogleLogin}>
-  {t('auth.google_login')}
-</Button>
+            <Button type='primary' icon={<GoogleOutlined />} className='w-full mb-3' onClick={handleGoogleLogin}>
+              {t('auth.google_login')}
+            </Button>
 
-<Button icon={<PhoneOutlined />} className='w-full' onClick={() => setStep('phone')}>
-  {t('auth.phone_login')}
-</Button>
-
+            <Button icon={<PhoneOutlined />} className='w-full' onClick={() => setStep('phone')}>
+              {t('auth.phone_login')}
+            </Button>
           </>
         );
     }

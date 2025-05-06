@@ -81,41 +81,41 @@ const QBEditor = () => {
   const createMutation = useMutation({
     mutationFn: createQB,
     onSuccess: () => {
-      message.success('Tạo mới quy tắc giá theo số lượng thành công!');
+      message.success('Quantity break rule created successfully!');
       navigate('/admin/discounts/qb');
       queryClient.invalidateQueries(['quantityBreaks']);
     },
     onError: (error) => {
-      message.error(`Lỗi khi tạo quy tắc: ${error.message}`);
+      message.error(`Error creating rule: ${error.message}`);
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (data) => updateQB(id, data),
     onSuccess: () => {
-      message.success('Cập nhật quy tắc giá theo số lượng thành công!');
+      message.success('Quantity break rule updated successfully!');
       navigate('/admin/discounts/qb');
       queryClient.invalidateQueries(['quantityBreaks']);
       queryClient.invalidateQueries(['quantityBreak', id]);
     },
     onError: (error) => {
-      message.error(`Lỗi khi cập nhật quy tắc: ${error.message}`);
+      message.error(`Error updating rule: ${error.message}`);
     },
   });
 
   const [openPreviewModal, setOpenPreviewModal] = useState(false);
   const QBFormSchema = z.object({
-    title: z.string().min(1, { message: 'Tên quy tắc không được để trống' }),
+    title: z.string().min(1, { message: 'Rule name cannot be empty' }),
     description: z.string().optional(),
     qb_rules: z
       .array(
         z.object({
-          quantity: z.number().min(1, { message: 'Số lượng phải lớn hơn 0' }),
+          quantity: z.number().min(1, { message: 'Quantity must be greater than 0' }),
           discount_type: z.enum(['percentage', 'fixed']),
-          value: z.number().min(0, { message: 'Giá trị giảm giá phải lớn hơn hoặc bằng 0' }),
+          value: z.number().min(0, { message: 'Discount value must be greater than or equal to 0' }),
         }),
       )
-      .min(1, { message: 'Phải có ít nhất một mức giảm giá' }),
+      .min(1, { message: 'Must have at least one discount level' }),
     start_date: z.coerce.date(),
     end_date: z.coerce.date().nullable(),
     customer_type: z.string(),
@@ -284,7 +284,7 @@ const QBEditor = () => {
 
   const resetForm = () => {
     reset(defaultValues);
-    message.success('Đã hoàn tác các thay đổi!');
+    message.success('Changes have been reset!');
   };
 
   const renderPreview = () => {
@@ -295,34 +295,34 @@ const QBEditor = () => {
     return (
       <div className='space-y-6'>
         <div className='bg-gray-50 p-4 rounded-lg'>
-          <h3 className='font-bold text-lg'>{title || 'Chưa có tiêu đề'}</h3>
-          <p className='text-gray-600'>{description || 'Không có mô tả'}</p>
+          <h3 className='font-bold text-lg'>{title || 'No title'}</h3>
+          <p className='text-gray-600'>{description || 'No description'}</p>
         </div>
 
-        <h4 className='font-semibold'>Các mức giảm giá:</h4>
+        <h4 className='font-semibold'>Discount Levels:</h4>
         <Table
           dataSource={rules}
           rowKey={(record, index) => index}
           pagination={false}
           columns={[
             {
-              title: 'Từ (số lượng)',
+              title: 'From (quantity)',
               dataIndex: 'quantity',
               key: 'quantity',
               render: (quantity) => <span className='font-medium'>{quantity}</span>,
             },
             {
-              title: 'Loại giảm giá',
+              title: 'Discount Type',
               dataIndex: 'discount_type',
               key: 'discount_type',
               render: (type) => (
                 <Tag color={type === 'percentage' ? 'green' : 'blue'}>
-                  {type === 'percentage' ? 'Phần trăm' : 'Giảm trực tiếp'}
+                  {type === 'percentage' ? 'Percentage' : 'Fixed Amount'}
                 </Tag>
               ),
             },
             {
-              title: 'Giá trị',
+              title: 'Value',
               dataIndex: 'value',
               key: 'value',
               render: (value, record) => (
@@ -336,29 +336,29 @@ const QBEditor = () => {
 
         <div className='grid grid-cols-2 gap-4 mt-4'>
           <div>
-            <h4 className='font-semibold'>Áp dụng cho:</h4>
+            <h4 className='font-semibold'>Applied to:</h4>
             <p>
-              <span className='text-gray-600'>Khách hàng: </span>
-              {customer_type === 'all' ? 'Tất cả khách hàng' : `${selected_customers.length} khách hàng đã chọn`}
+              <span className='text-gray-600'>Customers: </span>
+              {customer_type === 'all' ? 'All customers' : `${selected_customers.length} selected customers`}
             </p>
             <p>
-              <span className='text-gray-600'>Thị trường: </span>
-              {market_type === 'all' ? 'Tất cả thị trường' : `${selected_markets.length} thị trường đã chọn`}
+              <span className='text-gray-600'>Markets: </span>
+              {market_type === 'all' ? 'All markets' : `${selected_markets.length} selected markets`}
             </p>
             <p>
-              <span className='text-gray-600'>Sản phẩm: </span>
-              {product_type === 'all' ? 'Tất cả sản phẩm' : `${selected_products.length} sản phẩm đã chọn`}
+              <span className='text-gray-600'>Products: </span>
+              {product_type === 'all' ? 'All products' : `${selected_products.length} selected products`}
             </p>
           </div>
           <div>
-            <h4 className='font-semibold'>Thời gian áp dụng:</h4>
+            <h4 className='font-semibold'>Application Period:</h4>
             <p>
-              <span className='text-gray-600'>Bắt đầu: </span>
-              {watch('start_date')?.format('DD/MM/YYYY') || 'Chưa thiết lập'}
+              <span className='text-gray-600'>Start: </span>
+              {watch('start_date')?.format('DD/MM/YYYY') || 'Not set'}
             </p>
             <p>
-              <span className='text-gray-600'>Kết thúc: </span>
-              {watch('end_date')?.format('DD/MM/YYYY') || 'Không giới hạn'}
+              <span className='text-gray-600'>End: </span>
+              {watch('end_date')?.format('DD/MM/YYYY') || 'No limit'}
             </p>
           </div>
         </div>
@@ -370,10 +370,10 @@ const QBEditor = () => {
     <div className='p-6 rounded-lg max-w-[1100px] mx-auto'>
       {/* Header với nút quay lại/lưu/hoàn tác */}
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-2xl font-semibold'>{id ? 'Chỉnh sửa' : 'Tạo mới'} Quy tắc giá theo số lượng</h2>
+        <h2 className='text-2xl font-semibold'>{id ? 'Edit' : 'Create'} Quantity Break Rule</h2>
         <div className='flex gap-3'>
           <Button icon={<RollbackOutlined />} onClick={goBack} className='flex items-center gap-1'>
-            Quay lại
+            Back
           </Button>
           <Button
             type='default'
@@ -382,7 +382,7 @@ const QBEditor = () => {
             disabled={!isDirty}
             className='flex items-center gap-1'
           >
-            Hoàn tác
+            Undo
           </Button>
           <Button
             type='primary'
@@ -391,7 +391,7 @@ const QBEditor = () => {
             loading={isLoading}
             className='flex items-center gap-1'
           >
-            {id ? 'Cập nhật' : 'Lưu'}
+            {id ? 'Update' : 'Save'}
           </Button>
         </div>
       </div>
@@ -399,19 +399,19 @@ const QBEditor = () => {
       <Form layout='vertical' onFinish={handleSubmit(onSubmit)} className='space-y-6'>
         {/* Thông tin cơ bản */}
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Thông tin cơ bản</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Basic Information</label>
           <Card className='w-full space-y-4 p-4 shadow-sm col-span-7'>
             <Controller
               name='title'
               control={control}
               render={({ field }) => (
                 <Form.Item
-                  label='Tên quy tắc'
+                  label='Rule Name'
                   required
                   validateStatus={errors.title ? 'error' : ''}
                   help={errors.title?.message}
                 >
-                  <Input {...field} placeholder='Nhập tên quy tắc giá theo số lượng' />
+                  <Input {...field} placeholder='Enter quantity break rule name' />
                 </Form.Item>
               )}
             />
@@ -420,8 +420,8 @@ const QBEditor = () => {
               name='description'
               control={control}
               render={({ field }) => (
-                <Form.Item label='Mô tả'>
-                  <Input.TextArea {...field} placeholder='Nhập mô tả chi tiết' rows={3} />
+                <Form.Item label='Description'>
+                  <Input.TextArea {...field} placeholder='Enter detailed description' rows={3} />
                 </Form.Item>
               )}
             />
@@ -432,12 +432,12 @@ const QBEditor = () => {
                 control={control}
                 render={({ field }) => (
                   <Form.Item
-                    label='Ngày bắt đầu'
+                    label='Start Date'
                     required
                     validateStatus={errors.start_date ? 'error' : ''}
                     help={errors.start_date?.message}
                   >
-                    <DatePicker {...field} className='w-full' format='DD/MM/YYYY' placeholder='Chọn ngày bắt đầu' />
+                    <DatePicker {...field} className='w-full' format='DD/MM/YYYY' placeholder='Select start date' />
                   </Form.Item>
                 )}
               />
@@ -446,12 +446,12 @@ const QBEditor = () => {
                 name='end_date'
                 control={control}
                 render={({ field }) => (
-                  <Form.Item label='Ngày kết thúc' extra='Để trống nếu không giới hạn'>
+                  <Form.Item label='End Date' extra='Leave empty if no limit'>
                     <DatePicker
                       {...field}
                       className='w-full'
                       format='DD/MM/YYYY'
-                      placeholder='Chọn ngày kết thúc'
+                      placeholder='Select end date'
                       disabledDate={(current) => current && current < watch('start_date')}
                     />
                   </Form.Item>
@@ -462,8 +462,8 @@ const QBEditor = () => {
         </div>
         <div className='grid grid-cols-12 gap-6'>
           <label className='ml-4 font-medium text-base col-span-5'>
-            Mức giảm giá theo số lượng
-            <Tooltip title='Thiết lập các mức giảm giá dựa trên số lượng sản phẩm được đặt hàng'>
+            Quantity Break Discount Levels
+            <Tooltip title='Set discount levels based on ordered product quantity'>
               <QuestionCircleOutlined className='ml-2 text-gray-400' />
             </Tooltip>
           </label>
@@ -476,7 +476,7 @@ const QBEditor = () => {
                 >
                   <div className='col-span-3'>
                     <Form.Item
-                      label={`Từ SL`}
+                      label={`From Qty`}
                       validateStatus={errors.qb_rules?.[index]?.quantity ? 'error' : ''}
                       help={errors.qb_rules?.[index]?.quantity?.message}
                       className='mb-0'
@@ -485,14 +485,14 @@ const QBEditor = () => {
                         name={`qb_rules.${index}.quantity`}
                         control={control}
                         render={({ field }) => (
-                          <InputNumber {...field} min={1} className='w-full' placeholder='Số lượng' />
+                          <InputNumber {...field} min={1} className='w-full' placeholder='Quantity' />
                         )}
                       />
                     </Form.Item>
                   </div>
 
                   <div className='col-span-4'>
-                    <Form.Item label='Loại giảm giá' className='mb-0'>
+                    <Form.Item label='Discount Type' className='mb-0'>
                       <Controller
                         name={`qb_rules.${index}.discount_type`}
                         control={control}
@@ -500,8 +500,8 @@ const QBEditor = () => {
                           <Select
                             {...field}
                             options={[
-                              { label: 'Phần trăm', value: 'percentage' },
-                              { label: 'Giảm trực tiếp', value: 'fixed' },
+                              { label: 'Percentage', value: 'percentage' },
+                              { label: 'Fixed Amount', value: 'fixed' },
                             ]}
                           />
                         )}
@@ -511,7 +511,7 @@ const QBEditor = () => {
 
                   <div className='col-span-4'>
                     <Form.Item
-                      label='Giá trị'
+                      label='Value'
                       validateStatus={errors.qb_rules?.[index]?.value ? 'error' : ''}
                       help={errors.qb_rules?.[index]?.value?.message}
                       className='mb-0'
@@ -525,7 +525,7 @@ const QBEditor = () => {
                             min={0}
                             max={watch(`qb_rules.${index}.discount_type`) === 'percentage' ? 100 : undefined}
                             className='w-full'
-                            placeholder='Giá trị'
+                            placeholder='Value'
                             addonAfter={watch(`qb_rules.${index}.discount_type`) === 'percentage' ? '%' : 'đ'}
                           />
                         )}
@@ -542,22 +542,22 @@ const QBEditor = () => {
               ))}
 
               <Button type='dashed' onClick={addRule} block icon={<PlusOutlined />}>
-                Thêm mức giá
+                Add Price Level
               </Button>
             </div>
           </Card>
         </div>
 
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Chọn thị trường</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Select Markets</label>
           <Card className='w-full p-4 shadow-sm space-y-4 col-span-7'>
             <Controller
               name='market_type'
               control={control}
               render={({ field }) => (
                 <Radio.Group {...field} className='flex flex-col space-y-3'>
-                  <Radio value='all'>Tất cả thị trường</Radio>
-                  <Radio value='specific'>Thị trường cụ thể</Radio>
+                  <Radio value='all'>All Markets</Radio>
+                  <Radio value='specific'>Specific Markets</Radio>
                 </Radio.Group>
               )}
             />
@@ -571,7 +571,7 @@ const QBEditor = () => {
                     render={({ field }) => (
                       <Select
                         mode='multiple'
-                        placeholder='Chọn thị trường'
+                        placeholder='Select markets'
                         options={markets?.data?.map((m) => ({
                           label: m.name === 'VietNam' ? '🇻🇳 VN' : '🇬🇧 US-UK',
                           value: m.id,
@@ -588,7 +588,7 @@ const QBEditor = () => {
         </div>
 
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Áp dụng cho khách hàng</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Apply to Customers</label>
           <Card className='w-full p-4 shadow-sm col-span-7'>
             <Controller
               name='customer_type'
@@ -596,8 +596,8 @@ const QBEditor = () => {
               render={({ field }) => (
                 <>
                   <Radio.Group {...field} className='flex flex-col space-y-3'>
-                    <Radio value='all'>Tất cả khách hàng</Radio>
-                    <Radio value='specific'>Chọn khách hàng cụ thể</Radio>
+                    <Radio value='all'>All Customers</Radio>
+                    <Radio value='specific'>Select Specific Customers</Radio>
                   </Radio.Group>
                   <div className='pt-4'>
                     {customer_type === 'specific' && (
@@ -608,7 +608,7 @@ const QBEditor = () => {
                           render={({ field }) => (
                             <Select
                               mode='multiple'
-                              placeholder='Chọn khách hàng'
+                              placeholder='Select customers'
                               options={customers?.data?.map((c) => ({
                                 label: c.name,
                                 value: c.id,
@@ -628,7 +628,7 @@ const QBEditor = () => {
         </div>
 
         <div className='grid grid-cols-12 gap-6'>
-          <label className='ml-4 font-medium text-base col-span-5'>Áp dụng cho sản phẩm</label>
+          <label className='ml-4 font-medium text-base col-span-5'>Apply to Products</label>
           <Card className='w-full p-4 shadow-sm col-span-7'>
             <Controller
               name='product_type'
@@ -636,8 +636,8 @@ const QBEditor = () => {
               render={({ field }) => (
                 <>
                   <Radio.Group {...field} className='flex flex-col space-y-3'>
-                    <Radio value='all'>Tất cả sản phẩm</Radio>
-                    <Radio value='specific'>Sản phẩm cụ thể</Radio>
+                    <Radio value='all'>All Products</Radio>
+                    <Radio value='specific'>Specific Products</Radio>
                   </Radio.Group>
                   {product_type === 'specific' && (
                     <div className='p-4 mt-4 max-h-[400px] overflow-y-auto border border-gray-200 rounded-lg'>
@@ -666,7 +666,7 @@ const QBEditor = () => {
               onClick={() => setOpenPreviewModal(true)}
               className='flex items-center gap-2 border-gray-300'
             >
-              Xem trước
+              Preview
             </Button>
             <Button
               type='primary'
@@ -675,20 +675,20 @@ const QBEditor = () => {
               className='flex items-center gap-2'
               loading={isLoading}
             >
-              {id ? 'Cập nhật' : 'Lưu'}
+              {id ? 'Update' : 'Save'}
             </Button>
           </Space>
         </div>
       </Form>
 
       <Modal
-        title='Xem trước Quy tắc giá theo số lượng'
+        title='Preview Quantity Break Rule'
         open={openPreviewModal}
         onCancel={() => setOpenPreviewModal(false)}
         width={700}
         footer={[
           <Button key='close' onClick={() => setOpenPreviewModal(false)}>
-            Đóng
+            Close
           </Button>,
         ]}
       >

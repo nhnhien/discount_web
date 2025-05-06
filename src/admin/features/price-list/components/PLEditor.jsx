@@ -22,7 +22,7 @@ import { getMarket } from '@/service/market';
 import ProductPriceTable from '../ProductPriceTable';
 
 const schema = z.object({
-  title: z.string().min(1, 'Vui lòng nhập tên bảng giá'),
+  title: z.string().min(1, 'Please enter price list name'),
   description: z.string().optional(),
   start_date: z.any(),
   end_date: z.any().nullable(),
@@ -54,25 +54,25 @@ const PLEditor = () => {
   const createMutation = useMutation({
     mutationFn: (data) => createRule(data, true), // ✅ is_price_list = true
     onSuccess: () => {
-      message.success('Tạo bảng giá thành công');
+      message.success('Price list created successfully');
       queryClient.invalidateQueries(['price-list-rules']);
       navigate('/admin/discounts/pl');
     },
     onError: () => {
-      message.error('Tạo bảng giá thất bại');
+      message.error('Failed to create price list');
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (data) => updateRule(id, data, true),
     onSuccess: () => {
-      message.success('Cập nhật bảng giá thành công');
+      message.success('Price list updated successfully');
       queryClient.invalidateQueries(['price-list-rules']);
       queryClient.invalidateQueries(['price-list', id]);
       navigate('/admin/discounts/pl');
     },
     onError: () => {
-      message.error('Cập nhật bảng giá thất bại');
+      message.error('Failed to update price list');
     },
   });
 
@@ -136,7 +136,7 @@ const PLEditor = () => {
     );
   
     if (validAmounts.length === 0) {
-      message.error('Vui lòng nhập giá cố định cho ít nhất 1 sản phẩm hoặc biến thể');
+      message.error('Please enter fixed price for at least 1 product or variant');
       return;
     }
   
@@ -167,7 +167,7 @@ const PLEditor = () => {
   return (
     <div className='max-w-[1000px] mx-auto px-6 pt-8 pb-16'>
       <div className='flex justify-between items-center mb-6'>
-        <h2 className='text-2xl font-semibold'>{id ? 'Chỉnh sửa' : 'Tạo mới'} Bảng Giá</h2>
+        <h2 className='text-2xl font-semibold'>{id ? 'Edit' : 'Create'} Price List</h2>
         <div className='space-x-3'>
           <Button icon={<RollbackOutlined />} onClick={() => navigate('/admin/discounts/pl')}>
             Quay lại
@@ -178,16 +178,16 @@ const PLEditor = () => {
   onClick={handleSubmit(onSubmit)}
   disabled={customPrices.filter(p => Number(p.amount) > 0).length === 0}
 >
-  {id ? 'Cập nhật' : 'Lưu'}
+  {id ? 'Update' : 'Save'}
 </Button>
 
         </div>
       </div>
 
       <Form layout='vertical' onFinish={handleSubmit(onSubmit)} className='space-y-6'>
-        <Card title='Thông tin cơ bản'>
+        <Card title='Basic Information'>
           <Form.Item
-            label='Tên bảng giá'
+            label='Price List Name'
             validateStatus={errors.title ? 'error' : ''}
             help={errors.title?.message}
             required
@@ -195,22 +195,22 @@ const PLEditor = () => {
             <Controller
               name='title'
               control={control}
-              render={({ field }) => <Input {...field} placeholder='Nhập tiêu đề bảng giá' />}
+              render={({ field }) => <Input {...field} placeholder='Enter price list title' />}
             />
           </Form.Item>
 
-          <Form.Item label='Mô tả'>
+          <Form.Item label='Description'>
             <Controller
               name='description'
               control={control}
               render={({ field }) => (
-                <Input.TextArea {...field} placeholder='Mô tả ngắn về bảng giá' rows={3} />
+                <Input.TextArea {...field} placeholder='Brief description of the price list' rows={3} />
               )}
             />
           </Form.Item>
 
           <div className='grid grid-cols-2 gap-4'>
-            <Form.Item label='Ngày bắt đầu' required>
+            <Form.Item label='Start Date' required>
               <Controller
                 name='start_date'
                 control={control}
@@ -219,7 +219,7 @@ const PLEditor = () => {
                 )}
               />
             </Form.Item>
-            <Form.Item label='Ngày kết thúc'>
+            <Form.Item label='End Date'>
               <Controller
                 name='end_date'
                 control={control}
@@ -231,15 +231,15 @@ const PLEditor = () => {
           </div>
         </Card>
 
-        <Card title='Áp dụng cho thị trường'>
-          <Form.Item label='Chọn thị trường'>
+        <Card title='Apply to Markets'>
+          <Form.Item label='Select Market'>
             <Controller
               name='market_type'
               control={control}
               render={({ field }) => (
                 <Radio.Group {...field}>
-                  <Radio value='all'>Tất cả thị trường</Radio>
-                  <Radio value='specific'>Chọn thị trường cụ thể</Radio>
+                  <Radio value='all'>All Markets</Radio>
+                  <Radio value='specific'>Select Specific Markets</Radio>
                 </Radio.Group>
               )}
             />
@@ -247,7 +247,7 @@ const PLEditor = () => {
 
           {watch('market_type') === 'specific' && (
             <Form.Item
-              label='Thị trường cụ thể'
+              label='Specific Markets'
               validateStatus={errors?.selected_markets ? 'error' : ''}
               help={errors?.selected_markets?.message}
               required
@@ -255,12 +255,12 @@ const PLEditor = () => {
               <Controller
                 name='selected_markets'
                 control={control}
-                rules={{ required: 'Vui lòng chọn ít nhất một thị trường' }}
+                rules={{ required: 'Please select at least one market' }}
                 render={({ field }) => (
                   <Select
                     {...field}
                     mode='multiple'
-                    placeholder='Chọn thị trường'
+                    placeholder='Select markets'
                     options={marketData?.data?.map((m) => ({
                       label: m.name === 'VietNam' ? '🇻🇳 Việt Nam' : '🌍 US/UK',
                       value: m.id,
@@ -272,7 +272,7 @@ const PLEditor = () => {
           )}
         </Card>
 
-        <Card title='Giá tùy chỉnh theo sản phẩm' className='mt-6'>
+        <Card title='Custom Prices by Product' className='mt-6'>
           <ProductPriceTable
             products={productData?.data || []}
             customPrices={customPrices}

@@ -45,7 +45,7 @@ const { RangePicker } = DatePicker;
 const { Option } = Select;
 ChartJS.register(TimeScale);
 
-const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Biến động giá' }) => {
+const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Price Fluctuation' }) => {
   const [activeTab, setActiveTab] = useState('chart');
   const [priceType, setPriceType] = useState('final');
   const [timeRange, setTimeRange] = useState('all');
@@ -82,7 +82,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       labels: filteredData.map((item) => new Date(item.changed_at)),
       datasets: [
         {
-          label: priceType === 'final' ? 'Giá bán' : 'Giá gốc',
+          label: priceType === 'final' ? 'Final Price' : 'Original Price',
           data: filteredData.map((item) => item.new_price),
           borderColor: priceType === 'final' ? '#f5222d' : '#1890ff',
           backgroundColor: priceType === 'final' ? 'rgba(245, 34, 45, 0.1)' : 'rgba(24, 144, 255, 0.1)',
@@ -156,7 +156,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
         },
         title: {
           display: true,
-          text: 'Thời gian',
+          text: 'Time',
           font: {
             size: 14,
           },
@@ -169,7 +169,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       y: {
         title: {
           display: true,
-          text: 'Giá (VNĐ)',
+          text: 'Price (VNĐ)',
           font: {
             size: 14,
           },
@@ -247,13 +247,13 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
         new_price: item.new_price,
         change_amount: item.new_price - item.old_price,
         change_percentage: calculatePercentChange(item.old_price, item.new_price),
-        change_reason: item.change_reason || 'Không có thông tin',
-        changed_by: item.user?.username || 'Hệ thống',
+        change_reason: item.change_reason || 'No information',
+        changed_by: item.user?.username || 'System',
       }));
   }, [data, priceType, timeRange, customDateRange]);
 
   const getPriceChangeDisplay = (changeAmount, changePercentage) => {
-    if (!changePercentage && changePercentage !== 0) return <Text type='secondary'>Giá đầu tiên</Text>;
+    if (!changePercentage && changePercentage !== 0) return <Text type='secondary'>First Recorded Price</Text>;
 
     if (changeAmount > 0) {
       return (
@@ -270,7 +270,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
     } else {
       return (
         <Text>
-          <DashOutlined /> Không thay đổi (0%)
+          <DashOutlined /> No change (0%)
         </Text>
       );
     }
@@ -278,7 +278,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
 
   const columns = [
     {
-      title: 'Thời gian',
+      title: 'Date',
       dataIndex: 'changed_at',
       key: 'changed_at',
       render: (date) => (
@@ -286,30 +286,30 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       ),
     },
     {
-      title: 'Giá cũ',
+      title: 'Old Price',
       dataIndex: 'old_price',
       key: 'old_price',
       render: (price) => (price ? formatVND(price) : '-'),
     },
     {
-      title: 'Giá mới',
+      title: 'New Price',
       dataIndex: 'new_price',
       key: 'new_price',
       render: (price) => <Text strong>{formatVND(price)}</Text>,
     },
     {
-      title: 'Thay đổi',
+      title: 'Change',
       key: 'change',
       render: (_, record) => getPriceChangeDisplay(record.change_amount, record.change_percentage),
     },
     {
-      title: 'Người thay đổi',
+      title: 'Changed By',
       dataIndex: 'changed_by',
       key: 'changed_by',
       render: (user) => <Tag color='blue'>{user}</Tag>,
     },
     {
-      title: 'Lý do',
+      title: 'Reason',
       dataIndex: 'change_reason',
       key: 'change_reason',
       ellipsis: {
@@ -317,7 +317,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       },
       render: (reason) => (
         <Tooltip title={reason}>
-          <span>{reason || 'Không có thông tin'}</span>
+          <span>{reason || 'No information'}</span>
         </Tooltip>
       ),
     },
@@ -364,15 +364,15 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
         <Card size='small'>
           <Statistic
-            title='Giá cao nhất / thấp nhất'
+            title='Highest / Lowest Price'
             value={`${formatVND(highestPrice)} / ${lowestPrice < Number.MAX_VALUE ? formatVND(lowestPrice) : '-'}`}
           />
         </Card>
         <Card size='small'>
           <Statistic
-            title='Số lần thay đổi giá'
+            title='Number of Price Changes'
             value={priceChangeCount}
-            suffix={`lần ${priceType === 'final' ? '(giá bán)' : '(giá gốc)'}`}
+            suffix={`times ${priceType === 'final' ? '(final price)' : '(original price)'}`}
           />
         </Card>
       </div>
@@ -383,7 +383,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
     if (isLoading) {
       return (
         <div className='flex items-center justify-center py-16'>
-          <Spin size='large' tip='Đang tải dữ liệu biến động giá...' />
+          <Spin size='large' tip='Loading price fluctuation data...' />
         </div>
       );
     }
@@ -394,8 +394,8 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
             <span>
-              Không thể tải dữ liệu biến động giá. <br />
-              Vui lòng thử lại sau.
+              Unable to load price fluctuation data. <br />
+              Please try again later.
             </span>
           }
         />
@@ -408,8 +408,8 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
             <span>
-              Chưa có dữ liệu biến động giá cho sản phẩm này. <br />
-              Thay đổi giá sẽ được ghi lại tự động trong hệ thống.
+              No price fluctuation data available for this product. <br />
+              Price changes will be automatically recorded in the system.
             </span>
           }
         />
@@ -424,7 +424,7 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
             {chartData ? (
               <Line data={chartData} options={chartOptions} />
             ) : (
-              <Empty description='Không có dữ liệu thỏa mãn điều kiện lọc' image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              <Empty description='No data matching the filter criteria' image={Empty.PRESENTED_IMAGE_SIMPLE} />
             )}
           </div>
         </>
@@ -441,11 +441,11 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
               pageSize: 5,
               showSizeChanger: true,
               pageSizeOptions: ['5', '10', '20'],
-              showTotal: (total) => `Tổng cộng ${total} bản ghi`,
+              showTotal: (total) => `Total ${total} records`,
             }}
             scroll={{ x: 800 }}
             locale={{
-              emptyText: 'Không có dữ liệu thỏa mãn điều kiện lọc',
+              emptyText: 'No data matching the filter criteria',
             }}
           />
         </>
@@ -463,8 +463,8 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
       }
       className='shadow-sm mb-4'
       extra={
-        <Button type='text' icon={<DownloadOutlined />} onClick={() => {}} title='Xuất dữ liệu'>
-          Xuất
+        <Button type='text' icon={<DownloadOutlined />} onClick={() => {}} title='Export Data'>
+          Export
         </Button>
       }
     >
@@ -476,8 +476,8 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
             buttonStyle='solid'
             size='middle'
           >
-            <Radio.Button value='final'>Giá bán</Radio.Button>
-            <Radio.Button value='original'>Giá gốc</Radio.Button>
+            <Radio.Button value='final'>Final Price</Radio.Button>
+            <Radio.Button value='original'>Original Price</Radio.Button>
           </Radio.Group>
 
           <Radio.Group
@@ -487,10 +487,10 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
             size='middle'
           >
             <Radio.Button value='chart'>
-              <LineChartOutlined /> Biểu đồ
+              <LineChartOutlined /> Chart
             </Radio.Button>
             <Radio.Button value='table'>
-              <TableOutlined /> Bảng
+              <TableOutlined /> Table
             </Radio.Button>
           </Radio.Group>
         </Space>
@@ -504,11 +504,11 @@ const PriceTrendChart = ({ productId, variantId, isVariant = false, title = 'Bi�
             }}
             style={{ width: 120 }}
           >
-            <Option value='all'>Tất cả</Option>
-            <Option value='30d'>30 ngày</Option>
-            <Option value='90d'>90 ngày</Option>
-            <Option value='1y'>1 năm</Option>
-            <Option value='custom'>Tùy chỉnh</Option>
+            <Option value='all'>All</Option>
+            <Option value='30d'>30 days</Option>
+            <Option value='90d'>90 days</Option>
+            <Option value='1y'>1 year</Option>
+            <Option value='custom'>Custom</Option>
           </Select>
 
           {timeRange === 'custom' && (

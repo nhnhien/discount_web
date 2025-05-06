@@ -26,12 +26,12 @@ const getAdminNavigationItems = (t) => [
     children: [
       {
         id: 31,
-        title: 'Sản phẩm',
+        title: 'Products',
         link: '/admin/product',
       },
       {
         id: 32,
-        title: 'Danh mục',
+        title: 'Categories',
         link: '/admin/category',
       },
     ],

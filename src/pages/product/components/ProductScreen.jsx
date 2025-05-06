@@ -109,10 +109,10 @@ const ProductsScreen = () => {
         {/* Breadcrumb */}
         <Breadcrumb className='mb-6'>
           <Breadcrumb.Item href='/'>
-            <HomeOutlined /> Trang chủ
+            <HomeOutlined /> Home
           </Breadcrumb.Item>
           <Breadcrumb.Item>
-            <AppstoreOutlined /> Sản phẩm
+            <AppstoreOutlined /> Products
           </Breadcrumb.Item>
           {currentCategory && <Breadcrumb.Item>{currentCategory.name}</Breadcrumb.Item>}
         </Breadcrumb>
@@ -128,9 +128,9 @@ const ProductsScreen = () => {
                 value={filters.sortBy}
                 onChange={handleSortChange}
                 options={[
-                  { value: 'newest', label: 'Mới nhất' },
-                  { value: 'price_asc', label: 'Giá: Thấp đến cao' },
-                  { value: 'price_desc', label: 'Giá: Cao đến thấp' },
+                  { value: 'newest', label: 'Newest' },
+                  { value: 'price_asc', label: 'Price: Low to High' },
+                  { value: 'price_desc', label: 'Price: High to Low' },
                 ]}
               />
             </div>
@@ -141,10 +141,10 @@ const ProductsScreen = () => {
             <div className='bg-white p-6 rounded-lg shadow-sm mb-6'>
               <div className='flex flex-col md:flex-row justify-between items-start md:items-center mb-6'>
                 <Title level={4} className='m-0 mb-4 md:mb-0'>
-                  {currentCategory ? currentCategory.name : 'Tất cả sản phẩm'}
+                  {currentCategory ? currentCategory.name : 'All Products'}
                 </Title>
                 <Input.Search
-                  placeholder='Tìm kiếm sản phẩm...'
+                  placeholder='Search for products...'
                   allowClear
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
@@ -157,7 +157,7 @@ const ProductsScreen = () => {
               {filters.search && (
                 <div className='mb-4'>
                   <Tag closable onClose={() => handleSearch('')}>
-                    Tìm kiếm: {filters.search}
+                  Search: {filters.search}
                   </Tag>
                 </div>
               )}
@@ -168,15 +168,15 @@ const ProductsScreen = () => {
                 </div>
               ) : isError ? (
                 <div className='flex justify-center items-center h-64'>
-                  <Empty description='Đã có lỗi xảy ra khi tải sản phẩm' />
+                  <Empty description='An error occurred while loading products' />
                 </div>
               ) : productsData?.data?.length === 0 ? (
                 <Empty
                   description={
                     <span>
-                      Không tìm thấy sản phẩm
-                      {filters.search ? ` phù hợp với "${filters.search}"` : ''}
-                      {currentCategory ? ` trong danh mục "${currentCategory.name}"` : ''}
+                      No products found
+                      {filters.search ? ` matching "${filters.search}"` : ''}
+                      {currentCategory ? ` in category "${currentCategory.name}"` : ''}
                     </span>
                   }
                 />
@@ -202,7 +202,7 @@ const ProductsScreen = () => {
                       total={productsData.pagination?.total || 0}
                       onChange={handlePageChange}
                       showSizeChanger
-                      showTotal={(total, range) => `${range[0]}-${range[1]} của ${total} sản phẩm`}
+                      showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} products`}
                     />
                   </div>
                 </>

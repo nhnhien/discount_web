@@ -187,7 +187,7 @@ const ProfileScreen = () => {
               </Tag>
             )}
             <Tag icon={<HomeOutlined />} color="purple">
-              {addressData?.data?.length || 0} địa chỉ
+              {addressData?.data?.length || 0} Address
             </Tag>
           </div>
         </div>
@@ -197,7 +197,7 @@ const ProfileScreen = () => {
         <TabPane 
           tab={
             <span className="px-1">
-              <UserOutlined /> Thông tin cá nhân
+              <UserOutlined /> Personal information
             </span>
           } 
           key="1"
@@ -224,7 +224,7 @@ const ProfileScreen = () => {
                 <Input 
                   disabled 
                   value={user?.email || 'Không có'} 
-                  placeholder="Chưa có email" 
+                  placeholder="No email provided" 
                   className="disabled:bg-gray-50 disabled:text-gray-500"
                 />
               </Form.Item>
@@ -257,7 +257,7 @@ const ProfileScreen = () => {
                     loading={updatePhoneMutation.isPending}
                     className="shadow-sm hover:shadow transition-shadow duration-300"
                   >
-                    Cập nhật số điện thoại
+                    Update phone number
                   </Button>
                 </Form.Item>
               )}
@@ -268,7 +268,7 @@ const ProfileScreen = () => {
         <TabPane 
           tab={
             <span className="px-1">
-              <EnvironmentOutlined /> Địa chỉ giao hàng
+              <EnvironmentOutlined /> Shipping address
             </span>
           } 
           key="2"
@@ -283,7 +283,7 @@ const ProfileScreen = () => {
                 onClick={() => openAddressModal()}
                 className="shadow-sm hover:shadow transition-shadow duration-300"
               >
-                Thêm địa chỉ
+                Add address
               </Button>
             }
           >
@@ -396,7 +396,7 @@ const ProfileScreen = () => {
           </Form.Item>
           
           <Form.Item
-            label="Số điện thoại"
+            label="Phone number"
             name="phone_number"
             rules={[
               { required: true, message: 'Vui lòng nhập số điện thoại' },

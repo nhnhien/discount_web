@@ -29,7 +29,7 @@ import {
 
 // ✅ Fix lỗi bắt validate sai bằng preprocess
 const schema = z.object({
-  discount_code: z.string().min(1, 'Mã giảm giá không được để trống'),
+  discount_code: z.string().min(1, 'Discount code cannot be empty'),
   title: z.string().optional(),
   description: z.string().optional(),
   discount_type: z.enum(['percentage', 'fixed', 'free_shipping']),
@@ -40,7 +40,7 @@ const schema = z.object({
   is_active: z.boolean().default(true),
   date_range: z
     .array(z.date())
-    .refine((arr) => arr.length === 2, 'Cần chọn ngày bắt đầu và kết thúc'),
+    .refine((arr) => arr.length === 2, 'Please select start and end dates'),
   product_ids: z.array(z.number()).optional(),
   variant_ids: z.array(z.number()).optional(),
   user_ids: z.array(z.number()).optional(),
@@ -109,22 +109,22 @@ const DiscountEditor = () => {
   const createMutation = useMutation({
     mutationFn: createDiscount,
     onSuccess: () => {
-      message.success('Tạo mã giảm giá thành công');
+      message.success('Discount code created successfully');
       navigate('/admin/discounts');
     },
     onError: () => {
-      message.error('Không thể tạo mã giảm giá');
+      message.error('Failed to create discount code');
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (data) => updateDiscount(id, data),
     onSuccess: () => {
-      message.success('Cập nhật mã giảm giá thành công');
+      message.success('Discount code updated successfully');
       navigate('/admin/discounts');
     },
     onError: () => {
-      message.error('Không thể cập nhật mã giảm giá');
+      message.error('Failed to update discount code');
     },
   });
 
@@ -142,16 +142,16 @@ const DiscountEditor = () => {
   return (
     <div className="p-6 rounded-lg max-w-[1100px] mx-auto">
       <h2 className="text-2xl font-semibold mb-6">
-        {isEdit ? 'Cập nhật mã giảm giá' : 'Tạo mã giảm giá'}
+        {isEdit ? 'Update Discount Code' : 'Create Discount Code'}
       </h2>
       <Form layout="vertical" className="space-y-6">
-        <Card title="Thông tin mã giảm giá" className="shadow-sm">
+        <Card title="Discount Code Information" className="shadow-sm">
           <Controller
             name="discount_code"
             control={control}
             render={({ field }) => (
               <Form.Item
-                label="Mã giảm giá"
+                label="Discount Code"
                 required
                 validateStatus={errors.discount_code ? 'error' : ''}
                 help={errors.discount_code?.message}
@@ -164,7 +164,7 @@ const DiscountEditor = () => {
             name="title"
             control={control}
             render={({ field }) => (
-              <Form.Item label="Tiêu đề">
+              <Form.Item label="Title">
                 <Input {...field} />
               </Form.Item>
             )}
@@ -173,20 +173,20 @@ const DiscountEditor = () => {
             name="description"
             control={control}
             render={({ field }) => (
-              <Form.Item label="Mô tả">
+              <Form.Item label="Description">
                 <Input.TextArea {...field} rows={3} />
               </Form.Item>
             )}
           />
         </Card>
 
-        <Card title="Thiết lập giảm giá" className="shadow-sm">
+        <Card title="Discount Settings" className="shadow-sm">
             {/* ⚠️ Cảnh báo nếu mã đã hết lượt */}
   {discountData?.data?.usage_limit &&
     discountData.data.usage_count >= discountData.data.usage_limit && (
       <div className="mb-4">
         <p className="text-red-600 font-medium">
-          ⚠️ Mã này đã hết lượt sử dụng ({discountData.data.usage_count}/{discountData.data.usage_limit})
+          ⚠️ This code has reached its usage limit ({discountData.data.usage_count}/{discountData.data.usage_limit})
         </p>
       </div>
   )}
@@ -198,7 +198,7 @@ const DiscountEditor = () => {
       return (
         <div className="mb-4">
           <p className="text-orange-500 font-medium">
-            ⏰ Mã giảm giá sắp hết hạn: còn {daysLeft} ngày
+            ⏰ Discount code is about to expire: {daysLeft} days left
           </p>
         </div>
       );
@@ -209,11 +209,11 @@ const DiscountEditor = () => {
               name="discount_type"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Loại giảm giá">
+                <Form.Item label="Discount Type">
                   <Select {...field}>
-                    <Select.Option value="percentage">Theo phần trăm</Select.Option>
-                    <Select.Option value="fixed">Giảm cố định</Select.Option>
-                    <Select.Option value="free_shipping">Miễn phí vận chuyển</Select.Option>
+                    <Select.Option value="percentage">Percentage</Select.Option>
+                    <Select.Option value="fixed">Fixed Amount</Select.Option>
+                    <Select.Option value="free_shipping">Free Shipping</Select.Option>
                   </Select>
                 </Form.Item>
               )}
@@ -222,7 +222,7 @@ const DiscountEditor = () => {
               name="value"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Giá trị giảm">
+                <Form.Item label="Discount Value">
                   <InputNumber
                     {...field}
                     min={0}
@@ -236,7 +236,7 @@ const DiscountEditor = () => {
               name="usage_limit"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Giới hạn sử dụng">
+                <Form.Item label="Usage Limit">
                   <InputNumber
                     {...field}
                     min={0}
@@ -250,7 +250,7 @@ const DiscountEditor = () => {
               name="min_order_amount"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Đơn hàng tối thiểu">
+                <Form.Item label="Minimum Order Amount">
                   <InputNumber
                     {...field}
                     min={0}
@@ -264,7 +264,7 @@ const DiscountEditor = () => {
               name="max_discount_amount"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Mức giảm tối đa">
+                <Form.Item label="Maximum Discount Amount">
                   <InputNumber
                     {...field}
                     min={0}
@@ -278,7 +278,7 @@ const DiscountEditor = () => {
               name="is_active"
               control={control}
               render={({ field }) => (
-                <Form.Item label="Kích hoạt">
+                <Form.Item label="Activation">
                   <Switch checked={field.value} onChange={field.onChange} />
                 </Form.Item>
               )}
@@ -288,7 +288,7 @@ const DiscountEditor = () => {
               control={control}
               render={({ field }) => (
                 <Form.Item
-                  label="Thời gian áp dụng"
+                  label="Application Period"
                   validateStatus={errors.date_range ? 'error' : ''}
                   help={errors.date_range?.message}
                 >
@@ -304,17 +304,17 @@ const DiscountEditor = () => {
           </div>
         </Card>
 
-        <Card title="Áp dụng cho" className="shadow-sm">
+        <Card title="Apply to" className="shadow-sm">
           <Controller
             name="product_ids"
             control={control}
             render={({ field }) => (
-<Form.Item label="Sản phẩm">
+<Form.Item label="Products">
   <Select
     {...field}
     mode="multiple"
     allowClear
-    placeholder="Chọn sản phẩm (để trống để áp dụng cho tất cả)"
+    placeholder="Select products (leave empty to apply to all)"
     options={productOptions}
   />
 </Form.Item>
@@ -325,12 +325,12 @@ const DiscountEditor = () => {
             name="variant_ids"
             control={control}
             render={({ field }) => (
-              <Form.Item label="Biến thể">
+              <Form.Item label="Variants">
                 <Select
                   {...field}
                   mode="multiple"
                   allowClear
-                  placeholder="Chọn biến thể"
+                  placeholder="Select variants"
                   options={variantOptions}
                 />
               </Form.Item>
@@ -340,12 +340,12 @@ const DiscountEditor = () => {
             name="user_ids"
             control={control}
             render={({ field }) => (
-              <Form.Item label="Khách hàng">
+              <Form.Item label="Customers">
                 <Select
                   {...field}
                   mode="multiple"
                   allowClear
-                  placeholder="Chọn khách hàng"
+                  placeholder="Select customers"
                   options={userOptions}
                 />
               </Form.Item>
@@ -355,14 +355,14 @@ const DiscountEditor = () => {
 
         <div className="flex justify-end gap-4 mt-6">
           <Button type="default" onClick={() => navigate('/admin/discounts')}>
-            Hủy
+            Cancel
           </Button>
           <Button
             type="primary"
             loading={createMutation.isLoading || updateMutation.isLoading}
             onClick={() => handleSubmit(onSubmit)()}
           >
-            {isEdit ? 'Cập nhật' : 'Tạo'}
+            {isEdit ? 'Update' : 'Create'}
           </Button>
         </div>
       </Form>

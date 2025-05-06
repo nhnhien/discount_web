@@ -41,51 +41,51 @@ const DiscountManager = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteDiscount,
     onSuccess: () => {
-      message.success('Đã xoá mã giảm giá');
+      message.success('Discount code deleted successfully');
       queryClient.invalidateQueries(['discounts']);
     },
     onError: () => {
-      message.error('Không thể xoá mã giảm giá');
+      message.error('Failed to delete discount code');
     },
   });
   const toggleMutation = useMutation({
     mutationFn: ({ id, is_active }) => toggleDiscountActive(id, is_active),
     onSuccess: () => {
-      message.success('Đã cập nhật trạng thái');
+      message.success('Status updated successfully');
       queryClient.invalidateQueries(['discounts']);
     },
     onError: () => {
-      message.error('Cập nhật trạng thái thất bại');
+      message.error('Failed to update status');
     },
   });
   
   const columns = [
     {
-      title: 'Mã',
+      title: 'Code',
       dataIndex: 'discount_code',
       key: 'code',
       render: (code) => <Tag color="blue">{code}</Tag>,
     },
     {
-      title: 'Tiêu đề',
+      title: 'Title',
       dataIndex: 'title',
       key: 'title',
     },
     {
-      title: 'Loại',
+      title: 'Type',
       dataIndex: 'discount_type',
       key: 'type',
       render: (type) => {
         const map = {
-          percentage: 'Phần trăm',
-          fixed: 'Giảm cố định',
-          free_shipping: 'Miễn phí vận chuyển',
+          percentage: 'Percentage',
+          fixed: 'Fixed Amount',
+          free_shipping: 'Free Shipping',
         };
         return map[type] || type;
       },
     },
     {
-      title: 'Giá trị',
+      title: 'Value',
       dataIndex: 'value',
       key: 'value',
       render: (val, record) =>
@@ -96,7 +96,7 @@ const DiscountManager = () => {
           : '-',
     },
     {
-      title: 'Thời gian',
+      title: 'Time',
       key: 'date',
       render: (_, record) => (
         <span>
@@ -105,18 +105,18 @@ const DiscountManager = () => {
       ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'is_active',
       key: 'status',
       render: (isActive) =>
         isActive ? (
-          <Tag color="green">Đang hoạt động</Tag>
+          <Tag color="green">Active</Tag>
         ) : (
-          <Tag color="red">Ngưng áp dụng</Tag>
+          <Tag color="red">Inactive</Tag>
         ),
     },
     {
-      title: 'Kích hoạt',
+      title: 'Activation',
       dataIndex: 'is_active',
       key: 'toggle',
       render: (value, record) => (
@@ -129,7 +129,7 @@ const DiscountManager = () => {
       ),
     },
     {
-      title: 'Hành động',
+      title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
@@ -138,7 +138,7 @@ const DiscountManager = () => {
             onClick={() => navigate(`/admin/discount/edit/${record.id}`)}
           />
           <Popconfirm
-            title="Bạn có chắc muốn xoá?"
+            title="Are you sure you want to delete?"
             onConfirm={() => deleteMutation.mutate(record.id)}
           >
             <Button danger icon={<DeleteOutlined />} />
@@ -151,14 +151,14 @@ const DiscountManager = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <Card
-        title={<Title level={4}>Quản lý mã giảm giá</Title>}
+        title={<Title level={4}>Discount Code Management</Title>}
         extra={
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={() => navigate('/admin/discount/create')}
           >
-            Tạo mới
+            Create New
           </Button>
         }
         bordered={false}

@@ -14,22 +14,22 @@ const CustomerManager = () => {
   const deactivateMutation = useMutation({
     mutationFn: deactivateUser,
     onSuccess: () => {
-      message.success('Đã khóa tài khoản thành công');
+      message.success('Account deactivated successfully');
       queryClient.invalidateQueries({ queryKey: ['customers'] });
     },
     onError: () => {
-      message.error('Không thể khóa tài khoản');
+      message.error('Failed to deactivate account');
     },
   });
 
   const reactivateMutation = useMutation({
     mutationFn: reactivateUser,
     onSuccess: () => {
-      message.success('Đã kích hoạt lại tài khoản');
+      message.success('Account reactivated successfully');
       queryClient.invalidateQueries({ queryKey: ['customers'] });
     },
     onError: () => {
-      message.error('Không thể kích hoạt lại tài khoản');
+      message.error('Failed to reactivate account');
     },
   });
 
@@ -43,54 +43,54 @@ const CustomerManager = () => {
 
   const columns = [
     {
-      title: 'Người dùng',
+      title: 'User',
       key: 'user',
       render: (_, record) => (
         <Space>
           <Avatar src={record.avatar} alt={record.name} />
           <div>
-            <Typography.Text strong>{record.name || 'Không rõ'}</Typography.Text>
+            <Typography.Text strong>{record.name || 'Unknown'}</Typography.Text>
             <div className="text-gray-500 text-sm">{record.email}</div>
           </div>
         </Space>
       ),
     },
     {
-      title: 'Điện thoại',
+      title: 'Phone',
       dataIndex: 'phone',
       key: 'phone',
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'is_active',
       key: 'is_active',
       render: (is_active) =>
-        is_active ? <Tag color="green">Đang hoạt động</Tag> : <Tag color="red">Đã bị khóa</Tag>,
+        is_active ? <Tag color="green">Active</Tag> : <Tag color="red">Deactivated</Tag>,
     },
     {
-      title: 'Hành động',
+      title: 'Actions',
       key: 'action',
       render: (_, record) => (
         <Space>
           {record.is_active ? (
             <Popconfirm
-              title="Bạn có chắc muốn khóa tài khoản này?"
+              title="Are you sure you want to deactivate this account?"
               onConfirm={() => handleDeactivate(record.id)}
-              okText="Có"
-              cancelText="Không"
+              okText="Yes"
+              cancelText="No"
             >
               <Button danger type="primary">
-                Khóa
+                Deactivate
               </Button>
             </Popconfirm>
           ) : (
             <Popconfirm
-              title="Bạn có muốn kích hoạt lại tài khoản này?"
+              title="Do you want to reactivate this account?"
               onConfirm={() => handleReactivate(record.id)}
-              okText="Kích hoạt"
-              cancelText="Hủy"
+              okText="Reactivate"
+              cancelText="Cancel"
             >
-              <Button type="default">Kích hoạt</Button>
+              <Button type="default">Reactivate</Button>
             </Popconfirm>
           )}
         </Space>
@@ -101,9 +101,9 @@ const CustomerManager = () => {
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Quản lý khách hàng</h2>
+        <h2 className="text-xl font-semibold">Customer Management</h2>
         <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isLoading}>
-          Làm mới
+          Refresh
         </Button>
       </div>
       <Table

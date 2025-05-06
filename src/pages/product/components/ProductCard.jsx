@@ -50,17 +50,17 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
   const addToCartMutation = useMutation({
     mutationFn: (productData) => cartService.addToCart(productData),
     onSuccess: () => {
-      message.success('Đã thêm sản phẩm vào giỏ hàng');
+      message.success('Product added to cart successfully');
       queryClient.invalidateQueries(['cart']);
     },
     onError: (err) => {
-      message.error(err?.response?.data?.message || 'Lỗi khi thêm vào giỏ hàng');
+      message.error(err?.response?.data?.message || 'Error adding product to cart');
     },
   });
 
   const handleAddToCart = () => {
     if (!userId) {
-      return message.warning('Vui lòng đăng nhập trước khi thêm vào giỏ hàng');
+      return message.warning('Please log in before adding to cart');
     }
 
     const productToAdd = {
@@ -84,10 +84,10 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
     } else {
       if (isWishlisted) {
         dispatch(removeFromWishlist(payload));
-        message.info('Đã bỏ khỏi danh sách yêu thích');
+        message.info('Removed from wishlist');
       } else {
         dispatch(addToWishlist(payload));
-        message.success('Đã thêm vào danh sách yêu thích');
+        message.success('Added to wishlist');
       }
     }
   };
@@ -103,7 +103,7 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
     return (
       <div className='flex items-center gap-2'>
         <Text className='text-lg font-bold text-blue-600'>
-          {isValidPrice(finalPrice) ? formatCurrency(finalPrice) : 'Liên hệ'}
+          {isValidPrice(finalPrice) ? formatCurrency(finalPrice) : 'Contact for price'}
         </Text>
         {hasDiscount && (
           <Text delete className='text-sm text-gray-500'>
@@ -154,7 +154,7 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
             />
             <div className='absolute inset-0 bg-black bg-opacity-0 opacity-0 group-hover:bg-opacity-20 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center'>
               <div className='flex gap-2'>
-                <Tooltip title='Xem chi tiết'>
+                <Tooltip title='View details'>
                   <Button
                     shape='circle'
                     icon={<EyeOutlined />}
@@ -165,7 +165,7 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
                     className='bg-white hover:bg-blue-500 hover:text-white'
                   />
                 </Tooltip>
-                <Tooltip title='Thêm vào giỏ hàng'>
+                <Tooltip title='Add to cart'>
                   <Button
                     shape='circle'
                     icon={<ShoppingCartOutlined />}
@@ -176,7 +176,7 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
                     className='bg-white hover:bg-blue-500 hover:text-white'
                   />
                 </Tooltip>
-                <Tooltip title={isWishlisted ? 'Bỏ yêu thích' : 'Yêu thích'}>
+                <Tooltip title={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}>
                   <Button
                     shape='circle'
                     icon={isWishlisted ? <HeartFilled className='text-red-500' /> : <HeartOutlined />}
@@ -193,10 +193,10 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
         }
         actions={[
           <Button type='text' icon={<EyeOutlined />} onClick={() => onViewDetail(product.id)} key='detail'>
-            Chi tiết
+            Details
           </Button>,
           <Button type='text' icon={<ShoppingCartOutlined />} onClick={handleAddToCart} key='add-to-cart'>
-            Thêm vào giỏ
+            Add to cart
           </Button>,
         ]}
         bodyStyle={{ flex: '1 0 auto', display: 'flex', flexDirection: 'column' }}
@@ -215,8 +215,8 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
                 <Text className='ml-2 text-xs text-gray-500'>(120)</Text>
               </div>
               <div className='flex flex-wrap gap-1'>
-                {product.has_variant && <Tag color='blue'>Nhiều phiên bản</Tag>}
-                {(variant?.stock_quantity || product.stock_quantity) <= 5 && <Tag color='red'>Sắp hết hàng</Tag>}
+                {product.has_variant && <Tag color='blue'>Multiple Variants</Tag>}
+                {(variant?.stock_quantity || product.stock_quantity) <= 5 && <Tag color='red'>Almost Sold Out</Tag>}
                 {product.category?.name && <Tag color='green'>{product.category.name}</Tag>}
               </div>
               <div className='mt-auto pt-2'>{getPriceDisplay()}</div>

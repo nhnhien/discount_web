@@ -55,10 +55,10 @@ const HomeProduct = () => {
       <div className='container mx-auto px-4'>
         <div className='flex justify-between items-center mb-6'>
           <Title level={2} className='text-blue-700 mb-0'>
-            Sản phẩm nổi bật
+          Featured Products
           </Title>
           <Button type='link' onClick={handleViewAllProducts} className='text-blue-600 flex items-center'>
-            Xem tất cả <RightOutlined />
+          View All <RightOutlined />
           </Button>
         </div>
 
@@ -69,8 +69,8 @@ const HomeProduct = () => {
             <Col span={24}>
               <Alert
                 type='error'
-                message='Không thể tải sản phẩm'
-                description={error.message || 'Đã xảy ra lỗi'}
+                message='Failed to load products'
+                description={error.message || 'An unexpected error occurred'}
                 showIcon
               />
             </Col>
@@ -79,8 +79,8 @@ const HomeProduct = () => {
               <Col xs={24} sm={12} md={6} lg={6} key={product.id}>
                 <ProductCard
                   product={product}
-                  onAddToCart={() => message.info('Chức năng sẽ cập nhật sau')}
-                  onToggleWishlist={() => message.info('Chức năng sẽ cập nhật sau')}
+                  onAddToCart={() => message.info('This feature will be updated soon')}
+                  onToggleWishlist={() => message.info('This feature will be updated soon')}
                   onViewDetail={handleViewProductDetail}
                   isInWishlist={false}
                 />
@@ -88,7 +88,7 @@ const HomeProduct = () => {
             ))
           ) : (
             <Col span={24} className='text-center py-10'>
-              <Empty description='Không có sản phẩm nổi bật' />
+              <Empty description='No featured products found' />
             </Col>
           )}
         </Row>

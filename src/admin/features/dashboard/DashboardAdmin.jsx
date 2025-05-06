@@ -38,7 +38,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/vi';
 
 dayjs.extend(relativeTime);
-dayjs.locale('vi');
+// dayjs.locale('vi');
+
+dayjs.locale('en');
 
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
@@ -254,7 +256,7 @@ const DashboardAdmin = () => {
     const paymentMethodsData = Object.entries(paymentMethodsMap)
       .map(([method, count]) => ({ 
         method: method === 'vnpay' ? 'VNPay' : 
-                method === 'cod' ? 'Tiền mặt' : 
+                method === 'cod' ? 'Cash' : 
                 method === 'bank_transfer' ? 'Chuyển khoản' : 
                 method === 'momo' ? 'MoMo' : 
                 method.charAt(0).toUpperCase() + method.slice(1),
@@ -338,7 +340,7 @@ const DashboardAdmin = () => {
 
   const orderColumns = [
     {
-      title: 'Mã đơn hàng',
+      title: 'Order ID',
       dataIndex: 'order_number',
       key: 'id',
       render: (text) => (
@@ -350,7 +352,7 @@ const DashboardAdmin = () => {
       )
     },
     {
-      title: 'Khách hàng',
+      title: 'Customer',
       dataIndex: 'customer',
       key: 'customer',
       render: (customer) => (
@@ -364,7 +366,7 @@ const DashboardAdmin = () => {
       ),
     },
     {
-      title: 'Ngày đặt',
+      title: 'Order Date',
       dataIndex: 'created_at',
       key: 'date',
       render: (date) => (
@@ -377,7 +379,7 @@ const DashboardAdmin = () => {
       ),
     },
     {
-      title: 'Giá trị',
+      title: 'Value',
       dataIndex: 'total_amount',
       key: 'amount',
       render: (amount) => (
@@ -385,7 +387,7 @@ const DashboardAdmin = () => {
       ),
     },
     {
-      title: 'Trạng thái',
+      title: 'Status',
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
@@ -399,7 +401,7 @@ const DashboardAdmin = () => {
             break;
           case 'confirmed':
             color = 'cyan';
-            text = 'Đã xác nhận';
+            text = 'Confirmed';
             break;
           case 'processing':
             color = 'blue';
@@ -415,7 +417,7 @@ const DashboardAdmin = () => {
             break;
           case 'pending':
             color = 'orange';
-            text = 'Chờ xác nhận';
+            text = 'Pending confirmation';
             break;
           default:
             color = 'default';
@@ -660,7 +662,7 @@ const DashboardAdmin = () => {
             <Statistic
               title={
                 <div className="flex items-center justify-between">
-                  <span className='text-gray-600 font-medium'>Tổng doanh thu</span>
+                  <span className='text-gray-600 font-medium'>Total revenue</span>
                   <DollarOutlined className="text-emerald-500 text-xl" />
                 </div>
               }
@@ -675,7 +677,7 @@ const DashboardAdmin = () => {
                 {stats.monthGrowth >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
                 {stats.monthGrowth}%
               </span>
-              <span className='text-gray-500 text-xs'>từ tháng trước</span>
+              <span className='text-gray-500 text-xs'>from last month</span>
             </div>
           </Card>
         </Col>
@@ -687,7 +689,7 @@ const DashboardAdmin = () => {
             <Statistic
               title={
                 <div className="flex items-center justify-between">
-                  <span className='text-gray-600 font-medium'>Tổng đơn hàng</span>
+                  <span className='text-gray-600 font-medium'>Total orders</span>
                   <ShoppingCartOutlined className="text-blue-500 text-xl" />
                 </div>
               }
@@ -699,7 +701,7 @@ const DashboardAdmin = () => {
                 {stats.weekGrowth >= 0 ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
                 {stats.weekGrowth}%
               </span>
-              <span className='text-gray-500 text-xs'>từ tuần trước</span>
+              <span className='text-gray-500 text-xs'>from last week</span>
             </div>
           </Card>
         </Col>
@@ -711,7 +713,7 @@ const DashboardAdmin = () => {
             <Statistic
               title={
                 <div className="flex items-center justify-between">
-                  <span className='text-gray-600 font-medium'>Tổng khách hàng</span>
+                  <span className='text-gray-600 font-medium'>Total customers</span>
                   <UserOutlined className="text-purple-500 text-xl" />
                 </div>
               }
@@ -721,7 +723,7 @@ const DashboardAdmin = () => {
             <div className='mt-2 flex justify-between items-center'>
               <div className='flex items-center'>
                 <Badge color='green' className='mr-1' />
-                <span className='text-gray-500 text-xs'>Mới hôm nay: {stats.todayVisitors}</span>
+                <span className='text-gray-500 text-xs'>New today: {stats.todayVisitors}</span>
               </div>
             </div>
           </Card>
@@ -734,7 +736,7 @@ const DashboardAdmin = () => {
             <Statistic
               title={
                 <div className="flex items-center justify-between">
-                  <span className='text-gray-600 font-medium'>Đơn chờ xử lý</span>
+                  <span className='text-gray-600 font-medium'>Orders pending processing</span>
                   <ShoppingOutlined className="text-amber-500 text-xl" />
                 </div>
               }
@@ -758,23 +760,23 @@ const DashboardAdmin = () => {
           <Card
             title={
               <div className="flex justify-between items-center">
-                <span className='font-semibold text-gray-700'>Doanh thu theo thời gian</span>
+                <span className='font-semibold text-gray-700'>Revenue over time</span>
                 <Segmented
                   options={[
                     {
                       value: 'line',
                       icon: <LineChartOutlined />,
-                      label: 'Đường',
+                      label: 'Line',
                     },
                     {
                       value: 'column',
                       icon: <BarChartOutlined />,
-                      label: 'Cột',
+                      label: 'Bar',
                     },
                     {
                       value: 'area',
                       icon: <AreaChartOutlined />,
-                      label: 'Vùng',
+                      label: 'Area',
                     },
                   ]}
                   value={chartType}
@@ -814,7 +816,7 @@ const DashboardAdmin = () => {
         </Col>
         <Col xs={24} lg={8}>
           <Card
-            title={<span className='font-semibold text-gray-700'>Đơn hàng theo danh mục</span>}
+            title={<span className='font-semibold text-gray-700'>Orders by category</span>}
             className='shadow-sm h-full'
             extra={
               <Tooltip title="Biểu đồ thể hiện số lượng đơn hàng cho mỗi sản phẩm">
@@ -843,13 +845,13 @@ const DashboardAdmin = () => {
             title={
               <div className="flex items-center">
                 <ShoppingCartOutlined className="mr-2 text-blue-500" />
-                <span className='font-semibold text-gray-700'>Đơn hàng gần đây</span>
+                <span className='font-semibold text-gray-700'>Recent orders</span>
               </div>
             }
             className='shadow-sm'
             extra={
               <Button type="link" icon={<RightOutlined />} href='/admin/orders'>
-                Xem tất cả
+                View all
               </Button>
             }
           >
@@ -876,13 +878,13 @@ const DashboardAdmin = () => {
             title={
               <div className="flex items-center">
                 <FireOutlined className="mr-2 text-red-500" />
-                <span className='font-semibold text-gray-700'>Sản phẩm bán chạy</span>
+                <span className='font-semibold text-gray-700'>Top selling products</span>
               </div>
             }
             className='shadow-sm'
             extra={
               <Button type="link" icon={<RightOutlined />} href='/admin/product'>
-                Xem tất cả
+                View all
               </Button>
             }
           >
@@ -892,19 +894,19 @@ const DashboardAdmin = () => {
                   <thead className='bg-gray-50'>
                     <tr>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Sản phẩm
+                      Product
                       </th>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Số lượng bán
+                      Quantity sold
                       </th>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Doanh thu
+                      Revenue
                       </th>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Tăng trưởng
+                      Growth
                       </th>
                       <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
-                        Xu hướng
+                      Trends
                       </th>
                     </tr>
                   </thead>
@@ -923,7 +925,7 @@ const DashboardAdmin = () => {
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
                           <div className='text-sm text-gray-900 font-medium'>{product.sales}</div>
-                          <div className='text-xs text-gray-500'>sản phẩm</div>
+                          <div className='text-xs text-gray-500'>Products</div>
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
                           <div className='text-sm text-gray-900 font-bold text-emerald-600'>
@@ -975,7 +977,7 @@ const DashboardAdmin = () => {
         <Col xs={24} sm={8} lg={6}>
           <Card className='shadow-sm border-l-4 border-l-blue-500'>
             <Statistic
-              title="Đơn hàng chờ xử lý"
+              title="Pending orders"
               value={stats.pendingOrders}
               valueStyle={{ color: '#faad14', fontWeight: 'bold' }}
               prefix={<InfoCircleOutlined />}
@@ -992,7 +994,7 @@ const DashboardAdmin = () => {
         <Col xs={24} sm={8} lg={6}>
           <Card className='shadow-sm border-l-4 border-l-cyan-500'>
             <Statistic
-              title="Đơn đang giao"
+              title="Orders being delivered"
               value={stats.shippedOrders}
               valueStyle={{ color: '#13c2c2', fontWeight: 'bold' }}
               prefix={<InfoCircleOutlined />}
@@ -1010,7 +1012,7 @@ const DashboardAdmin = () => {
         <Col xs={24} sm={8} lg={6}>
           <Card className='shadow-sm border-l-4 border-l-green-500'>
             <Statistic
-              title="Đơn đã giao"
+              title="Delivered orders"
               value={stats.deliveredOrders}
               valueStyle={{ color: '#52c41a', fontWeight: 'bold' }}
               prefix={<InfoCircleOutlined />}
@@ -1027,7 +1029,7 @@ const DashboardAdmin = () => {
         <Col xs={24} sm={8} lg={6}>
           <Card className='shadow-sm border-l-4 border-l-red-500'>
             <Statistic
-              title="Đơn đã hủy"
+              title="Canceled orders"
               value={stats.cancelledOrders}
               valueStyle={{ color: '#ff4d4f', fontWeight: 'bold' }}
               prefix={<InfoCircleOutlined />}
@@ -1049,7 +1051,7 @@ const DashboardAdmin = () => {
             title={
               <div className="flex items-center">
                 <BarChartOutlined className="mr-2 text-blue-500" />
-                <span className="font-semibold">Đơn hàng theo ngày</span>
+                <span className="font-semibold">Orders by day</span>
               </div>
             }
             className='shadow-sm'
@@ -1064,7 +1066,7 @@ const DashboardAdmin = () => {
             title={
               <div className="flex items-center">
                 <PieChartOutlined className="mr-2 text-purple-500" />
-                <span className="font-semibold">Phương thức thanh toán</span>
+                <span className="font-semibold">Payment method</span>
               </div>
             }
             className='shadow-sm'
@@ -1086,7 +1088,7 @@ const DashboardAdmin = () => {
             title={
               <div className="flex items-center">
                 <DollarOutlined className="mr-2 text-green-500" />
-                <span className="font-semibold">Chỉ số kinh doanh</span>
+                <span className="font-semibold">Business metrics</span>
               </div>
             }
             className='shadow-sm'
@@ -1095,7 +1097,7 @@ const DashboardAdmin = () => {
               <Col xs={24} sm={12} md={8}>
                 <Card className="border-0 shadow-none bg-gray-50">
                   <Statistic 
-                    title="Giá trị đơn hàng trung bình" 
+                    title="Average order value" 
                     value={stats.avgOrderValue} 
                     formatter={(value) => formatVND(value)}
                     valueStyle={{ color: '#52c41a' }}
@@ -1105,7 +1107,7 @@ const DashboardAdmin = () => {
               <Col xs={24} sm={12} md={8}>
                 <Card className="border-0 shadow-none bg-gray-50">
                   <Statistic 
-                    title="Tỷ lệ chuyển đổi" 
+                    title="Conversion rate" 
                     value={stats.conversionRate} 
                     suffix="%" 
                     precision={2}
@@ -1116,7 +1118,7 @@ const DashboardAdmin = () => {
               <Col xs={24} sm={12} md={8}>
                 <Card className="border-0 shadow-none bg-gray-50">
                   <Statistic 
-                    title="Tỷ lệ hoàn thành" 
+                    title="Completion rate" 
                     value={stats.deliveredOrders / stats.totalOrders * 100} 
                     suffix="%" 
                     precision={2}
@@ -1144,7 +1146,7 @@ const DashboardAdmin = () => {
           <h1 className='text-2xl font-bold text-gray-800 flex items-center'>
             <DashboardOutlined className="mr-2" /> Dashboard
           </h1>
-          <p className="text-gray-500">Chào mừng quay trở lại! Dưới đây là tổng quan hoạt động kinh doanh.</p>
+          <p className="text-gray-500">Welcome back! Here is an overview of business activity.</p>
         </div>
         <div className="flex items-center">
           <Button 
@@ -1153,7 +1155,7 @@ const DashboardAdmin = () => {
             onClick={refetchOrders} 
             className="mr-3"
           >
-            Làm mới
+            Refresh
           </Button>
           <RangePicker 
             className='w-64' 
@@ -1181,7 +1183,7 @@ const DashboardAdmin = () => {
         <TabPane 
           tab={
             <span className="px-2 flex items-center">
-              <DashboardOutlined className="mr-1" /> Tổng quan
+              <DashboardOutlined className="mr-1" /> Overview
             </span>
           } 
           key="overview"
@@ -1191,7 +1193,7 @@ const DashboardAdmin = () => {
         <TabPane 
           tab={
             <span className="px-2 flex items-center">
-              <PieChartOutlined className="mr-1" /> Phân tích
+              <PieChartOutlined className="mr-1" /> Analytics
             </span>
           } 
           key="analytics"
