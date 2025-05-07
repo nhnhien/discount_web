@@ -9,7 +9,7 @@ const getCategory = async () => {
     const res = await apiClient.get('/api/category');
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Không thể tải danh mục');
+    throw new Error(error.response?.data?.message || 'Unable to load categories');
   }
 };
 
@@ -23,7 +23,7 @@ const getCategoryById = async (id) => {
     const res = await apiClient.get(`/api/category/${id}`);
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Không thể tải danh mục');
+    throw new Error(error.response?.data?.message || 'Unable to load category');
   }
 };
 
@@ -34,10 +34,18 @@ const getCategoryById = async (id) => {
  */
 const createCategory = async (categoryData) => {
   try {
+    // Validate category name
+    if (!categoryData.name || categoryData.name.trim().length === 0) {
+      throw new Error('Category name is required');
+    }
+    
     const res = await apiClient.post('/api/category', categoryData);
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Không thể tạo danh mục');
+    if (error.response?.status === 409) {
+      throw new Error('Category name already exists');
+    }
+    throw new Error(error.response?.data?.message || 'Unable to create category');
   }
 };
 
@@ -49,10 +57,21 @@ const createCategory = async (categoryData) => {
  */
 const updateCategory = async (id, categoryData) => {
   try {
+    // Validate category name
+    if (!categoryData.name || categoryData.name.trim().length === 0) {
+      throw new Error('Category name is required');
+    }
+
     const res = await apiClient.put(`/api/category/${id}`, categoryData);
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Không thể cập nhật danh mục');
+    if (error.response?.status === 409) {
+      throw new Error('Category name already exists');
+    }
+    if (error.response?.status === 400) {
+      throw new Error('Category is being used by products and cannot be updated');
+    }
+    throw new Error(error.response?.data?.message || 'Unable to update category');
   }
 };
 
@@ -66,7 +85,10 @@ const deleteCategory = async (id) => {
     const res = await apiClient.delete(`/api/category/${id}`);
     return res.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || 'Không thể xóa danh mục');
+    if (error.response?.status === 400) {
+      throw new Error('Category is being used by products and cannot be deleted');
+    }
+    throw new Error(error.response?.data?.message || 'Unable to delete category');
   }
 };
 

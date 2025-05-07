@@ -59,6 +59,14 @@ const OrderSuccess = () => {
   const getOrderStatus = () => {
     if (!order) return 0;
     
+    const validStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled'];
+    const status = order.status.toLowerCase();
+    
+    if (!validStatuses.includes(status)) {
+      console.error('Invalid order status:', status);
+      return 0;
+    }
+    
     const statusMap = {
       'pending': 0,
       'processing': 1, 
@@ -67,11 +75,19 @@ const OrderSuccess = () => {
       'cancelled': -1
     };
     
-    return statusMap[order.status.toLowerCase()] || 0;
+    return statusMap[status] || 0;
   };
 
   // Helper để lấy màu cho trạng thái
   const getStatusColor = (status) => {
+    const validStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled'];
+    const statusLower = status?.toLowerCase();
+    
+    if (!validStatuses.includes(statusLower)) {
+      console.error('Invalid order status:', status);
+      return 'default';
+    }
+    
     const colorMap = {
       'pending': 'orange',
       'processing': 'blue',
@@ -80,11 +96,19 @@ const OrderSuccess = () => {
       'cancelled': 'red'
     };
     
-    return colorMap[status?.toLowerCase()] || 'default';
+    return colorMap[statusLower] || 'default';
   };
 
   // Helper để lấy icon cho trạng thái
   const getStatusIcon = (status) => {
+    const validStatuses = ['pending', 'processing', 'shipping', 'completed', 'cancelled'];
+    const statusLower = status?.toLowerCase();
+    
+    if (!validStatuses.includes(statusLower)) {
+      console.error('Invalid order status:', status);
+      return <ClockCircleOutlined />;
+    }
+    
     const iconMap = {
       'pending': <ClockCircleOutlined />,
       'processing': <ShopOutlined />,
@@ -93,7 +117,21 @@ const OrderSuccess = () => {
       'cancelled': <RollbackOutlined />
     };
     
-    return iconMap[status?.toLowerCase()] || <ClockCircleOutlined />;
+    return iconMap[statusLower] || <ClockCircleOutlined />;
+  };
+
+  // Validate shipping address
+  const validateShippingAddress = (address) => {
+    if (!address) return false;
+    
+    const requiredFields = ['full_name', 'phone_number', 'address', 'city'];
+    return requiredFields.every(field => address[field] && address[field].trim().length > 0);
+  };
+
+  // Validate phone number format
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^[0-9+]{10,12}$/;
+    return phoneRegex.test(phone);
   };
 
   // Tính tổng số sản phẩm
@@ -122,7 +160,7 @@ const OrderSuccess = () => {
           <div className="text-center py-8">
             <Spin size="large" />
             <div className="mt-4 text-gray-600">
-              <Paragraph>Đang tải thông tin đơn hàng...</Paragraph>
+              <Paragraph>Loading order information...</Paragraph>
               <Skeleton active paragraph={{ rows: 4 }} className="mt-8" />
             </div>
           </div>
@@ -137,15 +175,64 @@ const OrderSuccess = () => {
         <Card className="shadow-sm rounded-lg overflow-hidden">
           <Result
             status="error"
-            title="Không tìm thấy đơn hàng"
-            subTitle="Đơn hàng có thể đã bị xoá hoặc không tồn tại."
+            title="Order not found"
+            subTitle="The order may have been deleted or does not exist."
             extra={
               <Space>
                 <Button type="primary" size="large" onClick={() => navigate('/')} icon={<HomeOutlined />}>
-                  Về trang chủ
+                  Go to Home
                 </Button>
                 <Button onClick={() => navigate('/orders')} icon={<ShoppingOutlined />}>
-                  Đơn hàng của tôi
+                  My Orders
+                </Button>
+              </Space>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
+  // Validate order data
+  if (!validateShippingAddress(order.shippingAddress)) {
+    return (
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <Card className="shadow-sm rounded-lg overflow-hidden">
+          <Result
+            status="error"
+            title="Invalid Shipping Information"
+            subTitle="The order contains invalid shipping information. Please contact support."
+            extra={
+              <Space>
+                <Button type="primary" size="large" onClick={() => navigate('/')} icon={<HomeOutlined />}>
+                  Go to Home
+                </Button>
+                <Button onClick={() => navigate('/orders')} icon={<ShoppingOutlined />}>
+                  My Orders
+                </Button>
+              </Space>
+            }
+          />
+        </Card>
+      </div>
+    );
+  }
+
+  if (!validatePhoneNumber(order.shippingAddress.phone_number)) {
+    return (
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <Card className="shadow-sm rounded-lg overflow-hidden">
+          <Result
+            status="error"
+            title="Invalid Phone Number"
+            subTitle="The order contains an invalid phone number. Please contact support."
+            extra={
+              <Space>
+                <Button type="primary" size="large" onClick={() => navigate('/')} icon={<HomeOutlined />}>
+                  Go to Home
+                </Button>
+                <Button onClick={() => navigate('/orders')} icon={<ShoppingOutlined />}>
+                  My Orders
                 </Button>
               </Space>
             }

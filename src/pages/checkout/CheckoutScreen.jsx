@@ -50,8 +50,8 @@ import { orderService } from '@/service/order';
 import { addressService } from '@/service/address';
 import { paymentService } from '@/service/payment';
 import { useLocation } from 'react-router-dom';
-import axios from 'axios'; 
-
+import axios from 'axios';
+import vnpayLogo from '../../assets/images/vnpay-logo.png';
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
 const { Option } = Select;
@@ -69,7 +69,16 @@ const formatPrice = (price) => {
 };
 
 // Component hiển thị tóm tắt đơn hàng
-const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, prev, handlePlaceOrder, createOrderLoading }) => (
+const OrderSummary = ({
+  cart,
+  selectedCartItems,
+  isLoading,
+  currentStep,
+  next,
+  prev,
+  handlePlaceOrder,
+  createOrderLoading,
+}) => (
   <Card
     className='order-summary-card'
     style={{
@@ -87,7 +96,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
       }}
     >
       <Title level={4} style={{ color: 'white', margin: 0 }}>
-        <ShoppingOutlined /> 	Order Information
+        <ShoppingOutlined /> Order Information
       </Title>
     </div>
 
@@ -135,8 +144,12 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                   </Text>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text type='secondary' style={{ fontSize: '13px' }}>
-                      {item.variant_name && <Tag color="blue" style={{ marginRight: 4, padding: '0 4px' }}>{item.variant_name}</Tag>}
-                      SL: {item.quantity}
+                      {item.variant_name && (
+                        <Tag color='blue' style={{ marginRight: 4, padding: '0 4px' }}>
+                          {item.variant_name}
+                        </Tag>
+                      )}
+                      Quantity: {item.quantity}
                     </Text>
                     <Text style={{ fontSize: '14px', fontWeight: 500, color: '#1890ff' }}>
                       {formatPrice(item.unit_price * item.quantity)}
@@ -160,14 +173,8 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
             <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
           </div>
           {cart?.shipping_fee === 0 && cart?.shipping_address?.city && (
-  <Alert
-    message="You have received free shipping!"
-    type="success"
-    showIcon
-    style={{ marginTop: 12 }}
-  />
-)}
-
+            <Alert message='You have received free shipping!' type='success' showIcon style={{ marginTop: 12 }} />
+          )}
 
           {cart?.discount_amount > 0 && (
             <div className='flex justify-between mb-2'>
@@ -177,7 +184,9 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
           )}
           <Divider style={{ margin: '12px 0' }} />
           <div className='flex justify-between mb-4'>
-            <Text strong style={{ fontSize: '16px' }}>Total:</Text>
+            <Text strong style={{ fontSize: '16px' }}>
+              Total:
+            </Text>
             <Text strong style={{ fontSize: '18px', color: '#1890ff' }}>
               {formatPrice(cart?.total_amount || 0)}
             </Text>
@@ -185,12 +194,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
 
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
             {currentStep > 0 && (
-              <Button 
-                onClick={prev} 
-                icon={<ArrowLeftOutlined />} 
-                size='large' 
-                style={{ flex: 1 }}
-              >
+              <Button onClick={prev} icon={<ArrowLeftOutlined />} size='large' style={{ flex: 1 }}>
                 Go Back
               </Button>
             )}
@@ -207,7 +211,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                   flex: currentStep > 0 ? 2 : 1,
                 }}
               >
-                	Place Order
+                Place Order
               </Button>
             ) : (
               <Button
@@ -221,7 +225,7 @@ const OrderSummary = ({ cart, selectedCartItems, isLoading, currentStep, next, p
                   flex: currentStep > 0 ? 2 : 1,
                 }}
               >
-                	Continue
+                Continue
               </Button>
             )}
           </div>
@@ -256,18 +260,20 @@ const AddressCard = ({ address, selected, onSelect, onDelete }) => (
             <span style={{ color: '#8c8c8c' }}>{address.phone_number}</span>
           </div>
           {selected && (
-            <Tag color="success" style={{ marginLeft: '8px' }}>
+            <Tag color='success' style={{ marginLeft: '8px' }}>
               <CheckCircleOutlined /> Selected Address
             </Tag>
           )}
         </div>
         <div style={{ marginTop: '8px', color: '#595959', display: 'flex', alignItems: 'flex-start' }}>
           <EnvironmentOutlined style={{ marginRight: '8px', marginTop: '4px', color: '#1890ff' }} />
-          <div>{address.address}, {address.city}</div>
+          <div>
+            {address.address}, {address.city}
+          </div>
         </div>
       </div>
     </Radio>
-    <Tooltip title="Xoá địa chỉ">
+    <Tooltip title='Xoá địa chỉ'>
       <Button
         type='text'
         icon={<DeleteOutlined />}
@@ -303,14 +309,12 @@ const PaymentMethodCard = ({ value, selected, title, description, icon, onClick 
           <Text strong style={{ fontSize: '16px' }}>
             {title}
             {selected && (
-              <Tag color="success" style={{ marginLeft: '8px', padding: '0 4px' }}>
+              <Tag color='success' style={{ marginLeft: '8px', padding: '0 4px' }}>
                 <CheckCircleOutlined /> Selected
               </Tag>
             )}
           </Text>
-          <div style={{ color: '#8c8c8c', fontSize: '14px' }}>
-            {description}
-          </div>
+          <div style={{ color: '#8c8c8c', fontSize: '14px' }}>{description}</div>
         </div>
       </div>
     </Radio>
@@ -333,27 +337,31 @@ const ProductList = ({ items }) => (
       itemLayout='horizontal'
       dataSource={items}
       renderItem={(item) => (
-        <List.Item 
-          style={{ 
-            padding: '16px 12px', 
+        <List.Item
+          style={{
+            padding: '16px 12px',
             borderBottom: '1px solid #f0f0f0',
             background: 'white',
             borderRadius: '6px',
-            marginBottom: '8px' 
+            marginBottom: '8px',
           }}
         >
           <List.Item.Meta
             avatar={
               <div className='relative' style={{ marginRight: '12px' }}>
                 <Badge.Ribbon
-                  text={item.original_price > 0 && item.unit_price < item.original_price 
-                    ? `-${Math.round((1 - item.unit_price / item.original_price) * 100)}%` 
-                    : null}
+                  text={
+                    item.original_price > 0 && item.unit_price < item.original_price
+                      ? `-${Math.round((1 - item.unit_price / item.original_price) * 100)}%`
+                      : null
+                  }
                   color='#f43f5e'
-                  style={{ display: item.original_price > 0 && item.unit_price < item.original_price ? 'block' : 'none' }}
+                  style={{
+                    display: item.original_price > 0 && item.unit_price < item.original_price ? 'block' : 'none',
+                  }}
                 >
                   <Image
-                    src={item.image || "/api/placeholder/100/100"}
+                    src={item.image || '/api/placeholder/100/100'}
                     alt={item.name}
                     className='rounded-lg'
                     width={80}
@@ -366,7 +374,9 @@ const ProductList = ({ items }) => (
             }
             title={
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <Text strong style={{ fontSize: '16px' }}>{item.name}</Text>
+                <Text strong style={{ fontSize: '16px' }}>
+                  {item.name}
+                </Text>
                 <Text style={{ fontSize: '15px', fontWeight: 500, color: '#1890ff' }}>
                   {formatPrice(item.unit_price * item.quantity)}
                 </Text>
@@ -375,29 +385,27 @@ const ProductList = ({ items }) => (
             description={
               <div style={{ fontSize: '14px' }}>
                 <div style={{ marginBottom: '6px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {item.variant_name && (
-                    <Tag color="blue">{item.variant_name}</Tag>
-                  )}
-                  <Tag color="green">
+                  {item.variant_name && <Tag color='blue'>{item.variant_name}</Tag>}
+                  <Tag color='green'>
                     <ClockCircleOutlined /> In Stock
                   </Tag>
-                  <Tag color="default">
-                    <Text>SL: {item.quantity}</Text>
+                  <Tag color='default'>
+                    <Text>Quantity: {item.quantity}</Text>
                   </Tag>
                 </div>
                 <div>
                   <Space>
-                    <Text type="secondary">Unit Price: {formatPrice(item.unit_price)}</Text>
+                    <Text type='secondary'>Unit Price: {formatPrice(item.unit_price)}</Text>
                     {item.original_price > 0 && item.unit_price < item.original_price && (
-                      <Text delete type="secondary">
+                      <Text delete type='secondary'>
                         {formatPrice(item.original_price)}
                       </Text>
                     )}
                   </Space>
                   {item.discount_amount > 0 && (
                     <div>
-                      <Text type="secondary" style={{ fontStyle: 'italic', color: '#f5222d' }}>
-                      Discount code applied
+                      <Text type='secondary' style={{ fontStyle: 'italic', color: '#f5222d' }}>
+                        Discount code applied
                       </Text>
                     </div>
                   )}
@@ -416,7 +424,7 @@ const CheckoutScreen = () => {
   const location = useLocation();
   const queryClient = useQueryClient();
   const [form] = Form.useForm();
-  
+
   const [currentStep, setCurrentStep] = useState(CHECKOUT_STEPS.ADDRESS);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isAddressModalVisible, setIsAddressModalVisible] = useState(false);
@@ -424,14 +432,12 @@ const CheckoutScreen = () => {
 
   const selectedItemIds = location.state?.selectedItems || [];
   const applyDiscount = location.state?.applyDiscount || false;
-  
+
   // Fetch cart data
   const { data: cartData, isLoading: cartLoading } = useQuery({
     queryKey: ['cart', selectedItemIds, applyDiscount],
-    queryFn: () => cartService.getCart(applyDiscount, selectedItemIds)
+    queryFn: () => cartService.getCart(applyDiscount, selectedItemIds),
   });
-  
-  
 
   // Fetch address data
   const {
@@ -447,59 +453,58 @@ const CheckoutScreen = () => {
   const cart = cartData?.data;
   const selectedCartItems = (cart?.items || []).filter((item) => selectedItemIds.includes(item.id));
   // Thêm useEffect để đồng bộ selectedAddress từ cart khi dữ liệu cart được tải
-useEffect(() => {
-  if (cart?.shipping_address_id && !selectedAddress) {
-    setSelectedAddress(cart.shipping_address_id);
-  }
-}, [cart, selectedAddress]);
-// Thêm vào phần đầu của component, sau khi khai báo state và các hooks
-useEffect(() => {
-  // Kiểm tra xem trong cart có thông tin shipping_address_id không
-  if (cart?.shipping_address?.id) {
-    // Nếu có, đặt selectedAddress thành id của địa chỉ giao hàng
-    setSelectedAddress(cart.shipping_address.id);
-  }
-}, [cart]);
+  useEffect(() => {
+    if (cart?.shipping_address_id && !selectedAddress) {
+      setSelectedAddress(cart.shipping_address_id);
+    }
+  }, [cart, selectedAddress]);
+  // Thêm vào phần đầu của component, sau khi khai báo state và các hooks
+  useEffect(() => {
+    // Kiểm tra xem trong cart có thông tin shipping_address_id không
+    if (cart?.shipping_address?.id) {
+      // Nếu có, đặt selectedAddress thành id của địa chỉ giao hàng
+      setSelectedAddress(cart.shipping_address.id);
+    }
+  }, [cart]);
   // Auto-select the first address if there's only one and none is selected
-// Đoạn code đồng bộ hai chiều
-useEffect(() => {
-  if (selectedAddress) {
+  // Đoạn code đồng bộ hai chiều
+  useEffect(() => {
+    if (selectedAddress) {
+      // Cập nhật thông tin shipping_address
+      cartService
+        .updateShippingInfo({ shipping_address_id: selectedAddress })
+        .then(() => {
+          // Force refetch giỏ hàng sau khi đã chọn địa chỉ
+          queryClient.invalidateQueries(['cart', selectedItemIds, applyDiscount]);
+        })
+        .catch((error) => {
+          console.error('Error updating shipping address: ', error);
+        });
+    }
+  }, [selectedAddress, selectedItemIds, applyDiscount, queryClient]);
+
+  // Thêm useEffect mới để đồng bộ từ cart sang selectedAddress
+  useEffect(() => {
+    if (cart?.shipping_address_id && !selectedAddress) {
+      setSelectedAddress(cart.shipping_address_id);
+    }
+  }, [cart]);
+
+  // Khi người dùng chọn địa chỉ
+  const handleSelectAddress = (addressId) => {
+    setSelectedAddress(addressId);
+
     // Cập nhật thông tin shipping_address
-    cartService.updateShippingInfo({ shipping_address_id: selectedAddress })
+    cartService
+      .updateShippingInfo({ shipping_address_id: addressId })
       .then(() => {
         // Force refetch giỏ hàng sau khi đã chọn địa chỉ
         queryClient.invalidateQueries(['cart', selectedItemIds, applyDiscount]);
       })
-      .catch(error => {
-        console.error("Error updating shipping address: ", error);
+      .catch((error) => {
+        console.error('Error updating shipping address: ', error);
       });
-  }
-}, [selectedAddress, selectedItemIds, applyDiscount, queryClient]);
-
-// Thêm useEffect mới để đồng bộ từ cart sang selectedAddress
-useEffect(() => {
-  if (cart?.shipping_address_id && !selectedAddress) {
-    setSelectedAddress(cart.shipping_address_id);
-  }
-}, [cart]);
-
-  
-  
-  // Khi người dùng chọn địa chỉ
-const handleSelectAddress = (addressId) => {
-  setSelectedAddress(addressId);
-  
-  // Cập nhật thông tin shipping_address
-  cartService.updateShippingInfo({ shipping_address_id: addressId })
-    .then(() => {
-      // Force refetch giỏ hàng sau khi đã chọn địa chỉ
-      queryClient.invalidateQueries(['cart', selectedItemIds, applyDiscount]);
-    })
-    .catch(error => {
-      console.error("Error updating shipping address: ", error);
-    });
-};
-  
+  };
 
   // Navigation between steps
   const next = () => {
@@ -566,30 +571,30 @@ const handleSelectAddress = (addressId) => {
   });
 
   // Handle place order
-const handlePlaceOrder = () => {
-  if (!selectedCartItems.length) {
-    message.error('No products in the cart');
-    return;
-  }
+  const handlePlaceOrder = () => {
+    if (!selectedCartItems.length) {
+      message.error('No products in the cart');
+      return;
+    }
 
-  // Thêm kiểm tra địa chỉ
-  if (!selectedAddress) {
-    message.error('Please select a delivery address');
-    return;
-  }
+    // Thêm kiểm tra địa chỉ
+    if (!selectedAddress) {
+      message.error('Please select a delivery address');
+      return;
+    }
 
-  createOrderMutation.mutate({
-    shipping_address_id: selectedAddress,
-    payment_method: paymentMethod,
-    items: selectedCartItems.map((item) => ({
-      product_id: item.product_id,
-      variant_id: item.variant_id,
-      quantity: item.quantity,
-    })),
-    cart_item_ids: selectedCartItems.map((item) => item.id),
-    discount_code: cart?.discount_code || null,
-  });
-};
+    createOrderMutation.mutate({
+      shipping_address_id: selectedAddress,
+      payment_method: paymentMethod,
+      items: selectedCartItems.map((item) => ({
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        quantity: item.quantity,
+      })),
+      cart_item_ids: selectedCartItems.map((item) => item.id),
+      discount_code: cart?.discount_code || null,
+    });
+  };
 
   // Handle address form
   const handleAddAddress = () => {
@@ -613,7 +618,6 @@ const handlePlaceOrder = () => {
     return addresses.find((addr) => addr.id === selectedAddress);
   };
 
-  
   // Province data for address form
 
   const fetchProvinces = async () => {
@@ -627,14 +631,12 @@ const handlePlaceOrder = () => {
     queryKey: ['provinces'],
     queryFn: fetchProvinces,
   });
-  
+
   // Render các biểu tượng cho phương thức thanh toán
   const renderPaymentIcon = (method) => {
     switch (method) {
       case 'cod':
         return <DollarOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#faad14' }} />;
-      case 'bank_transfer':
-        return <CreditCardOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#52c41a' }} />;
       case 'vnpay':
         return (
           <div
@@ -648,7 +650,7 @@ const handlePlaceOrder = () => {
             }}
           >
             <img
-              src='/logo-vnpay.png'
+              src={vnpayLogo}
               alt='VNPay'
               style={{
                 maxWidth: '100%',
@@ -666,15 +668,15 @@ const handlePlaceOrder = () => {
   // Kiểm tra nếu không có sản phẩm
   if (selectedCartItems.length === 0 && !cartLoading) {
     return (
-      <div style={{ background: '#f7f9fc', minHeight: '100vh', padding: '40px 0' }}>
+      <div className='bg-bg-secondary min-h-screen py-10'>
         <div className='container mx-auto px-4 py-6 text-center'>
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <span>
                 No products available for checkout. <br />
-                <Button type="primary" onClick={() => navigate('/cart')} style={{ marginTop: '16px' }}>
-                Return to Cart
+                <Button type='primary' onClick={() => navigate('/cart')} style={{ marginTop: '16px' }}>
+                  Return to Cart
                 </Button>
               </span>
             }
@@ -685,7 +687,7 @@ const handlePlaceOrder = () => {
   }
 
   return (
-    <div style={{ background: '#f7f9fc', minHeight: '100vh', padding: '24px 0' }}>
+    <div className='bg-bg-secondary min-h-screen py-6'>
       <div className='container mx-auto px-4 py-6'>
         {/* Header và Steps */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
@@ -693,24 +695,20 @@ const handlePlaceOrder = () => {
             <ShoppingOutlined /> Payment
           </Title>
 
-          <Steps 
-            current={currentStep} 
-            responsive={true} 
-            style={{ maxWidth: '800px', margin: '0 auto' }}
-          >
-            <Step 
-              title='Address' 
-              icon={<EnvironmentOutlined />} 
+          <Steps current={currentStep} responsive={true} style={{ maxWidth: '800px', margin: '0 auto' }}>
+            <Step
+              title='Address'
+              icon={<EnvironmentOutlined />}
               description={selectedAddress ? 'Selected' : 'Select address'}
             />
-            <Step 
-              title='Payment' 
-              icon={<CreditCardOutlined />} 
+            <Step
+              title='Payment'
+              icon={<CreditCardOutlined />}
               description={currentStep > CHECKOUT_STEPS.ADDRESS ? getPaymentMethodLabel(paymentMethod) : ''}
             />
-            <Step 
-              title='Confirm' 
-              icon={<CheckCircleOutlined />} 
+            <Step
+              title='Confirm'
+              icon={<CheckCircleOutlined />}
               description={currentStep === CHECKOUT_STEPS.CONFIRMATION ? 'Confirm Order' : ''}
             />
           </Steps>
@@ -729,7 +727,7 @@ const handlePlaceOrder = () => {
                 }
                 extra={
                   <Button onClick={handleAddAddress} icon={<PlusOutlined />} type='primary'>
-                    	Add New Address
+                    Add New Address
                   </Button>
                 }
                 style={{
@@ -758,22 +756,22 @@ const handlePlaceOrder = () => {
                     ))}
                   </Radio.Group>
                 ) : (
-                  <Empty 
+                  <Empty
                     description={
                       <span>
-                        	No addresses found. Please add a new address.
+                        No addresses found. Please add a new address.
                         <br />
-                        <Button 
-                          type="primary" 
-                          icon={<PlusOutlined />} 
+                        <Button
+                          type='primary'
+                          icon={<PlusOutlined />}
                           onClick={handleAddAddress}
                           style={{ marginTop: '16px' }}
                         >
-                          	Add New Address
+                          Add New Address
                         </Button>
                       </span>
-                    } 
-                    style={{ padding: '32px 0' }} 
+                    }
+                    style={{ padding: '32px 0' }}
                   />
                 )}
               </Card>
@@ -798,29 +796,20 @@ const handlePlaceOrder = () => {
                   style={{ width: '100%' }}
                 >
                   <Space direction='vertical' style={{ width: '100%' }}>
-                    <PaymentMethodCard 
-                      value="cod"
+                    <PaymentMethodCard
+                      value='cod'
                       selected={paymentMethod === 'cod'}
-                      title="Cash on Delivery (COD)"
-                      description="Pay with cash upon receiving the order"
+                      title='Cash on Delivery (COD)'
+                      description='Pay with cash upon receiving the order'
                       icon={<DollarOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#faad14' }} />}
                       onClick={() => setPaymentMethod('cod')}
                     />
 
-                    <PaymentMethodCard 
-                      value="bank_transfer"
-                      selected={paymentMethod === 'bank_transfer'}
-                      title="Bank Transfer"
-                      description="Transfer to a bank account"
-                      icon={<CreditCardOutlined style={{ fontSize: '24px', marginRight: '12px', color: '#52c41a' }} />}
-                      onClick={() => setPaymentMethod('bank_transfer')}
-                    />
-
-                    <PaymentMethodCard 
-                      value="vnpay"
+                    <PaymentMethodCard
+                      value='vnpay'
                       selected={paymentMethod === 'vnpay'}
-                      title="VNPay"
-                      description="Pay via VNPay gateway with ATM/Visa/MasterCard"
+                      title='VNPay'
+                      description='Pay via VNPay gateway with ATM/Visa/MasterCard'
                       icon={
                         <div
                           style={{
@@ -833,7 +822,7 @@ const handlePlaceOrder = () => {
                           }}
                         >
                           <img
-                            src='/logo-vnpay.png'
+                            src={vnpayLogo}
                             alt='VNPay'
                             style={{
                               maxWidth: '100%',
@@ -849,7 +838,7 @@ const handlePlaceOrder = () => {
                 </Radio.Group>
 
                 <Alert
-                  message="Payment Information"
+                  message='Payment Information'
                   description={
                     <div>
                       <ul style={{ paddingLeft: '20px', margin: '8px 0' }}>
@@ -859,7 +848,7 @@ const handlePlaceOrder = () => {
                       </ul>
                     </div>
                   }
-                  type="info"
+                  type='info'
                   showIcon
                   style={{ marginTop: '24px' }}
                 />
@@ -883,15 +872,17 @@ const handlePlaceOrder = () => {
                   {/* Thông tin giao hàng */}
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                      <EnvironmentOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
+                      <EnvironmentOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
                       Shipping Information
                     </Title>
                     {getSelectedAddress() && (
-                      <Card style={{ 
-                        background: '#f9f9f9', 
-                        borderRadius: '8px',
-                        boxShadow: 'none'
-                      }}>
+                      <Card
+                        style={{
+                          background: '#f9f9f9',
+                          borderRadius: '8px',
+                          boxShadow: 'none',
+                        }}
+                      >
                         <div>
                           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                             <UserOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
@@ -905,7 +896,9 @@ const handlePlaceOrder = () => {
                           </div>
                           <div style={{ color: '#595959', display: 'flex', alignItems: 'flex-start' }}>
                             <EnvironmentOutlined style={{ marginRight: '8px', marginTop: '4px', color: '#1890ff' }} />
-                            <div>{getSelectedAddress().address}, {getSelectedAddress().city}</div>
+                            <div>
+                              {getSelectedAddress().address}, {getSelectedAddress().city}
+                            </div>
                           </div>
                         </div>
                       </Card>
@@ -915,19 +908,24 @@ const handlePlaceOrder = () => {
                   {/* Phương thức thanh toán */}
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                      <CreditCardOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
+                      <CreditCardOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
                       Payment Method
                     </Title>
-                    <Card style={{ 
-                      background: '#f9f9f9', 
-                      borderRadius: '8px',
-                      boxShadow: 'none'
-                    }}>
+                    <Card
+                      style={{
+                        background: '#f9f9f9',
+                        borderRadius: '8px',
+                        boxShadow: 'none',
+                      }}
+                    >
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         {renderPaymentIcon(paymentMethod)}
                         <Text strong>
-                          {paymentMethod === 'cod' ? 'Cash on Delivery (COD)' : 
-                           paymentMethod === 'bank_transfer' ? 'Bank Transfer' : 'VNPay'}
+                          {paymentMethod === 'cod'
+                            ? 'Cash on Delivery (COD)'
+                            : paymentMethod === 'bank_transfer'
+                            ? 'Bank Transfer'
+                            : 'VNPay'}
                         </Text>
                       </div>
                     </Card>
@@ -936,7 +934,7 @@ const handlePlaceOrder = () => {
                   {/* Danh sách sản phẩm */}
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                      <ShoppingOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
+                      <ShoppingOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
                       Order Details ({selectedCartItems.length} products)
                     </Title>
                     <ProductList items={selectedCartItems} />
@@ -945,14 +943,14 @@ const handlePlaceOrder = () => {
                   {/* Tổng kết đơn hàng */}
                   <div style={{ marginBottom: '24px' }}>
                     <Title level={5} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                      <DollarOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> 
-                      Tổng kết đơn hàng
+                      <DollarOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
+                      Order Summary
                     </Title>
-                    <Card 
-                      style={{ 
-                        background: '#f9f9f9', 
+                    <Card
+                      style={{
+                        background: '#f9f9f9',
                         borderRadius: '8px',
-                        boxShadow: 'none' 
+                        boxShadow: 'none',
                       }}
                     >
                       <div className='flex justify-between mb-2'>
@@ -960,26 +958,24 @@ const handlePlaceOrder = () => {
                         <Text>{formatPrice(cart?.subtotal || 0)}</Text>
                       </div>
                       {cart?.shipping_address?.city ? (
-  <div className='flex justify-between mb-2'>
-    <Text>Shipping Fee:</Text>
-    <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
-  </div>
-) : (
-  <div className='flex justify-between mb-2'>
-    <Text>Shipping Fee:</Text>
-    <Text type="secondary">Vui lòng chọn địa chỉ</Text>
-  </div>
-)}
-{cart?.shipping_address?.city && cart?.shipping_fee === 0 && (
-  <Alert
-    message="You have received free shipping!"
-    type="success"
-    showIcon
-    style={{ marginTop: 12 }}
-  />
-)}
-
-
+                        <div className='flex justify-between mb-2'>
+                          <Text>Shipping Fee:</Text>
+                          <Text>{formatPrice(cart?.shipping_fee || 0)}</Text>
+                        </div>
+                      ) : (
+                        <div className='flex justify-between mb-2'>
+                          <Text>Shipping Fee:</Text>
+                          <Text type='secondary'>Vui lòng chọn địa chỉ</Text>
+                        </div>
+                      )}
+                      {cart?.shipping_address?.city && cart?.shipping_fee === 0 && (
+                        <Alert
+                          message='You have received free shipping!'
+                          type='success'
+                          showIcon
+                          style={{ marginTop: 12 }}
+                        />
+                      )}
 
                       {cart?.discount_amount > 0 && (
                         <div className='flex justify-between mb-2'>
@@ -989,7 +985,9 @@ const handlePlaceOrder = () => {
                       )}
                       <Divider style={{ margin: '12px 0' }} />
                       <div className='flex justify-between'>
-                        <Text strong style={{ fontSize: '16px' }}>Total:</Text>
+                        <Text strong style={{ fontSize: '16px' }}>
+                          Total:
+                        </Text>
                         <Text strong style={{ fontSize: '18px', color: '#1890ff' }}>
                           {formatPrice(cart?.total_amount || 0)}
                         </Text>
@@ -997,43 +995,9 @@ const handlePlaceOrder = () => {
                     </Card>
                   </div>
 
-                  {/* Thông tin chuyển khoản cho phương thức bank_transfer */}
-                  {paymentMethod === 'bank_transfer' && (
-                    <Alert
-                      message={
-                        <Title level={5} style={{ margin: 0, color: '#fa8c16' }}>
-                          <InfoCircleOutlined style={{ marginRight: '8px' }} />
-                          Bank Transfer Information
-                        </Title>
-                      }
-                      description={
-                        <div>
-                          <Paragraph style={{ margin: '0 0 8px 0' }}>
-                          Please transfer with the following reference:{' '}
-                            <Text strong copyable>{`DH-${(Math.random() * 1000000).toFixed(0)}`}</Text>
-                          </Paragraph>
-                          <ul style={{ paddingLeft: '20px', margin: '0' }}>
-                            <li style={{ marginBottom: '4px' }}>
-                            Bank: <Text strong>Vietcombank</Text>
-                            </li>
-                            <li style={{ marginBottom: '4px' }}>
-                            Account Number: <Text strong copyable>1234567890</Text>
-                            </li>
-                            <li>
-                            Account Holder: <Text strong>COMPANY</Text>
-                            </li>
-                          </ul>
-                        </div>
-                      }
-                      type="warning"
-                      style={{ marginBottom: '16px' }}
-                      showIcon={false}
-                    />
-                  )}
-
                   {/* Thông tin thêm */}
                   <Alert
-                    message="Order Notes"
+                    message='Order Notes'
                     description={
                       <ul style={{ paddingLeft: '20px', margin: '0' }}>
                         <li>Orders will be delivered within 2-3 business days</li>
@@ -1041,7 +1005,7 @@ const handlePlaceOrder = () => {
                         <li>Contact hotline 1900xxxx for further assistance</li>
                       </ul>
                     }
-                    type="info"
+                    type='info'
                     showIcon
                   />
                 </div>
@@ -1062,7 +1026,7 @@ const handlePlaceOrder = () => {
                 handlePlaceOrder={handlePlaceOrder}
                 createOrderLoading={createOrderMutation.isLoading}
               />
-              
+
               {/* Thông tin thêm */}
               {currentStep !== CHECKOUT_STEPS.CONFIRMATION && (
                 <Card
@@ -1077,23 +1041,23 @@ const handlePlaceOrder = () => {
                       <TruckOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
                       <Text strong>Fast delivery</Text>
                     </div>
-                    <Text type="secondary">Delivery within 2–3 business days</Text>
+                    <Text type='secondary'>Delivery within 2–3 business days</Text>
                   </div>
-                  
+
                   <div style={{ marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                       <SafetyOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
                       <Text strong>Quality assurance</Text>
                     </div>
-                    <Text type="secondary">Genuine products, quality-checked before delivery</Text>
+                    <Text type='secondary'>Genuine products, quality-checked before delivery</Text>
                   </div>
-                  
+
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
                       <LockOutlined style={{ fontSize: '18px', color: '#1890ff', marginRight: '8px' }} />
                       <Text strong>Secure payment</Text>
                     </div>
-                    <Text type="secondary">Your payment information is protected</Text>
+                    <Text type='secondary'>Your payment information is protected</Text>
                   </div>
                 </Card>
               )}
@@ -1105,7 +1069,7 @@ const handlePlaceOrder = () => {
         <Modal
           title={
             <div style={{ fontSize: '18px' }}>
-              <PlusOutlined /> 	Add New Address
+              <PlusOutlined /> Add New Address
             </div>
           }
           open={isAddressModalVisible}
@@ -1119,15 +1083,15 @@ const handlePlaceOrder = () => {
           <Form form={form} layout='vertical'>
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item 
-                  name='full_name' 
-                  label='Full Name' 
+                <Form.Item
+                  name='full_name'
+                  label='Full Name'
                   rules={[{ required: true, message: 'Please enter your full name' }]}
                 >
-                  <Input 
-                    size='large' 
-                    placeholder='Nguyễn Văn A' 
-                    prefix={<UserOutlined style={{ color: '#d9d9d9' }} />} 
+                  <Input
+                    size='large'
+                    placeholder='Nguyễn Văn A'
+                    prefix={<UserOutlined style={{ color: '#d9d9d9' }} />}
                   />
                 </Form.Item>
               </Col>
@@ -1137,42 +1101,40 @@ const handlePlaceOrder = () => {
                   label='Phone Number'
                   rules={[
                     { required: true, message: 'Please enter your phone number' },
-                    { pattern: /^[0-9]{10}$/, message: 'Invalid phone number' }
+                    { pattern: /^[0-9]{10}$/, message: 'Invalid phone number' },
                   ]}
                 >
-                  <Input 
-                    size='large' 
-                    placeholder='0901234567' 
-                    prefix={<PhoneOutlined style={{ color: '#d9d9d9' }} />} 
+                  <Input
+                    size='large'
+                    placeholder='0901234567'
+                    prefix={<PhoneOutlined style={{ color: '#d9d9d9' }} />}
                   />
                 </Form.Item>
               </Col>
             </Row>
             <Form.Item
-  name='city'
-  label='Province/City'
-  rules={[{ required: true, message: 'Please select a province/city' }]}
->
-  <Select
-    size='large'
-    placeholder='Chọn tỉnh/thành phố'
-    loading={provinceLoading}
-    options={provinceOptions}
-    showSearch
-    filterOption={(input, option) =>
-      option.label.toLowerCase().includes(input.toLowerCase())
-    }
-  />
-</Form.Item>
+              name='city'
+              label='Province/City'
+              rules={[{ required: true, message: 'Please select a province/city' }]}
+            >
+              <Select
+                size='large'
+                placeholder='Chọn tỉnh/thành phố'
+                loading={provinceLoading}
+                options={provinceOptions}
+                showSearch
+                filterOption={(input, option) => option.label.toLowerCase().includes(input.toLowerCase())}
+              />
+            </Form.Item>
 
             <Form.Item
               name='address'
               label='Specific Address'
               rules={[{ required: true, message: 'Please enter a specific address' }]}
             >
-              <Input.TextArea 
-                rows={3} 
-                placeholder='Số nhà, tên đường, phường/xã, quận/huyện...' 
+              <Input.TextArea
+                rows={3}
+                placeholder='Số nhà, tên đường, phường/xã, quận/huyện...'
                 style={{ resize: 'none' }}
               />
             </Form.Item>
@@ -1188,8 +1150,6 @@ const getPaymentMethodLabel = (method) => {
   switch (method) {
     case 'cod':
       return 'Thanh toán khi nhận hàng';
-    case 'bank_transfer':
-      return 'Bank Transfer';
     case 'vnpay':
       return 'VNPay';
     default:

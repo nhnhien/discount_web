@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html, body, #root {
-  @apply min-h-screen bg-orange-100;
+  @apply min-h-screen bg-bg-secondary; /* Changed to blue theme bg-bg-secondary */
 }
 
 body {
@@ -11,8 +11,8 @@ body {
 }
 
 .sidebar-fixed {
-  @apply fixed left-0 top-[60px] bottom-0 z-30 bg-white shadow-lg transition-transform duration-300 ease-in-out;
-  background-image: linear-gradient(to bottom, white, white);
+  @apply fixed left-0 top-[60px] bottom-0 z-30 bg-bg-primary shadow-lg transition-transform duration-300 ease-in-out;
+  background-image: linear-gradient(to bottom, theme('colors.bg-primary'), theme('colors.bg-primary'));
   background-repeat: repeat-y;
   background-size: 100% 100vh;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
@@ -24,7 +24,7 @@ body {
 }
 
 .main-container {
-  @apply flex flex-1 bg-content-admin;
+  @apply flex flex-1 bg-bg-secondary; /* Changed to blue theme bg-bg-secondary */
   min-height: calc(100vh - 60px);
 }
 
@@ -33,6 +33,10 @@ body {
   min-height: calc(100vh - 60px);
 }
 
+/* Card styling for better visibility on blue background */
+.ant-card {
+  @apply bg-bg-card shadow-sm; /* Using white background for cards */
+}
 /* Add this to src/index.css or create a new CSS file and import it */
 
 .homepage-hero-carousel .slick-dots {

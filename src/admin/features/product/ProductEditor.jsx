@@ -147,7 +147,7 @@ const ProductEditor = () => {
 
   useEffect(() => {
     if (productError) {
-      message.error('Không thể tải dữ liệu sản phẩm');
+      message.error('Unable to load product data');
       setLoadingInitialData(false);
     }
   }, [productError]);
@@ -161,7 +161,7 @@ const ProductEditor = () => {
 
   const handleAddVariant = () => {
     if (!isLastVariantFilled()) {
-      message.warning('Vui lòng điền đầy đủ thông tin SKU, giá và tồn kho cho biến thể hiện tại trước khi thêm mới.');
+      message.warning('Please fill in complete SKU, price and stock information for the current variant before adding a new one.');
       return;
     }
 
@@ -180,13 +180,13 @@ const ProductEditor = () => {
   const createMutation = useMutation({
     mutationFn: createProduct,
     onSuccess: () => {
-      message.success('Tạo sản phẩm thành công!');
+      message.success('Product created successfully!');
       queryClient.invalidateQueries(['products']);
       reset(originalValues);
       navigate('/admin/product');
     },
     onError: (error) => {
-      message.error('Có lỗi khi tạo sản phẩm: ' + (error.message || 'Vui lòng thử lại'));
+      message.error('Error creating product: ' + (error.message || 'Please try again'));
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -196,13 +196,13 @@ const ProductEditor = () => {
   const updateMutation = useMutation({
     mutationFn: (data) => editProduct(id, data),
     onSuccess: () => {
-      message.success('Cập nhật sản phẩm thành công!');
+      message.success('Product updated successfully!');
       queryClient.invalidateQueries(['products']);
       queryClient.invalidateQueries(['product_edit', id]);
       navigate('/admin/product');
     },
     onError: (error) => {
-      message.error('Có lỗi khi cập nhật sản phẩm: ' + (error.message || 'Vui lòng thử lại'));
+      message.error('Error updating product: ' + (error.message || 'Please try again'));
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -258,7 +258,7 @@ const ProductEditor = () => {
 
   const handleReset = () => {
     reset(originalValues);
-    message.info(isEditing ? 'Đã khôi phục dữ liệu ban đầu' : 'Đã xóa tất cả thông tin nhập');
+    message.info(isEditing ? 'Data has been restored to initial state' : 'All entered information has been cleared');
   };
 
   const renderVariants = () => (
@@ -268,16 +268,16 @@ const ProductEditor = () => {
           header={
             <div className='flex justify-between items-center'>
               <span className='font-semibold text-blue-700 text-base'>
-                Biến thể của sản phẩm: {watch('name') || 'Chưa đặt tên'}
+                Product variants: {watch('name') || 'Unnamed'}
               </span>
-              <Tooltip title='Thêm biến thể mới'>
+              <Tooltip title='Add new variant'>
                 <Button
                   type='primary'
                   onClick={handleAddVariant}
                   disabled={!isLastVariantFilled()}
                   icon={<PlusOutlined />}
                 >
-                  Thêm biến thể
+                  Add variant
                 </Button>
               </Tooltip>
             </div>
@@ -286,14 +286,14 @@ const ProductEditor = () => {
         >
           {fields.length === 0 ? (
             <div className='text-center p-8 text-gray-500'>
-              <p>Chưa có biến thể nào. Hãy thêm biến thể đầu tiên.</p>
+              <p>No variants yet. Add the first variant.</p>
             </div>
           ) : (
             fields.map((field, index) => (
               <div key={field.id} className='mb-6 border-b pb-4'>
                 <div className='flex justify-between items-center mb-2'>
                   <span className='font-medium text-blue-600'>
-                    Biến thể {index + 1}{' '}
+                    Variant {index + 1}{' '}
                     {watch(`variants.${index}.sku`) && (
                       <span className='ml-2 text-sm text-gray-500'>({watch(`variants.${index}.sku`)})</span>
                     )}
@@ -305,7 +305,7 @@ const ProductEditor = () => {
                       onClick={() => remove(index)}
                       size='small'
                     >
-                      Xóa
+                      Delete
                     </Button>
                   )}
                 </div>
@@ -321,14 +321,14 @@ const ProductEditor = () => {
                       <Controller
                         name={`variants.${index}.sku`}
                         control={control}
-                        rules={{ required: 'Vui lòng nhập SKU' }}
-                        render={({ field }) => <Input {...field} placeholder='Nhập SKU' />}
+                        rules={{ required: 'Please enter SKU' }}
+                        render={({ field }) => <Input {...field} placeholder='Enter SKU' />}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
                     <Form.Item
-                      label='Giá'
+                      label='Price'
                       required
                       validateStatus={errors.variants?.[index]?.price ? 'error' : ''}
                       help={errors.variants?.[index]?.price?.message}
@@ -336,16 +336,16 @@ const ProductEditor = () => {
                       <Controller
                         name={`variants.${index}.price`}
                         control={control}
-                        rules={{ required: 'Vui lòng nhập giá' }}
+                        rules={{ required: 'Please enter price' }}
                         render={({ field }) => (
-                          <Input {...field} placeholder='Nhập giá' suffix='VNĐ' type='number' min='0' step='1000' />
+                          <Input {...field} placeholder='Enter price' suffix='VND' type='number' min='0' step='1000' />
                         )}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
                     <Form.Item
-                      label='Tồn kho'
+                      label='Stock'
                       required
                       validateStatus={errors.variants?.[index]?.stock ? 'error' : ''}
                       help={errors.variants?.[index]?.stock?.message}
@@ -353,8 +353,8 @@ const ProductEditor = () => {
                       <Controller
                         name={`variants.${index}.stock`}
                         control={control}
-                        rules={{ required: 'Vui lòng nhập tồn kho' }}
-                        render={({ field }) => <Input {...field} placeholder='Nhập tồn kho' type='number' min='0' />}
+                        rules={{ required: 'Please enter stock quantity' }}
+                        render={({ field }) => <Input {...field} placeholder='Enter stock quantity' type='number' min='0' />}
                       />
                     </Form.Item>
                   </Col>
@@ -367,7 +367,7 @@ const ProductEditor = () => {
                         name={`variants.${index}.size`}
                         control={control}
                         render={({ field }) => (
-                          <Select {...field} placeholder='Chọn size' allowClear value={field.value || undefined}>
+                          <Select {...field} placeholder='Select size' allowClear value={field.value || undefined}>
                             {['S', 'M', 'L', 'XL', 'XXL'].map((size) => (
                               <Select.Option key={size} value={size}>
                                 {size}
@@ -379,21 +379,21 @@ const ProductEditor = () => {
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
-                    <Form.Item label='Màu sắc'>
+                    <Form.Item label='Color'>
                       <Controller
                         name={`variants.${index}.color`}
                         control={control}
-                        render={({ field }) => <Input {...field} placeholder='Nhập màu' />}
+                        render={({ field }) => <Input {...field} placeholder='Enter color' />}
                       />
                     </Form.Item>
                   </Col>
                   <Col xs={24} md={8}>
-                    <Form.Item label='Chất liệu'>
+                    <Form.Item label='Material'>
                       <Controller
                         name={`variants.${index}.material`}
                         control={control}
                         render={({ field }) => (
-                          <Select {...field} placeholder='Chọn chất liệu' allowClear value={field.value || undefined}>
+                          <Select {...field} placeholder='Select material' allowClear value={field.value || undefined}>
                             {['Cotton', 'Polyester', 'Linen', 'Denim', 'Wool', 'Silk'].map((material) => (
                               <Select.Option key={material} value={material}>
                                 {material}
@@ -406,7 +406,7 @@ const ProductEditor = () => {
                   </Col>
                 </Row>
   
-                <Form.Item label='Ảnh biến thể'>
+                <Form.Item label='Variant Image'>
                   <Controller
                     name={`variants.${index}.image_url`}
                     control={control}
@@ -435,11 +435,11 @@ const ProductEditor = () => {
     <div className='bg-white p-6 shadow-md rounded-lg max-w-full h-[81vh] overflow-auto'>
       <div className='flex justify-between items-center mb-6'>
         <h1 className='text-2xl font-semibold text-blue-700'>
-          {isEditing ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm mới'}
+          {isEditing ? 'Update Product' : 'Add New Product'}
         </h1>
         <Space>
           <Button onClick={handleReset} icon={<UndoOutlined />} disabled={!isDirty}>
-            Hoàn tác
+            Undo
           </Button>
           <Button
             type='primary'
@@ -448,7 +448,7 @@ const ProductEditor = () => {
             loading={isSubmitting}
             disabled={!isDirty}
           >
-            {isEditing ? 'Cập nhật' : 'Tạo mới'}
+            {isEditing ? 'Update' : 'Create'}
           </Button>
         </Space>
       </div>
@@ -457,7 +457,7 @@ const ProductEditor = () => {
         <div className='mb-4 bg-blue-50 p-3 rounded-md flex items-center'>
           <InfoCircleOutlined className='text-blue-500 mr-2' />
           <span>
-            Đang chỉnh sửa sản phẩm ID: <strong>{id}</strong>
+            Editing product ID: <strong>{id}</strong>
           </span>
         </div>
       )}
@@ -466,10 +466,10 @@ const ProductEditor = () => {
         <Row gutter={[24, 0]}>
           <Col xs={24} lg={12}>
             <div className='p-4 bg-gray-50 rounded-md mb-4'>
-              <h2 className='text-lg font-semibold mb-4 text-blue-700'>Thông tin cơ bản</h2>
+              <h2 className='text-lg font-semibold mb-4 text-blue-700'>Basic Information</h2>
 
               <Form.Item
-                label='Tên sản phẩm'
+                label='Product Name'
                 required
                 validateStatus={errors.name ? 'error' : ''}
                 help={errors.name?.message}
@@ -477,19 +477,19 @@ const ProductEditor = () => {
                 <Controller
                   name='name'
                   control={control}
-                  rules={{ required: 'Vui lòng nhập tên sản phẩm' }}
-                  render={({ field }) => <Input {...field} placeholder='Nhập tên sản phẩm' size='large' />}
+                  rules={{ required: 'Please enter product name' }}
+                  render={({ field }) => <Input {...field} placeholder='Enter product name' size='large' />}
                 />
               </Form.Item>
 
-              <Form.Item label='Mô tả sản phẩm'>
+              <Form.Item label='Product Description'>
                 <Controller
                   name='description'
                   control={control}
                   render={({ field }) => (
                     <TextArea
                       {...field}
-                      placeholder='Nhập mô tả sản phẩm'
+                      placeholder='Enter product description'
                       size='large'
                       rows={4}
                       showCount
@@ -502,7 +502,7 @@ const ProductEditor = () => {
               <Row gutter={16}>
                 <Col xs={24} md={12}>
                   <Form.Item
-                    label='Danh mục'
+                    label='Category'
                     required
                     validateStatus={errors.category ? 'error' : ''}
                     help={errors.category?.message}
@@ -510,11 +510,11 @@ const ProductEditor = () => {
                     <Controller
                       name='category'
                       control={control}
-                      rules={{ required: 'Vui lòng chọn danh mục' }}
+                      rules={{ required: 'Please select a category' }}
                       render={({ field }) => (
                         <Select
                           {...field}
-                          placeholder='Chọn danh mục'
+                          placeholder='Select category'
                           size='large'
                           className='w-full'
                           loading={isLoadingCategories}
@@ -542,11 +542,11 @@ const ProductEditor = () => {
                     <Controller
                       name='market'
                       control={control}
-                      rules={{ required: 'Vui lòng chọn market' }}
+                      rules={{ required: 'Please select a market' }}
                       render={({ field }) => (
                         <Select
                           {...field}
-                          placeholder='Chọn Market'
+                          placeholder='Select Market'
                           size='large'
                           className='w-full'
                           loading={isLoadingMarkets}
@@ -566,7 +566,7 @@ const ProductEditor = () => {
                 </Col>
               </Row>
 
-              <Form.Item label='Ảnh sản phẩm chính'>
+              <Form.Item label='Main Product Image'>
                 <Controller
                   name='image_url'
                   control={control}
@@ -579,8 +579,8 @@ const ProductEditor = () => {
               <Form.Item
                 label={
                   <Space>
-                    <span>Sản phẩm có biến thể?</span>
-                    <Tooltip title='Chọn nếu sản phẩm có nhiều biến thể như kích cỡ, màu sắc, v.v.'>
+                    <span>Product has variants?</span>
+                    <Tooltip title='Select if the product has multiple variants like size, color, etc.'>
                       <InfoCircleOutlined />
                     </Tooltip>
                   </Space>
@@ -623,18 +623,18 @@ const ProductEditor = () => {
           <Col xs={24} lg={12}>
             {!hasVariants ? (
               <div className='p-4 bg-gray-50 rounded-md'>
-                <h2 className='text-lg font-semibold mb-4 text-blue-700'>Thông tin sản phẩm</h2>
+                <h2 className='text-lg font-semibold mb-4 text-blue-700'>Product Information</h2>
                 <Form.Item label='SKU' required validateStatus={errors.sku ? 'error' : ''} help={errors.sku?.message}>
                   <Controller
                     name='sku'
                     control={control}
-                    rules={{ required: hasVariants ? false : 'Vui lòng nhập SKU' }}
-                    render={({ field }) => <Input {...field} placeholder='Nhập SKU' size='large' />}
+                    rules={{ required: hasVariants ? false : 'Please enter SKU' }}
+                    render={({ field }) => <Input {...field} placeholder='Enter SKU' size='large' />}
                   />
                 </Form.Item>
 
                 <Form.Item
-                  label='Giá'
+                  label='Price'
                   required
                   validateStatus={errors.price ? 'error' : ''}
                   help={errors.price?.message}
@@ -643,18 +643,18 @@ const ProductEditor = () => {
                     name='price'
                     control={control}
                     rules={{
-                      required: hasVariants ? false : 'Vui lòng nhập giá',
+                      required: hasVariants ? false : 'Please enter price',
                       pattern: {
                         value: /^\d+(\.\d{1,2})?$/,
-                        message: 'Giá phải là số hợp lệ',
+                        message: 'Price must be a valid number',
                       },
                     }}
                     render={({ field }) => (
                       <Input
                         {...field}
-                        placeholder='Nhập giá'
+                        placeholder='Enter price'
                         size='large'
-                        suffix='VNĐ'
+                        suffix='VND'
                         type='number'
                         min='0'
                         step='1000'
@@ -664,7 +664,7 @@ const ProductEditor = () => {
                 </Form.Item>
 
                 <Form.Item
-                  label='Tồn kho'
+                  label='Stock'
                   required
                   validateStatus={errors.stock ? 'error' : ''}
                   help={errors.stock?.message}
@@ -673,14 +673,14 @@ const ProductEditor = () => {
                     name='stock'
                     control={control}
                     rules={{
-                      required: hasVariants ? false : 'Vui lòng nhập số lượng tồn kho',
+                      required: hasVariants ? false : 'Please enter stock quantity',
                       pattern: {
                         value: /^\d+$/,
-                        message: 'Tồn kho phải là số nguyên',
+                        message: 'Stock must be a whole number',
                       },
                     }}
                     render={({ field }) => (
-                      <Input {...field} placeholder='Nhập số lượng tồn kho' size='large' type='number' min='0' />
+                      <Input {...field} placeholder='Enter stock quantity' size='large' type='number' min='0' />
                     )}
                   />
                 </Form.Item>

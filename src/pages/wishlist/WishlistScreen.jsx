@@ -43,18 +43,18 @@ const WishlistScreen = () => {
   return (
     <div className='bg-gray-50 min-h-screen py-8'>
       <div className='container mx-auto px-4'>
-        <Title level={3}>Danh sách sản phẩm yêu thích</Title>
+        <Title level={3}>Your Wishlist</Title>
 
         {isLoading ? (
           <div className='flex justify-center items-center h-64'>
             <Spin size='large' />
           </div>
         ) : isError ? (
-          <Empty description='Lỗi khi tải sản phẩm yêu thích' />
+          <Empty description='Failed to load wishlist items' />
         ) : isEmpty ? (
-          <Empty description='Bạn chưa thêm sản phẩm nào vào yêu thích'>
+          <Empty description="You haven't added any products to your wishlist yet">
             <Button type='primary' onClick={() => window.location.href = '/products'}>
-              Khám phá sản phẩm
+            Explore Products
             </Button>
           </Empty>
         ) : (

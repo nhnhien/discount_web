@@ -116,11 +116,15 @@ const ProductManager = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteProduct,
     onSuccess: () => {
-      message.success("Xóa sản phẩm thành công!")
+      message.success("Product deleted successfully!")
       queryClient.invalidateQueries(["product"])
     },
-    onError: () => {
-      message.error("Lỗi khi xóa sản phẩm!")
+    onError: (error) => {
+      if (error.response?.status === 400) {
+        message.error("Cannot delete product that is being used in orders")
+      } else {
+        message.error("Error deleting product!")
+      }
     },
   })
 
@@ -128,21 +132,83 @@ const ProductManager = () => {
     if (e) e.stopPropagation()
 
     confirm({
-      title: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      title: "Are you sure you want to delete this product?",
       icon: <ExclamationCircleOutlined />,
-      content: "Hành động này không thể hoàn tác!",
-      okText: "Xóa",
+      content: "This action cannot be undone!",
+      okText: "Delete",
       okType: "danger",
-      cancelText: "Hủy",
+      cancelText: "Cancel",
       onOk() {
         deleteMutation.mutate(productId)
       },
     })
   }
 
+  const handleExportExcel = () => {
+    try {
+      const filters = {}
+      if (categoryFilter) filters.categoryId = categoryFilter
+      if (searchTerm) filters.search = searchTerm
+
+      exportProductsToExcel(filters)
+    } catch (error) {
+      console.error("Error exporting products:", error)
+      message.error(error.message || "Unable to export Excel file")
+    }
+  }
+
+  const handleImportSuccess = () => {
+    setImportModalVisible(false)
+    refetchProducts()
+    message.success("Import product successfully!")
+  }
+
+  const handleImportError = (error) => {
+    message.error(error.message || "Error importing products. Please check the file format.")
+  }
+
+  // Validate category filter
+  const validateCategoryFilter = (categoryId) => {
+    if (!categoryId) return true;
+    return categories?.data?.some(cat => cat.id === categoryId);
+  }
+
+  // Update category filter with validation
+  const handleCategoryFilterChange = (value) => {
+    if (validateCategoryFilter(value)) {
+      setCategoryFilter(value);
+    } else {
+      message.error("Selected category no longer exists");
+      setCategoryFilter(null);
+    }
+  };
+
+  // Update search term with validation
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    if (value.length > 100) {
+      message.warning("Search term is too long");
+      return;
+    }
+    setSearchTerm(value);
+  };
+
+  // Validate product data before display
+  const validateProductData = (product) => {
+    if (!product) return false;
+    
+    const requiredFields = ['name', 'category_id', 'price'];
+    return requiredFields.every(field => product[field] !== undefined && product[field] !== null);
+  };
+
   const filteredProducts = useMemo(() => {
     if (!products) return []
     return products.data?.filter((product) => {
+      if (!validateProductData(product)) {
+        console.error('Invalid product data:', product);
+        return false;
+      }
+
       const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase())
       const matchesCategory = categoryFilter ? product.category_id === categoryFilter : true
       return matchesSearch && matchesCategory
@@ -159,25 +225,6 @@ const ProductManager = () => {
     if (quantity > 20) return <Tag color="success">In stock</Tag>
     if (quantity > 0) return <Tag color="warning">Low stock</Tag>
     return <Tag color="error">Out of stock</Tag>
-  }
-
-  const handleExportExcel = () => {
-    try {
-      const filters = {}
-      if (categoryFilter) filters.categoryId = categoryFilter
-      if (searchTerm) filters.search = searchTerm
-
-      exportProductsToExcel(filters)
-    } catch (error) {
-      console.error("Error exporting products:", error)
-      message.error("Không thể xuất file Excel")
-    }
-  }
-
-  const handleImportSuccess = () => {
-    setImportModalVisible(false)
-    refetchProducts()
-    message.success("Import sản phẩm thành công!")
   }
 
   const expandedRowRender = (record) => (
@@ -587,7 +634,7 @@ const ProductManager = () => {
           <Search
             placeholder="Search products"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
             allowClear
             className="w-full mt-2"
           />
@@ -599,7 +646,7 @@ const ProductManager = () => {
             placeholder="Select category"
             value={categoryFilter}
             allowClear
-            onChange={(value) => setCategoryFilter(value)}
+            onChange={handleCategoryFilterChange}
             className="w-full mt-2"
             loading={categoriesLoading}
           >
@@ -769,7 +816,7 @@ const ProductManager = () => {
               <Search
                 placeholder="Search products"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 allowClear
                 prefix={<SearchOutlined />}
                 style={{ width: screens.lg ? 250 : 200 }}
@@ -778,7 +825,7 @@ const ProductManager = () => {
                 placeholder="Select category"
                 value={categoryFilter}
                 allowClear
-                onChange={(value) => setCategoryFilter(value)}
+                onChange={handleCategoryFilterChange}
                 style={{ width: screens.lg ? 200 : 150 }}
                 loading={categoriesLoading}
               >
@@ -926,6 +973,7 @@ const ProductManager = () => {
         visible={importModalVisible}
         onCancel={() => setImportModalVisible(false)}
         onSuccess={handleImportSuccess}
+        onError={handleImportError}
       />
     </div>
   )

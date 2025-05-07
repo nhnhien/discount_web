@@ -492,7 +492,7 @@ const DashboardAdmin = () => {
     yField: 'value',
     color: '#5B8FF9',
     label: {
-      position: 'middle',
+      position: 'top',
       style: {
         fill: '#FFFFFF',
         opacity: 0.6,

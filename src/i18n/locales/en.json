@@ -75,7 +75,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "help": "Help",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "shop_by_category": "Shop by Category"
   },
   "nav": {
     "discounted": "Discounted Products",

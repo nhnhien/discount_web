@@ -95,6 +95,7 @@ const navItems = [
           <div className='flex items-center space-x-4'>
             <Link to='/'>
               <h1 className='text-2xl font-bold text-gray-800'>IUWE STORE</h1>
+              <p className='text-sm text-gray-500 tracking-wide'>SMART PRICING</p>
             </Link>
             <Button
               type='text'

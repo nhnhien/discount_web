@@ -53,13 +53,13 @@ const CategoryManager = () => {
   const createMutation = useMutation({
     mutationFn: createCategory,
     onSuccess: () => {
-      message.success('Đã thêm danh mục mới');
+      message.success('New category added');
       queryClient.invalidateQueries(['categories']);
       setModalVisible(false);
       form.resetFields();
     },
     onError: (error) => {
-      message.error(`Lỗi khi thêm danh mục: ${error.message}`);
+      message.error(`Error adding category: ${error.message}`);
     },
   });
 
@@ -67,14 +67,14 @@ const CategoryManager = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => updateCategory(id, data),
     onSuccess: () => {
-      message.success('Đã cập nhật danh mục');
+      message.success('Category updated');
       queryClient.invalidateQueries(['categories']);
       setModalVisible(false);
       setEditingCategory(null);
       form.resetFields();
     },
     onError: (error) => {
-      message.error(`Lỗi khi cập nhật danh mục: ${error.message}`);
+      message.error(`Error updating category: ${error.message}`);
     },
   });
 
@@ -82,11 +82,11 @@ const CategoryManager = () => {
   const deleteMutation = useMutation({
     mutationFn: deleteCategory,
     onSuccess: () => {
-      message.success('Đã xóa danh mục');
+      message.success('Category deleted');
       queryClient.invalidateQueries(['categories']);
     },
     onError: (error) => {
-      message.error(`Lỗi khi xóa danh mục: ${error.message}`);
+      message.error(`Error deleting category: ${error.message}`);
     },
   });
 
@@ -134,10 +134,10 @@ const CategoryManager = () => {
       const result = await uploadMutation.mutateAsync(file);
       if (result && result.url) {
         form.setFieldsValue({ image_url: result.url });
-        message.success('Tải ảnh lên thành công!');
+        message.success('Image uploaded successfully!');
       }
     } catch (error) {
-      message.error('Tải ảnh lên thất bại');
+      message.error('Failed to upload image');
     }
   };
 
@@ -174,7 +174,7 @@ const CategoryManager = () => {
       },
       render: (description) => (
         <Tooltip title={description}>
-          <span>{description || 'Không có mô tả'}</span>
+          <span>{description || 'No description'}</span>
         </Tooltip>
       ),
     },
@@ -216,11 +216,11 @@ const CategoryManager = () => {
             size="middle"
           />
           <Popconfirm
-            title="Bạn có chắc muốn xóa danh mục này?"
-            description="Hành động này không thể hoàn tác. Các sản phẩm thuộc danh mục này sẽ không bị xóa."
+            title="Are you sure you want to delete this category?"
+            description="This action cannot be undone. Products in this category will not be deleted."
             onConfirm={() => handleDeleteCategory(record.id)}
-            okText="Xóa"
-            cancelText="Hủy"
+            okText="Delete"
+            cancelText="Cancel"
             icon={<ExclamationCircleOutlined style={{ color: 'red' }} />}
           >
             <Button 
@@ -239,11 +239,11 @@ const CategoryManager = () => {
       <div className="p-6">
         <Card>
           <div className="text-center py-5">
-            <Title level={4} type="danger">Không thể tải danh mục</Title>
-            <Text type="secondary">Đã xảy ra lỗi khi tải danh mục: {error.message}</Text>
+            <Title level={4} type="danger">Unable to load categories</Title>
+            <Text type="secondary">An error occurred while loading categories: {error.message}</Text>
             <div className="mt-4">
               <Button type="primary" onClick={() => refetch()} icon={<ReloadOutlined />}>
-                Thử lại
+                Try again
               </Button>
             </div>
           </div>
@@ -300,14 +300,14 @@ const CategoryManager = () => {
               showTotal: (total) => `Total ${total} categories`,
             }}
             locale={{
-              emptyText: 'Không có danh mục nào',
+              emptyText: 'No categories found',
             }}
           />
         )}
       </Card>
 
       <Modal
-        title={editingCategory ? "Cập nhật danh mục" : "Thêm danh mục mới"}
+        title={editingCategory ? "Update Category" : "Add New Category"}
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         onOk={handleSubmit}
@@ -322,9 +322,9 @@ const CategoryManager = () => {
           <Form.Item
             name="name"
             label="Category name"
-            rules={[{ required: true, message: 'Vui lòng nhập tên danh mục' }]}
+            rules={[{ required: true, message: 'Please enter category name' }]}
           >
-            <Input placeholder="Nhập tên danh mục" />
+            <Input placeholder="Enter category name" />
           </Form.Item>
           
           <Form.Item
@@ -332,19 +332,18 @@ const CategoryManager = () => {
             label="Description"
           >
             <Input.TextArea 
-              placeholder="Nhập mô tả cho danh mục" 
+              placeholder="Enter category description" 
               autoSize={{ minRows: 3, maxRows: 6 }}
             />
           </Form.Item>
           
-          <Form.Item label="Ảnh danh mục">
-  <Form.Item name="image_url" noStyle>
-    <ImageUploader />
-  </Form.Item>
-</Form.Item>
+          <Form.Item label="Category Image">
+            <Form.Item name="image_url" noStyle>
+              <ImageUploader />
+            </Form.Item>
+          </Form.Item>
 
-
-          <Form.Item label="Hoặc tải ảnh lên">
+          <Form.Item label="Or upload image">
             <Upload
               name="image"
               listType="picture"
@@ -353,7 +352,7 @@ const CategoryManager = () => {
               accept="image/*"
             >
               <Button icon={<UploadOutlined />} loading={uploadMutation.isLoading}>
-                Tải lên ảnh
+                Upload Image
               </Button>
             </Upload>
           </Form.Item>

@@ -20,7 +20,8 @@ const getProductApplyCP = async (options = {}) => {
       search = "",
       categoryId = "",
       userId,
-      discount, // ✅ thêm discount ở đây
+      discount, // ✅ đã thêm discount
+      sortBy = "newest", // ✅ thêm sortBy với giá trị mặc định là "newest"
     } = options
 
     console.log("📦 [API CALL] getProductApplyCP - Params:", {
@@ -30,6 +31,7 @@ const getProductApplyCP = async (options = {}) => {
       categoryId,
       userId,
       discount,
+      sortBy, // ✅ log ra tham số sortBy
     })
 
     const res = await apiClient.get("/api/product", {
@@ -39,7 +41,8 @@ const getProductApplyCP = async (options = {}) => {
         search,
         categoryId,
         userId,
-        ...(discount !== undefined ? { discount } : {}), // ✅ chỉ thêm nếu discount được set
+        ...(discount !== undefined ? { discount } : {}), // chỉ thêm nếu discount được set
+        sortBy, // ✅ luôn truyền sortBy để backend sắp xếp
       },
     })
 
@@ -156,11 +159,12 @@ const importProductsFromExcel = async (formData) => {
 
 const exportProductsToExcel = async (filters = {}) => {
   try {
-    const { categoryId, search } = filters;
+    const { categoryId, search, sortBy } = filters;
     const queryParams = new URLSearchParams();
 
     if (categoryId) queryParams.append("categoryId", categoryId);
     if (search) queryParams.append("search", search);
+    if (sortBy) queryParams.append("sortBy", sortBy); // ✅ thêm sortBy cho export
 
     const auth = getAuth();
     const user = auth.currentUser;

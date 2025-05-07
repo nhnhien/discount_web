@@ -35,7 +35,7 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
 
     // ⚠️ Không kiểm tra instanceof File để tránh lỗi trên các trình duyệt/build khác nhau
     if (!file || !file.name || !file.type) {
-      message.error("Vui lòng chọn file Excel để import");
+      message.error("Please select an Excel file to import");
       return;
     }
 
@@ -60,17 +60,17 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
       setUploadProgress(100);
 
       if (response.success) {
-        message.success(`Import thành công ${response.data.productIds.length} sản phẩm`);
+        message.success(`Import successful ${response.data.productIds.length} products`);
         setFileList([]);
         onSuccess();
       } else {
-        setError(response.message || "Import thất bại");
-        message.error("Import thất bại");
+        setError(response.message || "Import failed");
+        message.error("Import failed");
       }
     } catch (error) {
       console.error("❌ Error importing:", error);
-      setError(error.message || "Không thể import sản phẩm");
-      message.error(error.message || "Import thất bại");
+      setError(error.message || "Cannot import products");
+      message.error(error.message || "Import failed");
     } finally {
       setUploading(false);
     }
@@ -81,7 +81,7 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
       await downloadProductTemplate();
     } catch (error) {
       console.error("❌ Error downloading template:", error);
-      message.error("Không thể tải file mẫu");
+      message.error("Cannot download template");
     }
   };
 
@@ -92,7 +92,7 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
         file.type === "application/vnd.ms-excel";
 
       if (!isExcel) {
-        message.error("Chỉ hỗ trợ file Excel (.xlsx, .xls)");
+        message.error("Only Excel files (.xlsx, .xls) are supported");
         return Upload.LIST_IGNORE;
       }
 
@@ -109,16 +109,16 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
 
   return (
     <Modal
-      title="Import sản phẩm từ Excel"
+      title="Import Products from Excel"
       open={visible}
       onCancel={onCancel}
       width={600}
       footer={[
         <Button key="download" onClick={handleDownloadTemplate} icon={<FileExcelOutlined />}>
-          Tải file mẫu
+          Download Template
         </Button>,
         <Button key="cancel" onClick={onCancel}>
-          Hủy
+          Cancel
         </Button>,
         <Button
           key="upload"
@@ -128,19 +128,19 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
           loading={uploading}
           disabled={fileList.length === 0}
         >
-          {uploading ? "Đang import..." : "Import"}
+          {uploading ? "Importing..." : "Import"}
         </Button>,
       ]}
     >
       <Space direction="vertical" style={{ width: "100%" }}>
         <Alert
-          message="Hướng dẫn import"
+          message="Import Instructions"
           description={
             <ul>
-              <li>Tải file mẫu để biết cấu trúc dữ liệu</li>
-              <li>Điền thông tin đầy đủ và đúng định dạng</li>
-              <li>Upload lại file để hệ thống xử lý</li>
-              <li>Các trường có dấu * là bắt buộc</li>
+              <li>Download the template to understand the data structure</li>
+              <li>Fill in complete information in the correct format</li>
+              <li>Upload the file back for system processing</li>
+              <li>Fields marked with * are required</li>
             </ul>
           }
           type="info"
@@ -151,8 +151,8 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
           <p className="ant-upload-drag-icon">
             <InboxOutlined />
           </p>
-          <p className="ant-upload-text">Kéo file vào đây hoặc click để chọn file Excel</p>
-          <p className="ant-upload-hint">Chỉ hỗ trợ định dạng .xlsx hoặc .xls</p>
+          <p className="ant-upload-text">Drag file here or click to select Excel file</p>
+          <p className="ant-upload-hint">Only .xlsx or .xls formats are supported</p>
         </Dragger>
 
         {uploading && (
@@ -163,11 +163,11 @@ const ExcelImportModal = ({ visible, onCancel, onSuccess }) => {
 
         {fileList.length > 0 && (
           <div style={{ marginTop: 8 }}>
-            <Text type="secondary">Đã chọn: {fileList[0].name}</Text>
+            <Text type="secondary">Selected: {fileList[0].name}</Text>
           </div>
         )}
 
-        {error && <Alert type="error" showIcon message="Lỗi import" description={error} />}
+        {error && <Alert type="error" showIcon message="Import Error" description={error} />}
       </Space>
     </Modal>
   );
