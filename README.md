@@ -1,8 +1,55 @@
-# React + Vite
+# Discount Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend application for the Discount Website project.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 18
+- Vite
+- Redux Toolkit
+- React Query
+- Ant Design
+- Tailwind CSS
+- i18next (Internationalization)
+
+## Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+
+## Installation
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/nhnhien/discount_web.git
+cd discount_web
+```
+
+### 2. Setup
+```bash
+# Install dependencies
+npm install
+
+# Create .env file
+echo "VITE_BASE_URL=http://localhost:8000" > .env
+
+# Start development server
+npm run dev
+```
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+
+## Features
+
+- User authentication (Firebase)
+- Product management
+- Category management
+- Order management
+- Payment integration (VNPay)
+- Discount management
+- Multi-language support
+- Responsive design
