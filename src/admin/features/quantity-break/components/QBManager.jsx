@@ -125,15 +125,15 @@ import React, { useState } from 'react';
        key: 'tiers',
        render: (rules) => {
          if (!rules || !rules.length) return '0';
-         return <Tag color='blue'>{rules.length} mức</Tag>;
+         return <Tag color='blue'>{rules.length} tiers</Tag>;
        },
      },
      {
        title: 'Application Period',
        key: 'time_range',
        render: (_, record) => {
-         const startDate = new Date(record.start_date).toLocaleDateString('vi-VN');
-         const endDate = record.end_date ? new Date(record.end_date).toLocaleDateString('vi-VN') : 'Không giới hạn';
+         const startDate = new Date(record.start_date).toLocaleDateString('en-US');
+         const endDate = record.end_date ? new Date(record.end_date).toLocaleDateString('en-US') : 'No limit';
          return (
            <span>
              {startDate} → {endDate}
@@ -146,7 +146,7 @@ import React, { useState } from 'react';
        key: 'status',
        render: (_, record) => {
          const active = isRuleActive(record);
-         return <Tag color={active ? 'green' : 'red'}>{active ? 'Đang áp dụng' : 'Hết hạn'}</Tag>;
+         return <Tag color={active ? 'green' : 'red'}>{active ? 'Active' : 'Expired'}</Tag>;
        },
      },
      {

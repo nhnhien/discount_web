@@ -8,7 +8,7 @@ const getProduct = async (userId = null) => {
     })
     return res.data
   } catch (error) {
-    throw new Error(error.message || "Không thể tải sản phẩm")
+    throw new Error(error.message || "Unable to load products")
   }
 }
 
@@ -20,8 +20,8 @@ const getProductApplyCP = async (options = {}) => {
       search = "",
       categoryId = "",
       userId,
-      discount, // ✅ đã thêm discount
-      sortBy = "newest", // ✅ thêm sortBy với giá trị mặc định là "newest"
+      discount,
+      sortBy = "newest",
     } = options
 
     console.log("📦 [API CALL] getProductApplyCP - Params:", {
@@ -31,7 +31,7 @@ const getProductApplyCP = async (options = {}) => {
       categoryId,
       userId,
       discount,
-      sortBy, // ✅ log ra tham số sortBy
+      sortBy,
     })
 
     const res = await apiClient.get("/api/product", {
@@ -41,15 +41,15 @@ const getProductApplyCP = async (options = {}) => {
         search,
         categoryId,
         userId,
-        ...(discount !== undefined ? { discount } : {}), // chỉ thêm nếu discount được set
-        sortBy, // ✅ luôn truyền sortBy để backend sắp xếp
+        ...(discount !== undefined ? { discount } : {}),
+        sortBy,
       },
     })
 
     return res.data
   } catch (error) {
     console.error("❌ getProductApplyCP error:", error)
-    throw new Error(error.message || "Không thể tải sản phẩm")
+    throw new Error(error.message || "Unable to load products")
   }
 }
 
@@ -60,7 +60,7 @@ const getProductById = async (productId, userId = null) => {
     })
     return res.data
   } catch (error) {
-    throw new Error(error.message || "Không thể tải sản phẩm")
+    throw new Error(error.message || "Unable to load product")
   }
 }
 
@@ -69,13 +69,13 @@ const getProductApplyCPById = async (productId, userId) => {
     console.log("📦 [API CALL] getProductApplyCPById:", { productId, userId })
 
     const res = await apiClient.get(`/api/product/${productId}`, {
-      params: { userId }, // 🔥 truyền userId nếu cần apply rule
+      params: { userId },
     })
 
     return res.data
   } catch (error) {
     console.error("❌ getProductApplyCPById error:", error)
-    throw new Error(error.message || "Không thể tải sản phẩm chi tiết")
+    throw new Error(error.message || "Unable to load product details")
   }
 }
 

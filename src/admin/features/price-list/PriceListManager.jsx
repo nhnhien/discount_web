@@ -110,7 +110,7 @@ const PriceListManager = () => {
             icon={<EditOutlined />}
             onClick={() => navigate(`/admin/discount/pl/edit/${record.id}`)}
           >
-            Sửa
+            Edit
           </Button>
           <Popconfirm
             title='Are you sure you want to delete this Price List?'
@@ -119,7 +119,7 @@ const PriceListManager = () => {
             cancelText='Cancel'
           >
             <Button danger icon={<DeleteOutlined />} loading={deleteMutation.isLoading}>
-              Xoá
+              Delete
             </Button>
           </Popconfirm>
         </Space>
@@ -137,7 +137,7 @@ const PriceListManager = () => {
           icon={<PlusOutlined />}
           onClick={() => navigate('/admin/discount/pl/create')}
         >
-          Tạo mới
+          Create New
         </Button>
       </div>
 

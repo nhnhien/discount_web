@@ -41,7 +41,7 @@ const WishlistScreen = () => {
   const isEmpty = !isLoading && (!Array.isArray(data) || data.length === 0);
 
   return (
-    <div className='bg-gray-50 min-h-screen py-8'>
+    <div className='bg-bg-secondary min-h-screen py-8'>
       <div className='container mx-auto px-4'>
         <Title level={3}>Your Wishlist</Title>
 

@@ -635,8 +635,8 @@ const CartScreen = () => {
                       {availableCodes.map(({ discount_code, remaining_uses, expires_in_days }) => (
                         <Tooltip
                           key={discount_code}
-                          title={`Còn lại ${remaining_uses ?? '∞'} lượt • HSD: ${
-                            expires_in_days != null ? `${expires_in_days} ngày` : 'Không giới hạn'
+                          title={`Remaining ${remaining_uses ?? '∞'} uses • EXP: ${
+                            expires_in_days != null ? `${expires_in_days} days` : 'Unlimited'
                           }`}
                         >
                           <Tag

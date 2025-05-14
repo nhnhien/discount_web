@@ -102,7 +102,7 @@ const ProductManager = () => {
       console.log("🧪 userId gửi lên:", selectedUser?.id)
       return getProductApplyCP({ userId: selectedUser?.id })
     },
-    enabled: selectedUser !== undefined,
+    enabled: true,
     onSuccess: (data) => {
       console.log("✅ Products:", data.data)
       data.data.forEach((p) => {
@@ -197,7 +197,7 @@ const ProductManager = () => {
   const validateProductData = (product) => {
     if (!product) return false;
     
-    const requiredFields = ['name', 'category_id', 'price'];
+    const requiredFields = ['name', 'category_id', 'original_price', 'final_price'];
     return requiredFields.every(field => product[field] !== undefined && product[field] !== null);
   };
 
@@ -398,9 +398,9 @@ const ProductManager = () => {
         const ruleType = rule?.is_price_list
           ? "Price List"
           : rule?.discount_type === "percentage"
-            ? `Giảm ${rule.discount_value}%`
+            ? `Discount ${rule.discount_value}%`
             : rule?.discount_type === "fixed price"
-              ? `Giảm ${formatVND(rule.discount_value)}`
+              ? `Discount ${formatVND(rule.discount_value)}`
               : ""
 
         if (record.has_variant) {
@@ -460,7 +460,7 @@ const ProductManager = () => {
       render: (_, record) => (
         <Space size={screens.sm ? "middle" : "small"}>
           {screens.sm && (
-            <Tooltip title="Xem chi tiết">
+            <Tooltip title="View Details">
               <Button
                 onClick={() => showProductDetails(record)}
                 icon={<EyeOutlined />}
@@ -469,7 +469,7 @@ const ProductManager = () => {
               />
             </Tooltip>
           )}
-          <Tooltip title="Chỉnh sửa">
+          <Tooltip title="Edit">
             <Button
               onClick={() => navigate(`edit/${record.id}`)}
               icon={<EditOutlined />}
@@ -478,7 +478,7 @@ const ProductManager = () => {
               size={screens.xs ? "small" : "middle"}
             />
           </Tooltip>
-          <Tooltip title="Xóa">
+          <Tooltip title="Delete">
             <Button
               icon={<DeleteOutlined />}
               danger
@@ -535,21 +535,21 @@ const ProductManager = () => {
           <div className="mb-6">
             <Row gutter={16} className="mb-4">
               <Col span={24}>
-                <Statistic title="Mã SKU" value={selectedProduct.sku || "Không có"} prefix={<BarcodeOutlined />} />
+                <Statistic title="SKU" value={selectedProduct.sku || "N/A"} prefix={<BarcodeOutlined />} />
               </Col>
             </Row>
 
             <Row gutter={16}>
               <Col span={screens.xs ? 24 : 12} className={screens.xs ? "mb-4" : ""}>
                 <Statistic
-                  title="Giá gốc"
+                  title="Original Price"
                   value={selectedProduct.original_price}
                   formatter={(value) => formatVND(value)}
                 />
               </Col>
               <Col span={screens.xs ? 24 : 12}>
                 <Statistic
-                  title="Giá bán"
+                  title="Selling Price"
                   value={selectedProduct.final_price}
                   formatter={(value) => formatVND(value)}
                   valueStyle={{ color: "#f5222d" }}
@@ -558,7 +558,7 @@ const ProductManager = () => {
             </Row>
             <Divider />
             <Statistic
-              title="Tồn kho"
+              title="Stock"
               value={selectedProduct.stock_quantity}
               prefix={<BarcodeOutlined />}
               valueStyle={{ color: selectedProduct.stock_quantity > 0 ? "#52c41a" : "#ff4d4f" }}
@@ -566,7 +566,7 @@ const ProductManager = () => {
           </div>
         ) : (
           <div>
-            <Title level={5}>Biến thể sản phẩm</Title>
+            <Title level={5}>Product Variants</Title>
             {screens.xs ? (
               <List
                 dataSource={selectedProduct.variants}
@@ -579,19 +579,19 @@ const ProductManager = () => {
                           <Text copyable>{variant.sku}</Text>
                         </div>
                         <div className="flex justify-between">
-                          <Text strong>Giá gốc:</Text>
+                          <Text strong>Original Price:</Text>
                           <Text type="secondary">{formatVND(variant.original_price)}</Text>
                         </div>
                         <div className="flex justify-between">
-                          <Text strong>Giá cuối:</Text>
+                          <Text strong>Final Price:</Text>
                           <Text type="success">{formatVND(variant.final_price)}</Text>
                         </div>
                         <div className="flex justify-between">
-                          <Text strong>Tồn kho:</Text>
+                          <Text strong>Stock:</Text>
                           {getStockStatusTag(variant.stock_quantity)}
                         </div>
                         <div>
-                          <Text strong>Thuộc tính:</Text>
+                          <Text strong>Attributes:</Text>
                           <div className="mt-1">
                             <Space wrap size={[0, 4]}>
                               {variant.attributes.map((attr, index) => (
@@ -729,7 +729,7 @@ const ProductManager = () => {
 
                 <div className="flex flex-wrap gap-1 mb-2">
                   <Tag color="cyan">{getCategoryName(item.category_id)}</Tag>
-                  {item.has_variant && <Tag color="purple">Có biến thể</Tag>}
+                  {item.has_variant && <Tag color="purple">Has variants</Tag>}
                 </div>
 
                 <div className="flex justify-between">
@@ -744,7 +744,7 @@ const ProductManager = () => {
                         </Text>
                       </div>
                     ) : (
-                      <Tag color="processing">Nhiều giá</Tag>
+                      <Tag color="processing">Multiple prices</Tag>
                     )}
                   </div>
                   <div>
@@ -752,7 +752,7 @@ const ProductManager = () => {
                       getStockStatusTag(item.stock_quantity)
                     ) : (
                       <Badge count={item.variants?.length || 0} showZero overflowCount={99}>
-                        <Text type="secondary">Biến thể</Text>
+                        <Text type="secondary">Variants</Text>
                       </Badge>
                     )}
                   </div>
@@ -804,7 +804,7 @@ const ProductManager = () => {
                 icon={viewMode === "table" ? <AppstoreOutlined /> : <MenuOutlined />}
                 onClick={() => setViewMode(viewMode === "table" ? "list" : "table")}
               >
-                {viewMode === "table" ? "View in grid" : "Xem dạng bảng"}
+                {viewMode === "table" ? "View in grid" : "View as table"}
               </Button>
             </Space>
           )}
@@ -852,7 +852,7 @@ const ProductManager = () => {
                 }}
                 loading={!userList}
               >
-                <Option value="">Tất cả người dùng</Option>
+                <Option value="">All Users</Option>
                 {userList?.data?.map((user) => (
                   <Option key={user.id} value={user.id}>
                     {user.email || user.name || `User ${user.id}`}
@@ -888,7 +888,7 @@ const ProductManager = () => {
       <div className="p-4 md:p-6">
         {isLoading ? (
           <div className="flex justify-center py-12">
-            <Spin size="large" tip="Đang tải dữ liệu..." />
+            <Spin size="large" tip="Loading data..." />
           </div>
         ) : filteredProducts && filteredProducts.length > 0 ? (
           <>

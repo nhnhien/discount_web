@@ -100,8 +100,8 @@ const DashboardAdmin = () => {
     if (!ordersData?.data || !productsData?.data) {
       return {
         recentOrders: [],
-        revenueData: [{ month: 'Không có dữ liệu', revenue: 0 }],
-        categoryData: [{ category: 'Không có dữ liệu', value: 0 }],
+        revenueData: [{ month: 'No data', revenue: 0 }],
+        categoryData: [{ category: 'No data', value: 0 }],
         dailyOrders: [],
         paymentMethodData: [],
         stats: {
@@ -123,7 +123,7 @@ const DashboardAdmin = () => {
     }
     
     // Get the actual orders array from the API response structure
-    const orders = ordersData.data;
+    const orders = ordersData.data || [];
     
     // Get recent orders (sorted by date)
     const sortedOrders = [...orders].sort((a, b) => 
@@ -131,12 +131,12 @@ const DashboardAdmin = () => {
     );
     const recent = sortedOrders.slice(0, 5);
     
-    // Calculate total sales and orders
-    const totalSales = orders.reduce((sum, order) => sum + parseFloat(order.total_amount || 0), 0);
+    // Calculate total sales and orders with null checks
+    const totalSales = orders.reduce((sum, order) => sum + (parseFloat(order.total_amount) || 0), 0);
     const totalOrders = orders.length;
     const avgOrderValue = totalOrders > 0 ? totalSales / totalOrders : 0;
     
-    // Count orders by status
+    // Count orders by status with null checks
     const pendingOrders = orders.filter(order => 
       order.status === 'pending' || order.status === 'processing'
     ).length;
@@ -149,7 +149,6 @@ const DashboardAdmin = () => {
     const productSalesMap = {};
     
     // Create a map of product name (as category) to order counts
-    // We'll use product names as categories since we don't have direct category access
     const productCategoryMap = {};
     
     // Create revenue by month/period data
@@ -166,7 +165,7 @@ const DashboardAdmin = () => {
     for (let i = 2; i >= 0; i--) {
       const monthDate = today.subtract(i, 'month');
       const monthKey = monthDate.format('MM/YYYY');
-      revenueByPeriod[monthKey] = 0; // Initialize all months with 0
+      revenueByPeriod[monthKey] = 0;
     }
     
     // Initialize last 14 days for daily chart
@@ -178,6 +177,8 @@ const DashboardAdmin = () => {
     
     // Process all orders to build our statistics
     orders.forEach(order => {
+      if (!order) return;
+      
       // Process date for period stats
       const orderDate = dayjs(order.created_at);
       const periodKey = orderDate.format('MM/YYYY');
@@ -204,6 +205,8 @@ const DashboardAdmin = () => {
       
       // Process product sales stats
       order.items?.forEach(item => {
+        if (!item) return;
+        
         // Get product info
         const productId = item.product_id;
         const productName = item.product_name || `Product ${productId}`;
@@ -220,7 +223,6 @@ const DashboardAdmin = () => {
             sales: 0, 
             revenue: 0,
             name: productName,
-            // Generate a random growth for demo purposes
             growth: Math.floor(Math.random() * 30) - 5
           };
         }
@@ -230,59 +232,45 @@ const DashboardAdmin = () => {
     });
     
     // Format revenue data for chart
-    const revenueChartData = Object.entries(revenueByPeriod)
-      .map(([month, revenue]) => ({ month, revenue }))
-      .sort((a, b) => {
-        const [aMonth, aYear] = a.month.split('/');
-        const [bMonth, bYear] = b.month.split('/');
-        // Compare years first, then months
-        return aYear !== bYear 
-          ? parseInt(aYear) - parseInt(bYear)
-          : parseInt(aMonth) - parseInt(bMonth);
-      });
+    const revenueChartData = Object.entries(revenueByPeriod).map(([month, revenue]) => ({
+      month,
+      revenue: revenue || 0
+    }));
+    
+    // Format category data for chart
+    const categoryChartData = Object.entries(productCategoryMap)
+      .map(([category, value]) => ({
+        category,
+        value: value || 0
+      }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
     
     // Format daily orders data
-    const dailyOrdersData = Object.entries(dailyOrdersMap)
-      .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => {
-        const [aDay, aMonth] = a.date.split('/');
-        const [bDay, bMonth] = b.date.split('/');
-        return aMonth !== bMonth 
-          ? parseInt(aMonth) - parseInt(bMonth) 
-          : parseInt(aDay) - parseInt(bDay);
-      });
+    const dailyOrdersData = Object.entries(dailyOrdersMap).map(([date, count]) => ({
+      date,
+      count: count || 0
+    }));
     
     // Format payment methods data
-    const paymentMethodsData = Object.entries(paymentMethodsMap)
-      .map(([method, count]) => ({ 
-        method: method === 'vnpay' ? 'VNPay' : 
-                method === 'cod' ? 'Cash' : 
-                method === 'bank_transfer' ? 'Chuyển khoản' : 
-                method === 'momo' ? 'MoMo' : 
-                method.charAt(0).toUpperCase() + method.slice(1),
-        count,
-        percent: Math.round((count / totalOrders) * 100)
-      }));
+    const paymentMethodsData = Object.entries(paymentMethodsMap).map(([method, count]) => ({
+      method,
+      count: count || 0
+    }));
     
-    // Format category data for chart (using product names)
-    const categoryChartData = Object.entries(productCategoryMap)
-      .map(([category, value]) => ({ category, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5); // Limit to top 5 to avoid chart crowding
-    
-    // Prepare top products
+    // Get top products
     const topProductsList = Object.entries(productSalesMap)
       .map(([id, data]) => ({
         id: parseInt(id),
         name: data.name,
-        sales: data.sales,
-        revenue: data.revenue,
-        growth: data.growth
+        sales: data.sales || 0,
+        revenue: data.revenue || 0,
+        growth: data.growth || 0
       }))
       .sort((a, b) => b.revenue - a.revenue)
       .slice(0, 5);
     
-    // Calculate month over month growth (based on actual data)
+    // Calculate month over month growth
     const thisMonth = dayjs().format('MM/YYYY');
     const lastMonth = dayjs().subtract(1, 'month').format('MM/YYYY');
     const thisMonthRevenue = revenueByPeriod[thisMonth] || 0;
@@ -292,7 +280,7 @@ const DashboardAdmin = () => {
       ? Math.round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100)
       : 0;
     
-    // Weekly growth calculation (based on actual data)
+    // Weekly growth calculation
     const thisWeek = dayjs().startOf('week').format('YYYY-MM-DD');
     const lastWeek = dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD');
     
@@ -305,19 +293,10 @@ const DashboardAdmin = () => {
       ? Math.round(((thisWeekOrders - lastWeekOrders) / lastWeekOrders) * 100)
       : 0;
     
-    // Ensure we have at least one data point for charts
-    const finalRevenueData = revenueChartData.length > 0 
-      ? revenueChartData 
-      : [{ month: 'Không có dữ liệu', revenue: 0 }];
-      
-    const finalCategoryData = categoryChartData.length > 0 
-      ? categoryChartData 
-      : [{ category: 'Không có dữ liệu', value: 0 }];
-    
     return {
       recentOrders: recent,
-      revenueData: finalRevenueData,
-      categoryData: finalCategoryData,
+      revenueData: revenueChartData.length > 0 ? revenueChartData : [{ month: 'No data', revenue: 0 }],
+      categoryData: categoryChartData.length > 0 ? categoryChartData : [{ category: 'No data', value: 0 }],
       dailyOrders: dailyOrdersData,
       paymentMethodData: paymentMethodsData,
       stats: {
@@ -344,7 +323,7 @@ const DashboardAdmin = () => {
       dataIndex: 'order_number',
       key: 'id',
       render: (text) => (
-        <Tooltip title="Nhấn để xem chi tiết">
+        <Tooltip title="Click to view details">
           <Text className="text-blue-600 hover:text-blue-800 cursor-pointer font-medium">
             {text}
           </Text>
@@ -361,7 +340,7 @@ const DashboardAdmin = () => {
             icon={<UserOutlined />} 
             className="bg-gradient-to-r from-blue-500 to-purple-500"
           />
-          <span className='ml-2 font-medium'>{customer?.name || 'Khách hàng'}</span>
+          <span className='ml-2 font-medium'>{customer?.name || 'Customer'}</span>
         </div>
       ),
     },
@@ -397,7 +376,7 @@ const DashboardAdmin = () => {
         switch (status) {
           case 'delivered':
             color = 'green';
-            text = 'Đã giao hàng';
+            text = 'Delivered';
             break;
           case 'confirmed':
             color = 'cyan';
@@ -405,15 +384,15 @@ const DashboardAdmin = () => {
             break;
           case 'processing':
             color = 'blue';
-            text = 'Đang xử lý';
+            text = 'Processing';
             break;
           case 'shipped':
             color = 'geekblue';
-            text = 'Đang giao hàng';
+            text = 'Shipped';
             break;
           case 'cancelled':
             color = 'red';
-            text = 'Đã hủy';
+            text = 'Cancelled';
             break;
           case 'pending':
             color = 'orange';
@@ -440,10 +419,10 @@ const DashboardAdmin = () => {
         <Dropdown
           overlay={
             <Menu>
-              <Menu.Item key='1' icon={<EyeOutlined />}>Xem chi tiết</Menu.Item>
-              <Menu.Item key='2' icon={<EditOutlined />}>Cập nhật trạng thái</Menu.Item>
+              <Menu.Item key='1' icon={<EyeOutlined />}>View Details</Menu.Item>
+              <Menu.Item key='2' icon={<EditOutlined />}>Update Status</Menu.Item>
               <Menu.Divider />
-              <Menu.Item key='3' danger icon={<DeleteOutlined />}>Hủy đơn</Menu.Item>
+              <Menu.Item key='3' danger icon={<DeleteOutlined />}>Cancel Order</Menu.Item>
             </Menu>
           }
           trigger={['click']}
@@ -481,7 +460,7 @@ const DashboardAdmin = () => {
     appendPadding: [10, 0, 0, 0],
     tooltip: {
       formatter: (datum) => {
-        return { name: 'Doanh thu', value: formatVND(datum.revenue) };
+        return { name: 'Revenue', value: formatVND(datum.revenue) };
       },
     },
   };
@@ -507,7 +486,7 @@ const DashboardAdmin = () => {
     },
     meta: {
       value: {
-        alias: 'Số lượng đơn hàng',
+        alias: 'Number of orders',
       },
     },
   };
@@ -531,7 +510,7 @@ const DashboardAdmin = () => {
     },
     statistic: {
       title: {
-        content: 'Phương thức',
+        content: 'Payment Method',
       },
     },
     interactions: [
@@ -542,6 +521,11 @@ const DashboardAdmin = () => {
         type: 'element-active',
       },
     ],
+    tooltip: {
+      formatter: (datum) => {
+        return { name: 'Number of orders', value: datum.count };
+      },
+    },
   };
 
   const dailyOrdersConfig = {
@@ -555,7 +539,7 @@ const DashboardAdmin = () => {
     },
     tooltip: {
       formatter: (datum) => {
-        return { name: 'Số đơn hàng', value: datum.count };
+        return { name: 'Number of orders', value: datum.count };
       },
     },
   };
@@ -563,14 +547,14 @@ const DashboardAdmin = () => {
   // Sử dụng Column thay vì Line để tránh vấn đề hiển thị khi chỉ có một điểm dữ liệu
   const RevenueChart = () => {
     // Đảm bảo dữ liệu phù hợp với biểu đồ
-    const chartData = revenueData.filter(item => item.month !== 'Không có dữ liệu');
+    const chartData = revenueData.filter(item => item.month !== 'No data');
     
     // Nếu không có dữ liệu hoặc chỉ có "không có dữ liệu"
     if (chartData.length === 0) {
       return (
         <div className="flex flex-col items-center justify-center h-full">
           <Empty 
-            description="Không có dữ liệu doanh thu trong khoảng thời gian này" 
+            description="No revenue data for this period" 
             image={Empty.PRESENTED_IMAGE_SIMPLE} 
           />
         </div>
@@ -596,7 +580,7 @@ const DashboardAdmin = () => {
           }}
           tooltip={{
             formatter: (datum) => {
-              return { name: 'Doanh thu', value: formatVND(datum.revenue) };
+              return { name: 'Revenue', value: formatVND(datum.revenue) };
             },
           }}
         />
@@ -637,13 +621,13 @@ const DashboardAdmin = () => {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <Alert 
-          message="Lỗi tải dữ liệu"
-          description="Không thể tải dữ liệu đơn hàng. Vui lòng thử lại sau."
+          message="Error loading data"
+          description="Unable to load order data. Please try again later."
           type="error"
           showIcon
           action={
             <Button icon={<ReloadOutlined />} onClick={refetchOrders}>
-              Tải lại
+              Reload
             </Button>
           }
         />
@@ -790,13 +774,13 @@ const DashboardAdmin = () => {
                 overlay={
                   <Menu>
                     <Menu.Item key='1' onClick={() => setDateRange([dayjs().subtract(7, 'day'), dayjs()])}>
-                      7 ngày qua
+                      Last 7 days
                     </Menu.Item>
                     <Menu.Item key='2' onClick={() => setDateRange([dayjs().subtract(30, 'day'), dayjs()])}>
-                      30 ngày qua
+                      Last 30 days
                     </Menu.Item>
                     <Menu.Item key='3' onClick={() => setDateRange([dayjs().subtract(90, 'day'), dayjs()])}>
-                      3 tháng qua
+                      Last 3 months
                     </Menu.Item>
                   </Menu>
                 }
@@ -810,7 +794,13 @@ const DashboardAdmin = () => {
             }
           >
             <div className='h-[300px]'>
-              <RevenueChart />
+              {isLoadingOrders ? (
+                <div className="h-full flex items-center justify-center">
+                  <Spin tip="Loading revenue data..." />
+                </div>
+              ) : (
+                <RevenueChart />
+              )}
             </div>
           </Card>
         </Col>
@@ -819,17 +809,17 @@ const DashboardAdmin = () => {
             title={<span className='font-semibold text-gray-700'>Orders by category</span>}
             className='shadow-sm h-full'
             extra={
-              <Tooltip title="Biểu đồ thể hiện số lượng đơn hàng cho mỗi sản phẩm">
+              <Tooltip title="Chart showing the number of orders for each product">
                 <InfoCircleOutlined className="text-gray-400" />
               </Tooltip>
             }
           >
             <div className='h-[300px]'>
-              {categoryData.length > 0 && categoryData[0].category !== 'Không có dữ liệu' ? (
+              {categoryData.length > 0 && categoryData[0].category !== 'No data' ? (
                 <Column {...categoryConfig} />
               ) : (
                 <Empty 
-                  description="Không có dữ liệu danh mục trong khoảng thời gian này" 
+                  description="No category data for this period" 
                   image={Empty.PRESENTED_IMAGE_SIMPLE} 
                 />
               )}
@@ -865,7 +855,7 @@ const DashboardAdmin = () => {
                 rowClassName="hover:bg-blue-50 transition-colors"
               />
             ) : (
-              <Empty description="Chưa có đơn hàng nào" />
+              <Empty description="No orders yet" />
             )}
           </Card>
         </Col>
@@ -940,19 +930,19 @@ const DashboardAdmin = () => {
                         </td>
                         <td className='px-6 py-4 whitespace-nowrap'>
                           {product.growth > 15 ? (
-                            <Tooltip title="Bán chạy">
+                            <Tooltip title="Best selling">
                               <FireOutlined className='text-red-500 text-lg' />
                             </Tooltip>
                           ) : product.growth > 5 ? (
-                            <Tooltip title="Tăng trưởng tốt">
+                            <Tooltip title="Good growth">
                               <RiseOutlined className='text-green-500 text-lg' />
                             </Tooltip>
                           ) : product.growth < 0 ? (
-                            <Tooltip title="Đang giảm">
+                            <Tooltip title="Decreasing">
                               <ArrowDownOutlined className='text-red-500 text-lg' />
                             </Tooltip>
                           ) : (
-                            <Tooltip title="Đang tăng">
+                            <Tooltip title="Increasing">
                               <ArrowUpOutlined className='text-green-500 text-lg' />
                             </Tooltip>
                           )}
@@ -963,7 +953,7 @@ const DashboardAdmin = () => {
                 </table>
               </div>
             ) : (
-              <Empty description="Chưa có dữ liệu sản phẩm" />
+              <Empty description="No product data yet" />
             )}
           </Card>
         </Col>
@@ -1075,7 +1065,7 @@ const DashboardAdmin = () => {
               {paymentMethodData.length > 0 ? (
                 <Pie {...pieConfig} />
               ) : (
-                <Empty description="Không có dữ liệu thanh toán" />
+                <Empty description="No payment data" />
               )}
             </div>
           </Card>
@@ -1137,7 +1127,7 @@ const DashboardAdmin = () => {
     <div className='p-6 bg-gray-50 min-h-screen'>
       {isLoading && (
         <div className="fixed inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50">
-          <Spin size="large" tip="Đang tải dữ liệu..." />
+          <Spin size="large" tip="Loading data..." />
         </div>
       )}
       
@@ -1159,15 +1149,15 @@ const DashboardAdmin = () => {
           </Button>
           <RangePicker 
             className='w-64' 
-            placeholder={['Từ ngày', 'Đến ngày']} 
+            placeholder={['From date', 'To date']} 
             allowClear={false}
             value={dateRange}
             onChange={handleDateRangeChange}
             ranges={{
-              'Hôm nay': [dayjs(), dayjs()],
-              '7 ngày qua': [dayjs().subtract(6, 'day'), dayjs()],
-              '30 ngày qua': [dayjs().subtract(29, 'day'), dayjs()],
-              'Tháng này': [dayjs().startOf('month'), dayjs().endOf('month')],
+              'Today': [dayjs(), dayjs()],
+              'Last 7 days': [dayjs().subtract(6, 'day'), dayjs()],
+              'Last 30 days': [dayjs().subtract(29, 'day'), dayjs()],
+              'This month': [dayjs().startOf('month'), dayjs().endOf('month')],
             }}
           />
         </div>
