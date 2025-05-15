@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import i18n from '@/i18n/i18n';
  
  const initialState = {
-   language: 'vi',
+   language: 'en',
  };
  
  const languageSlice = createSlice({
@@ -11,7 +11,6 @@ import i18n from '@/i18n/i18n';
    reducers: {
      setLanguage: (state, action) => {
        state.language = action.payload;
-       i18n.changeLanguage(action.payload);
      },
    },
  });

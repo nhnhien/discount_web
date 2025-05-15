@@ -47,7 +47,10 @@ const { TabPane } = Tabs;
 const { Title, Text } = Typography;
 
 const DashboardAdmin = () => {
-  const [dateRange, setDateRange] = useState([dayjs().subtract(30, 'day'), dayjs()]);
+  const [dateRange, setDateRange] = useState([
+    dayjs().subtract(30, 'day').startOf('day'),
+    dayjs().endOf('day')
+  ]);
   const [chartType, setChartType] = useState('line');
   const [viewMode, setViewMode] = useState('overview');
   const [activeTab, setActiveTab] = useState('overview');
@@ -61,38 +64,42 @@ const DashboardAdmin = () => {
   } = useQuery({
     queryKey: ['orders', dateRange],
     queryFn: () => orderService.getOrders({
-      start_date: dateRange[0].format('YYYY-MM-DD'),
-      end_date: dateRange[1].format('YYYY-MM-DD'),
-      limit: 100 // Get enough orders to calculate stats
+      start_date: dateRange[0].format('YYYY-MM-DD HH:mm:ss'),
+      end_date: dateRange[1].format('YYYY-MM-DD HH:mm:ss'),
+      page: 1,
+      limit: 1000 // lấy đủ toàn bộ đơn hàng
     }),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // luôn lấy mới
   });
 
   const { 
     data: productsData, 
-    isLoading: isLoadingProducts 
+    isLoading: isLoadingProducts,
+    refetch: refetchProducts
   } = useQuery({
     queryKey: ['product-stats'],
     queryFn: getProduct,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   const { 
     data: customersData, 
-    isLoading: isLoadingCustomers 
+    isLoading: isLoadingCustomers,
+    refetch: refetchCustomers
   } = useQuery({
     queryKey: ['customers'],
     queryFn: getCustomer,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   const { 
     data: categoriesData, 
-    isLoading: isLoadingCategories 
+    isLoading: isLoadingCategories,
+    refetch: refetchCategories
   } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategory,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
   // Calculate all statistics directly from order data
@@ -607,7 +614,7 @@ const DashboardAdmin = () => {
 
   const handleDateRangeChange = (dates) => {
     if (dates && dates.length === 2) {
-      setDateRange(dates);
+      setDateRange([dates[0].startOf('day'), dates[1].endOf('day')]);
     }
   };
 
@@ -616,6 +623,14 @@ const DashboardAdmin = () => {
   };
 
   const isLoading = isLoadingOrders || isLoadingProducts || isLoadingCustomers || isLoadingCategories;
+
+  // Thêm hàm refetch tất cả
+  const handleRefreshAll = () => {
+    refetchOrders();
+    refetchProducts();
+    refetchCustomers();
+    refetchCategories();
+  };
 
   if (ordersError) {
     return (
@@ -626,7 +641,7 @@ const DashboardAdmin = () => {
           type="error"
           showIcon
           action={
-            <Button icon={<ReloadOutlined />} onClick={refetchOrders}>
+            <Button icon={<ReloadOutlined />} onClick={handleRefreshAll}>
               Reload
             </Button>
           }
@@ -1142,7 +1157,7 @@ const DashboardAdmin = () => {
           <Button 
             type="default" 
             icon={<ReloadOutlined />} 
-            onClick={refetchOrders} 
+            onClick={handleRefreshAll} 
             className="mr-3"
           >
             Refresh

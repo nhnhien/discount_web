@@ -55,7 +55,7 @@ const HomeScreen = () => {
     queryFn: () =>
       getProductApplyCP({
         limit: 8,
-        userId: userId,
+        ...(userId ? { userId } : {}),
         sortBy: 'newest',
       }),
     enabled: true,
@@ -169,6 +169,11 @@ const HomeScreen = () => {
                     <Title level={5} className='m-0'>
                       {category.name}
                     </Title>
+                    {category.description && (
+                      <div className='text-gray-500 text-xs mt-1' style={{ minHeight: 36, whiteSpace: 'pre-line' }}>
+                        {category.description}
+                      </div>
+                    )}
                   </Card>
                 </Col>
               ))}

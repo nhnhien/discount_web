@@ -35,6 +35,18 @@ const wishlistSlice = createSlice({
       }
     },
     clearWishlist: () => [],
+    // Khi login, merge guest và user wishlist (nếu có)
+    mergeWishlistOnLogin: (state, action) => {
+      // action.payload = { guestWishlist, userWishlist }
+      const { guestWishlist = [], userWishlist = [] } = action.payload || {};
+      const map = new Map();
+      [...userWishlist, ...guestWishlist, ...state].forEach(item => {
+        const key = `${item.productId}_${item.variantId ?? 'null'}`;
+        if (!map.has(key)) map.set(key, item);
+      });
+      return Array.from(map.values());
+    },
+    // Khi logout, clear wishlist hoặc chuyển về guest wishlist nếu muốn
   },
 });
 
@@ -43,6 +55,7 @@ export const {
   removeFromWishlist,
   toggleWishlist,
   clearWishlist,
+  mergeWishlistOnLogin,
 } = wishlistSlice.actions;
 
 export default wishlistSlice.reducer;

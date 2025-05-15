@@ -20,7 +20,7 @@ const PriceComparison = ({ productId, variantId, isTabActive }) => {
   const [isComparing, setIsComparing] = useState(false);
   const [hasFetched, setHasFetched] = useState(false); // đã từng fetch hay chưa
 
-  const shouldFetch = isTabActive && !hasFetched;
+  const shouldFetch = isTabActive && !hasFetched && !!productId;
 
   const fetchPriceComparison = async () => {
     setIsComparing(true);

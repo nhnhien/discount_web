@@ -34,6 +34,21 @@ const getProductApplyCP = async (options = {}) => {
       sortBy,
     })
 
+    if (!userId) {
+      const res = await apiClient.get("/api/product", {
+        params: {
+          page,
+          limit,
+          search,
+          categoryId,
+          ...(discount !== undefined ? { discount } : {}),
+          sortBy,
+        },
+        headers: { Authorization: undefined },
+      });
+      return res.data;
+    }
+
     const res = await apiClient.get("/api/product", {
       params: {
         page,

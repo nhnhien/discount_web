@@ -19,6 +19,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getRule, createRule, updateRule } from '@/service/cp';
 import { getProduct } from '@/service/product';
 import { getMarket } from '@/service/market';
+import { getCustomer } from '@/service/user';
 import ProductPriceTable from '../ProductPriceTable';
 
 const schema = z.object({
@@ -49,6 +50,11 @@ const PLEditor = () => {
   const { data: marketData } = useQuery({
     queryKey: ['markets'],
     queryFn: getMarket,
+  });
+
+  const { data: userData } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomer,
   });
 
   const createMutation = useMutation({
@@ -95,6 +101,8 @@ const PLEditor = () => {
   });
 
   const [customPrices, setCustomPrices] = useState([]);
+  const [customerType, setCustomerType] = useState('all');
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
 
   useEffect(() => {
     if (ruleData?.data) {
@@ -118,6 +126,14 @@ const PLEditor = () => {
       })) || [];
 
       setCustomPrices([...productPrices, ...variantPrices]);
+
+      if (rule.customers && rule.customers.length > 0) {
+        setCustomerType('specific');
+        setSelectedCustomers(rule.customers.map((c) => c.id));
+      } else {
+        setCustomerType('all');
+        setSelectedCustomers([]);
+      }
     }
   }, [ruleData, setValue]);
 
@@ -140,6 +156,13 @@ const PLEditor = () => {
       return;
     }
   
+    let customer_ids = [];
+    if (customerType === 'all') {
+      customer_ids = userData?.data?.map((u) => u.id) || [];
+    } else {
+      customer_ids = selectedCustomers;
+    }
+  
     const payload = {
       title: data.title,
       description: data.description || '',
@@ -156,6 +179,7 @@ const PLEditor = () => {
       discount_value: 0,
       priority: 10,
       is_price_list: true,
+      customer_ids,
     };
   
     if (id) updateMutation.mutate(payload);
@@ -267,6 +291,29 @@ const PLEditor = () => {
                     }))}
                   />
                 )}
+              />
+            </Form.Item>
+          )}
+        </Card>
+
+        <Card title='Apply to Customers' className='mt-6'>
+          <Form.Item label='Apply to'>
+            <Radio.Group
+              value={customerType}
+              onChange={e => setCustomerType(e.target.value)}
+            >
+              <Radio value='all'>All Customers</Radio>
+              <Radio value='specific'>Specific Customers</Radio>
+            </Radio.Group>
+          </Form.Item>
+          {customerType === 'specific' && (
+            <Form.Item label='Select Customers'>
+              <Select
+                mode='multiple'
+                value={selectedCustomers}
+                onChange={setSelectedCustomers}
+                placeholder='Select customers'
+                options={userData?.data?.map(u => ({ label: u.name || u.email, value: u.id }))}
               />
             </Form.Item>
           )}

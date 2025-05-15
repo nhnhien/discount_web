@@ -65,7 +65,7 @@ const ProductDetail = () => {
   } = useQuery({
     queryKey: ['product', id, userId],
     queryFn: () => getProductApplyCPById(id, userId),
-    enabled: !!id && !!userId,
+    enabled: !!id,
   });
   console.log('[ProductDetail] userId:', userId); // 👈 kiểm tra xem userId có đúng không
 

@@ -92,14 +92,41 @@ const ProductCard = ({ product, variant = null, onToggleWishlist, onViewDetail }
     }
   };
 
+  // Lấy giá thấp nhất từ variant nếu có biến thể
+  const getMinVariantPrice = (type = 'final') => {
+    if (!product.has_variant || !Array.isArray(product.variants) || product.variants.length === 0) return null;
+    const prices = product.variants
+      .map(v => type === 'final' ? Number(v.final_price) : Number(v.original_price))
+      .filter(n => !isNaN(n) && n > 0);
+    if (prices.length === 0) return null;
+    return Math.min(...prices);
+  };
+
   const getPriceDisplay = () => {
     const isValidPrice = (p) => typeof p === 'number' && !isNaN(p) && p > 0;
 
+    // Nếu có biến thể, lấy giá thấp nhất từ variants
+    if (product.has_variant && Array.isArray(product.variants) && product.variants.length > 0) {
+      const minFinal = getMinVariantPrice('final');
+      const minOriginal = getMinVariantPrice('original');
+      const hasDiscount = isValidPrice(minOriginal) && isValidPrice(minFinal) && minOriginal > minFinal;
+      return (
+        <div className='flex items-center gap-2'>
+          <Text className='text-lg font-bold text-blue-600'>
+          Price from {isValidPrice(minFinal) ? formatCurrency(minFinal) : 'Contact us'}
+          </Text>
+          {hasDiscount && (
+            <Text delete className='text-sm text-gray-500'>
+              {formatCurrency(minOriginal)}
+            </Text>
+          )}
+        </div>
+      );
+    }
+    // Nếu không có biến thể, hiển thị như cũ
     const finalPrice = variant?.final_price ?? product.final_price;
     const originalPrice = variant?.original_price ?? product.original_price;
-
     const hasDiscount = isValidPrice(originalPrice) && isValidPrice(finalPrice) && originalPrice > finalPrice;
-
     return (
       <div className='flex items-center gap-2'>
         <Text className='text-lg font-bold text-blue-600'>
