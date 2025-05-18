@@ -100,7 +100,11 @@ const ProductManager = () => {
     queryKey: ["product", selectedUser?.id || "all"],
     queryFn: () => {
       console.log("🧪 userId gửi lên:", selectedUser?.id)
-      return getProductApplyCP({ userId: selectedUser?.id })
+      return getProductApplyCP({ 
+        userId: selectedUser?.id,
+        page: 1,
+        limit: 1000 // Tăng limit để lấy tất cả sản phẩm
+      })
     },
     enabled: true,
     onSuccess: (data) => {
@@ -110,6 +114,16 @@ const ProductManager = () => {
       })
     },
   })
+
+  // Thêm state để lưu trữ tất cả sản phẩm
+  const [allProducts, setAllProducts] = useState([])
+
+  // Cập nhật allProducts khi products thay đổi
+  useEffect(() => {
+    if (products?.data) {
+      setAllProducts(products.data)
+    }
+  }, [products])
 
   const isLoading = categoriesLoading || productsLoading
 
@@ -202,8 +216,8 @@ const ProductManager = () => {
   };
 
   const filteredProducts = useMemo(() => {
-    if (!products) return []
-    return products.data?.filter((product) => {
+    if (!allProducts) return []
+    return allProducts.filter((product) => {
       if (!validateProductData(product)) {
         console.error('Invalid product data:', product);
         return false;
@@ -213,7 +227,37 @@ const ProductManager = () => {
       const matchesCategory = categoryFilter ? product.category_id === categoryFilter : true
       return matchesSearch && matchesCategory
     })
-  }, [products, searchTerm, categoryFilter])
+  }, [allProducts, searchTerm, categoryFilter])
+
+  // Add pagination state
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    showTotal: (total) => `Total ${total} products`,
+  });
+
+  // Update pagination when filtered products change
+  useEffect(() => {
+    setPagination(prev => ({
+      ...prev,
+      total: filteredProducts.length,
+    }));
+  }, [filteredProducts]);
+
+  // Handle pagination change
+  const handleTableChange = (newPagination) => {
+    setPagination(newPagination);
+  };
+
+  // Get current page data
+  const getCurrentPageData = () => {
+    const start = (pagination.current - 1) * pagination.pageSize;
+    const end = start + pagination.pageSize;
+    return filteredProducts.slice(start, end);
+  };
 
   const getCategoryName = (categoryId) => {
     if (!categories?.data) return "N/A"
@@ -498,11 +542,12 @@ const ProductManager = () => {
     setCategoryFilter(null)
   }
 
+  // Cập nhật headerStatistics để sử dụng allProducts
   const headerStatistics = [
-    { title: "Total products", value: products?.data?.length || 0, icon: <ShoppingOutlined /> },
+    { title: "Total products", value: allProducts?.length || 0, icon: <ShoppingOutlined /> },
     {
       title: "Product variants",
-      value: products?.data?.filter((p) => p.has_variant).length || 0,
+      value: allProducts?.filter((p) => p.has_variant).length || 0,
       icon: <TagsOutlined />,
     },
     { title: "Category", value: categories?.data?.length || 0, icon: <TagsOutlined /> },
@@ -897,7 +942,7 @@ const ProductManager = () => {
             ) : (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                 <Table
-                  dataSource={filteredProducts}
+                  dataSource={getCurrentPageData()}
                   columns={columns}
                   rowKey="id"
                   expandable={{
@@ -916,13 +961,8 @@ const ProductManager = () => {
                         )
                       ) : null,
                   }}
-                  pagination={{
-                    pageSize: 10,
-                    showSizeChanger: screens.lg,
-                    showQuickJumper: screens.lg,
-                    showTotal: (total) => `Total ${total} products`,
-                    size: screens.sm ? "default" : "small",
-                  }}
+                  pagination={pagination}
+                  onChange={handleTableChange}
                   bordered={false}
                   className="custom-table"
                   loading={isLoading}
