@@ -1,3 +1,7 @@
+# Link Demo Youtube
+- CLIENT-SIDE FLOW: https://www.youtube.com/watch?v=gKXTaZy6BBc
+- ADMIN-SIDE FLOW: https://www.youtube.com/watch?v=RsBBwL4KnIM
+
 # Discount Web
 
 Frontend application for the Discount Website project.
