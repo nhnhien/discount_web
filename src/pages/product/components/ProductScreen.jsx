@@ -7,12 +7,15 @@ import { getCategory } from '@/service/category';
 import { getProductApplyCP } from '@/service/product';
 import CategoryFilter from './CategoryFilter';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const { Title, Text } = Typography;
 
 const ProductsScreen = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.auth.currentUser);
+  const userId = currentUser?.id;
 
   const [filters, setFilters] = useState({
     page: 1,
@@ -58,8 +61,12 @@ const ProductsScreen = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ['products', filters],
-    queryFn: () => getProductApplyCP(filters),
+    queryKey: ['products', filters, userId],
+    queryFn: () => getProductApplyCP({
+      ...filters,
+      userId,
+      categoryId: filters.categoryId || undefined,
+    }),
     placeholderData: (prev) => prev,
   });
 

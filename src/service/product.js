@@ -1,10 +1,13 @@
 import apiClient from "../config/axios.config"
 import { getAuth } from "firebase/auth";
 
-const getProduct = async (userId = null) => {
+const getProduct = async (userId = null, limit = 1000) => {
   try {
     const res = await apiClient.get("/api/product", {
-      params: userId ? { userId } : {},
+      params: {
+        ...(userId ? { userId } : {}),
+        limit,
+      },
     })
     return res.data
   } catch (error) {

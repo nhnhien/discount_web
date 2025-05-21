@@ -146,7 +146,10 @@ const SignInScreen = () => {
       });
   
       const data = await response.json();
+      console.log('API Response:', data);
+      
       if (response.ok) {
+        console.log('User data before dispatch:', data.user);
         dispatch(loginSuccess(data.user));
         message.success(t('auth.login_success'));
   

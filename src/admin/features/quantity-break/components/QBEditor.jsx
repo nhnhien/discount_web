@@ -71,7 +71,7 @@ const QBEditor = () => {
 
   const { data: products, isLoading: isLoadingProducts } = useQuery({
     queryKey: ['products'],
-    queryFn: getProduct,
+    queryFn: () => getProduct(null, 1000)
   });
 
   const { data: customers, isLoading: isLoadingCustomers } = useQuery({

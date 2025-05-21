@@ -109,7 +109,10 @@ const CPEditor = ({ initialData = {} }) => {
   const discount_value = watch('discount_value');
 
   const { data: markets } = useQuery({ queryKey: ['markets'], queryFn: getMarket });
-  const { data: products } = useQuery({ queryKey: ['products'], queryFn: getProduct });
+  const { data: products } = useQuery({ 
+    queryKey: ['products'], 
+    queryFn: () => getProduct(null, 1000) 
+  });
   const productsNoVariant = useMemo(() => {
     return products?.data?.filter((p) => !p.has_variant) || [];
   }, [products]);

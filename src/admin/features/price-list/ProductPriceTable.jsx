@@ -178,8 +178,8 @@ const ProductPriceTable = ({ products = [], customPrices = [], setCustomPrices }
       columns={productColumns}
       dataSource={data}
       rowKey='key'
-      pagination={{ pageSize: 10 }}
-      scroll={{ y: 400 }}
+      pagination={{ pageSize: 20, showSizeChanger: true }}
+      scroll={{ y: 600 }}
     />
   );
 };

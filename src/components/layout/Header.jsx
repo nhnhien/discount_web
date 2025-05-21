@@ -39,6 +39,9 @@ const Header = () => {
   const { t } = useTranslation();
   const language = useSelector((state) => state.language.language);
   const currentUser = useSelector((state) => state.auth.currentUser);
+  
+  console.log('Header - currentUser:', currentUser);
+  
   const [menuOpen, setMenuOpen] = useState(false);
   const wishlist = useSelector((state) => state.wishlist || []);
   const wishlistCount = Array.isArray(wishlist)
@@ -151,12 +154,37 @@ const navItems = [
                 <Button type='text' className='flex items-center space-x-2'>
                   {currentUser.avatar ? (
                     <img
-                      src={currentUser.avatar}
+                      src={`https://images.weserv.nl/?url=${encodeURIComponent(currentUser.avatar)}&w=24&h=24&fit=cover`}
                       alt='avatar'
                       className='w-6 h-6 rounded-full object-cover border'
+                      style={{
+                        display: 'block',
+                        width: '24px',
+                        height: '24px',
+                        objectFit: 'cover',
+                        borderRadius: '50%',
+                        border: '1px solid #e5e7eb'
+                      }}
+                      onError={(e) => {
+                        console.error('Error loading avatar:', e);
+                        e.target.onerror = null;
+                        e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=random&size=24`;
+                      }}
                     />
                   ) : (
-                    <UserOutlined className='text-gray-600 text-xl' />
+                    <img
+                      src={`https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=random&size=24`}
+                      alt='avatar'
+                      className='w-6 h-6 rounded-full object-cover border'
+                      style={{
+                        display: 'block',
+                        width: '24px',
+                        height: '24px',
+                        objectFit: 'cover',
+                        borderRadius: '50%',
+                        border: '1px solid #e5e7eb'
+                      }}
+                    />
                   )}
                   <span className='hidden md:inline'>{currentUser.name}</span>
                   <DownOutlined />
